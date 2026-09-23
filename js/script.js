@@ -387,8 +387,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Pinta las tarjetas. SIN numerar — al filtrar por "Seleccionados" los
   // números saldrían salteados (01, 02, 04, 06...) y quedaba raro.
   grid.innerHTML = PROYECTOS.map(p => `
-    <a class="proy-card" href="proyecto.html?p=${p.id}&cat=${p.cat}"
-       data-cat="${p.cat}" data-p="${p.id}" data-destacado="${p.destacado ? "1" : "0"}">
+     <a class="proy-card" href="proyecto.html?p=${p.slug}&cat=${p.cat}"
+       data-cat="${p.cat}" data-p="${p.slug}" data-destacado="${p.destacado ? "1" : "0"}">
       <div class="img-wrapper">
         <img class="img-grid" src="${p.img}" alt="${p.nombre}" loading="lazy">
         <div class="img-overlay"><span>${p.nombre}<br>${catLabel[p.cat] || ""}</span></div>
@@ -983,7 +983,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   let cat = params.get("cat") || "seleccionados";
   if (!CAT_NOMBRES[cat]) cat = "seleccionados";
-  const p = parseInt(params.get("p") || "0", 10);
+  const p = params.get("p") || "";
+  const esProyecto = x => x.slug === p || String(x.id) === p;
 
   // "Seleccionados" = solo los que llevan destacado: true (igual que la rejilla)
   const lista = (c) => (c === "seleccionados")
@@ -995,16 +996,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Si has llegado a un proyecto que NO está en Seleccionados (por ejemplo
   // desde el Archivo), la lista de al lado pasa a ser la de su categoría —
   // así el proyecto que estás viendo siempre sale en ella.
-  if (!items.some(x => x.id === p)) {
-    const suyo = PROYECTOS.find(x => x.id === p);
+  if (!items.some(esProyecto)) {
+    const suyo = PROYECTOS.find(esProyecto);
     if (suyo) { cat = suyo.cat; items = lista(cat); }
   }
 
-  const current = items.some(x => x.id === p) ? p : (items[0] && items[0].id);
+  const current = items.find(esProyecto)?.slug || (items[0] && items[0].slug);
 
   list.innerHTML = items.map(x => `
-    <li class="ficha-item${x.id === current ? " is-current" : ""}" data-p="${x.id}" data-img="${x.img}">
-      <a href="proyecto.html?p=${x.id}&cat=${cat}">
+    <li class="ficha-item${x.slug === current ? " is-current" : ""}" data-p="${x.slug}" data-img="${x.img}">
+      <a href="proyecto.html?p=${x.slug}&cat=${cat}">
         <div><h5>${x.nombre}</h5><p>${x.disc}</p></div>
         <span class="ficha-year">(${x.anio})</span>
       </a>
@@ -1014,7 +1015,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (catEl) catEl.textContent = "(" + CAT_NOMBRES[cat] + ")";
 
   // Nombre + fecha del proyecto actual (visible solo en móvil, en la columna derecha)
-  const currentProj = items.find(x => x.id === current);
+  const currentProj = items.find(x => x.slug === current);
   if (currentProj) {
     const nameEl = document.querySelector(".ficha-title-name");
     const yearEl = document.querySelector(".ficha-title-year");
@@ -1552,7 +1553,7 @@ document.addEventListener("DOMContentLoaded", () => {
     imagenesDeProyecto(p).forEach(src => {
       if (vistas.has(src)) return;          // sin repetir la misma foto
       vistas.add(src);
-      fotos.push({ img: src, nombre: p.nombre, id: p.id, cat: p.cat });
+      fotos.push({ img: src, nombre: p.nombre, id: p.id, slug: p.slug, cat: p.cat });
     });
     return barajar(fotos);
   });
@@ -1781,7 +1782,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const { x, y } = mejor;
       const a = document.createElement("a");
       a.className = "archivo-item";
-      a.href = "proyecto.html?p=" + p.id + "&cat=" + (p.cat || "seleccionados");
+      a.href = "proyecto.html?p=" + p.slug + "&cat=" + (p.cat || "seleccionados");
       a.setAttribute("data-nombre", p.nombre);
       a.style.width = w + "px";
       a.style.left = Math.round(x) + "px";
