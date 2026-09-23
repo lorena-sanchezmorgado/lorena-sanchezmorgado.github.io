@@ -1,0 +1,42 @@
+# === Portfolio Lorena Sánchez — control de versiones ===
+# Idea: versionar SOLO lo que usa la web (código + imágenes finales).
+# El material en crudo y los respaldos NO se borran: siguen en tu disco,
+# solo quedan fuera del repositorio para que sea ligero y limpio.
+
+# --- Sistema operativo ---
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
+
+# --- Ficheros fuente pesados (material en crudo, no lo usa la web) ---
+*.psd
+*.ai
+*.pdf
+*.mp4
+*.mov
+*.zip
+
+# --- Respaldos y copias antiguas (intactos en disco, fuera del repo) ---
+/_backup-original/
+/PORTFOLIO-sin grill de archive/
+
+# --- Material en crudo de proyectos ---
+# Solo se versionan las carpetas "limpias" (slug en minúscula) que la web enlaza.
+# El resto (carpetas con acentos/mayúsculas) es fuente: queda fuera del repo.
+media/proyectos/*
+!media/proyectos/compas/
+!media/proyectos/thompson/
+!media/proyectos/mapilo/
+!media/proyectos/los-unicos/
+!media/proyectos/four-seasons/
+!media/proyectos/puerta-alcala/
+!media/proyectos/pichi/
+!media/proyectos/cata-la-lata/
+
+# Dentro de esas carpetas slug, versiona SOLO las imágenes finales de la web
+# (web-01.jpg, web-portada.jpg...). El material en crudo que dejes suelto ahí
+# (nombres con espacios/mayúsculas, mockups, capturas...) se queda en tu disco
+# pero fuera del repo, para que no pese de más al subirlo.
+media/proyectos/*/*
+!media/proyectos/*/web-*

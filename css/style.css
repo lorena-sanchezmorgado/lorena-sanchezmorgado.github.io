@@ -1,0 +1,1881 @@
+@font-face {
+    font-family:"roc-grotesk-regular";
+    src: url('./fonts/Kostic\ -\ Roc\ Grotesk\ Regular.otf') format('opentype');
+    font-display:swap;font-style:normal;font-weight:700;font-stretch:normal;
+}
+@font-face {
+    font-family:"roc-grotesk-bold";
+    src: url('./fonts/Kostic\ -\ Roc\ Grotesk\ Bold.otf') format('opentype');
+    font-display:swap;font-style:normal;font-weight:700;font-stretch:normal;
+}
+@font-face {
+    font-family:"roc-grotesk-wide-medium";
+    src: url('./fonts/Kostic\ -\ Roc\ Grotesk\ Wide\ Medium.otf') format('opentype');
+    font-display:swap;font-style:normal;font-weight:700;font-stretch:normal;
+}
+@font-face {
+    font-family:"roc-grotesk-extrawide-extrabold";
+    src: url('./fonts/Kostic\ -\ Roc\ Grotesk\ ExtraWide\ ExtraBold.otf') format('opentype');
+    font-display:swap;font-style:normal;font-weight:700;font-stretch:normal;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+:root {
+    
+    --font-family-regular: 'roc-grotesk-regular', sans-serif;
+    --font-family-bold: 'roc-grotesk-bold', sans-serif;
+    --font-family-wide-medium: 'roc-grotesk-wide-medium', sans-serif;
+    --font-family-extrawide-extrabold: 'roc-grotesk-extrawide-extrabold', sans-serif;
+
+
+    /* --- Paleta portfolio Lorena Sánchez --- */
+    --tinta: #4D124C;                     /* textos, rótulos, líneas, iconos */
+    --papel: #F4F8F9;                     /* fondo */
+    --tinta-suave: rgba(77, 18, 76, .55); /* metadatos, años, secundario */
+    --linea: rgba(77, 18, 76, .14);       /* filetes */
+    --gutter: clamp(1.5rem, 5vw, 4.5rem); /* margen de página */
+    --fmenu: clamp(16rem, 28vw, 24rem);   /* ancho columna fija de la ficha */
+    --nav-h: 5.6rem;                      /* alto de la barra de navegación fija */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+    width: 100%;
+    overflow-x: hidden;
+    background-color: var(--papel) !important;
+    color: var(--tinta) !important;
+    font-family: var(--font-family-regular) !important;
+}
+
+/* Solo ocultamos el cursor nativo cuando la bola personalizada está activa
+   (la activa js/cursor.js si hay puntero fino). Así nunca te quedas sin puntero. */
+body.cursor-custom { cursor: none; }
+
+.cursor-ball {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;       /* centra la bola en el puntero */
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  display: none;                 /* oculta por defecto; se muestra si hay puntero fino */
+
+  /* SIEMPRE en modo inversión (como Peloteo): sin cambios de estado = sin glitch.
+     Invierte lo que tiene debajo: oscura sobre fondo claro, clara sobre morado,
+     y da la vuelta a texto e imágenes. */
+  background: var(--papel);
+  mix-blend-mode: difference;
+}
+body.cursor-custom .cursor-ball { display: block; }
+
+img {
+  max-width: 100%;                 /* ninguna imagen desborda su columna */
+}
+
+a {
+    text-decoration: none !important;
+}
+
+h1 {
+    font-size: 1.9rem !important;
+}
+
+h2 {
+    font-size: 1.3rem !important;
+}
+
+p {
+  text-align: justify;
+}
+
+
+/* NEGRITA DE VERDAD. Las tipografías Roc Grotesk son familias distintas (no
+   pesos de la misma), así que <strong> y <b> tienen que cambiar de familia —
+   si no, la negrita del HTML no se nota en ninguna parte. */
+strong, b {
+  font-family: var(--font-family-bold);
+  font-weight: 400;
+}
+
+::selection {
+  background: var(--tinta);
+  color: var(--papel);
+}
+/* NAV NUEVO (Lorena) — color fijo, sin blend ni toggle
+---------------------------------------------------------------------------------------------------------------- */
+.site-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1050;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 2.4rem var(--gutter) 1.3rem;   /* más aire arriba */
+  color: var(--tinta);
+  background: transparent;            /* sin rectángulo: el contenido pasa por detrás y se solapa */
+  pointer-events: none;               /* deja pasar el cursor sobre la barra */
+}
+
+/* En la GALERÍA el menú sí lleva fondo: las imágenes se arrastran y, sin fondo,
+   pasarían por detrás del menú tapándolo. Ahí sí queremos enmascarar. */
+.page-archivo .site-nav { background: var(--papel); }
+
+.site-nav a {
+  pointer-events: auto;               /* los enlaces sí son clicables */
+  color: var(--tinta);
+  font-family: var(--font-family-regular);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 1.45rem;                  /* más pequeño = más minimalista */
+  line-height: 1;
+  white-space: nowrap;                /* "SOBRE MÍ" nunca se parte en dos líneas */
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link.is-active {
+  text-decoration: underline !important;
+  text-underline-offset: 5px;
+  text-decoration-thickness: 2px;
+}
+
+.nav-name {
+  font-family: var(--font-family-wide-medium) !important;
+  color: var(--tinta);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 1.45rem;           /* igual que los enlaces del menú */
+  line-height: 1;
+  white-space: nowrap;
+}
+/* En pantallas muy pequeñas, "LORENA SÁNCHEZ" -> "LORENA SHZ" (abreviatura) */
+.nav-name .nn-short { display: none; }
+@media (max-width: 480px) {
+  .nav-name .nn-full  { display: none; }
+  .nav-name .nn-short { display: inline; }
+}
+
+/* Botón MENÚ (solo en pantallas pequeñas) */
+.nav-toggle {
+  display: none;
+  pointer-events: auto;
+  border: 0;
+  background: transparent;
+  color: var(--tinta);
+  font-family: var(--font-family-regular);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: clamp(1.15rem, 2.9vw, 1.45rem);   /* igual que SOBRE MÍ / PROYECTOS */
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;                 /* MENÚ subrayado */
+  text-underline-offset: 5px;
+  text-decoration-thickness: 2px;
+}
+
+/* Overlay del menú — mismo aspecto que Peloteo, pero en morado (antes rojo).
+   Pantalla completa morada + enlaces en cajas con borde que se invierten al hover. */
+.nav-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 1051;                 /* por encima del navbar: toma completa morada */
+  background: var(--tinta);      /* morado a pantalla completa (Peloteo: rojo) */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--gutter);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+}
+body.nav-open .nav-menu {
+  opacity: 1;
+  visibility: visible;
+}
+.nav-menu-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: min(80vw, 20rem);      /* ancho común: todas las cajas iguales */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+}
+/* cada enlace = caja con borde (como .link-aspecto de Peloteo), todas del mismo tamaño */
+.nav-menu-links a {
+  display: block;
+  width: 100%;
+  text-align: center;           /* texto centrado dentro de la caja */
+  box-sizing: border-box;
+  border: 2px solid var(--papel);
+  color: var(--papel);
+  font-family: var(--font-family-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: clamp(1.3rem, 4.2vw, 1.9rem);   /* más contenido, menos gigante */
+  line-height: 1;
+  white-space: nowrap;          /* "SOBRE MÍ" en una sola línea */
+  padding: 0.8rem 1.2rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+/* Activo = relleno (papel), y hover en uno normal también se rellena */
+.nav-menu-links a.is-active,
+.nav-menu-links a:hover {
+  background: var(--papel);     /* se rellena (Peloteo: negro) */
+  color: var(--tinta);
+}
+/* Hover SOBRE el activo = al contrario (se vacía), para ver que sí lo seleccionas */
+.nav-menu-links a.is-active:hover {
+  background: transparent;
+  color: var(--papel);
+}
+
+/* Botón de cerrar dentro del overlay (arriba a la izquierda, como el toggle) */
+.nav-menu-close {
+  position: absolute;
+  top: 1.4rem;
+  left: var(--gutter);
+  z-index: 2;
+  border: 0;
+  background: transparent;
+  color: var(--papel);
+  font-family: var(--font-family-regular);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: clamp(1.15rem, 2.9vw, 1.45rem);   /* igual de grande que MENÚ */
+  line-height: 1;                             /* CLAVE: mismo alto de línea que MENÚ */
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;                 /* subrayado como MENÚ */
+  text-underline-offset: 5px;
+  text-decoration-thickness: 2px;
+}
+
+/* Menú activo antes (pantallas medianas), para que LORENA SÁNCHEZ no se apriete */
+@media (max-width: 1100px) {
+  :root { --nav-h: 4.7rem; }               /* la barra es más baja al aparecer MENÚ */
+  .site-nav {
+    padding: 1.4rem var(--gutter);
+    align-items: center;
+  }
+  .site-nav .nav-links { display: none; }   /* enlaces pasan al overlay */
+  .nav-toggle {
+    display: block;
+    order: -1;                  /* MENÚ a la IZQUIERDA; LORENA SÁNCHEZ queda a la derecha */
+  }
+  .site-nav .nav-name { font-size: clamp(1.15rem, 2.9vw, 1.45rem); }   /* igual que MENÚ */
+  body.nav-open .nav-toggle { visibility: hidden; }
+}
+
+/* Móviles pequeños (iPhone SE y parecidos). MENÚ + LORENA SHZ. no cabían en
+   una línea: se aprieta la letra y se baja un punto el tamaño. */
+@media (max-width: 400px) {
+  .site-nav .nav-name,
+  .site-nav .nav-toggle {
+    font-size: 1.2rem;
+    letter-spacing: 0.06em;
+  }
+}
+
+
+/* MINIATURA QUE SIGUE AL CURSOR (lista de la ficha)
+---------------------------------------------------------------------------------------------------------------- */
+.project-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 9999;
+}
+
+.project-preview img {
+  width: auto;
+  height: auto;
+  max-width: 240px;      /* no gigante de ancho */
+  max-height: 240px;     /* las verticales ya no ocupan tanto */
+  object-fit: contain;   /* respeta la proporción: no recorta la imagen */
+  display: block;
+}
+
+
+/* REJILLA DE IMÁGENES (proyectos) — foto + rótulo al pasar el ratón
+---------------------------------------------------------------------------------------------------------------- */
+.img-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem; 
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.img-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;   
+  overflow: hidden;
+}
+
+.img-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.img-overlay span {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.img-wrapper:hover .img-overlay {
+  opacity: 1;
+}
+
+/* FOOTER */
+footer {
+  padding: 0 var(--gutter) 2rem;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  position: relative;   /* en el flujo: nunca tapa las imágenes */
+  z-index: 2;
+}
+
+/* SOBRE MÍ: footer siempre fijo abajo (encima del collage fijo) */
+.page-sobremi footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 1045;
+  pointer-events: none;
+}
+
+/* SOBRE MÍ en móvil: las fotos se apilan arriba y el collage deja de estar fijo,
+   así que MADRID/© ya NO va fijo: baja al final del contenido (como en proyectos). */
+@media (max-width: 900px) {
+  body.page-sobremi {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  .sobremi { min-height: 0; }              /* que el main no fuerce 100vh */
+  body.page-sobremi > main { flex: 0 0 auto; }
+  .page-sobremi footer {
+    position: relative;
+    bottom: auto;
+    z-index: 2;
+    margin-top: auto;                      /* se clava abajo si hay sitio; si no, scroll */
+    pointer-events: auto;
+  }
+}
+
+/* PROYECTOS, FICHA e HISTORIA: footer al fondo (baja del todo si hay sitio; si no, scroll) */
+body.page-proyectos,
+body.page-ficha,
+body.page-historia {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;                 /* en móvil descuenta la barra del navegador */
+}
+
+/* El footer absorbe el espacio libre y se clava abajo SIN forzar scroll.
+   Si el contenido no cabe, el margen auto se anula y el footer queda tras
+   las imágenes (con el hueco de padding-bottom del main) y se hace scroll. */
+body.page-proyectos > main,
+body.page-ficha > main,
+body.page-historia > main {
+  flex: 0 0 auto;
+}
+
+body.page-proyectos > footer,
+body.page-ficha > footer,
+body.page-historia > footer {
+  margin-top: auto;
+}
+
+/* QUIÉN ES LORE — título y VOLVER fijos; foto grande de pequeña arriba, texto
+   en la columna de Sobre mí con la fecha a la izquierda, y la foto de mayor
+   flotando dentro del texto. */
+
+/* Título FIJO a la izquierda, misma altura y tamaño que DISEÑADORA, CREATIVA, ARTISTA.
+   El !important gana al global h1{font-size:1.9rem!important}. */
+.historia-title {
+  position: fixed;
+  /* Mismo top y modelo de caja que el nombre de Sobre mí. La 1ª línea vacía
+     (.ht-lead) hace que "Quién es Lore?" caiga en la 2ª línea = a la altura de
+     "creativa y artista", no de "Diseñadora". */
+  top: calc(var(--nav-h) + 1.4rem);
+  left: var(--gutter);
+  z-index: 4;
+  margin: 0;
+  text-align: left;
+  color: var(--tinta);
+  line-height: 0.9;                                     /* igual que .sm-name */
+  white-space: nowrap;
+  font-family: var(--font-family-bold);
+  text-transform: uppercase;
+  font-size: clamp(1.8rem, 3.8vw, 4.4rem) !important;   /* mismo tamaño que .sm-name-2 */
+  letter-spacing: -0.01em;
+}
+
+/* Barra fija con VOLVER a la derecha (misma posición y tamaño que en proyectos) */
+.historia-top {
+  position: fixed;
+  top: calc(var(--nav-h) - 1px);
+  left: 0;
+  right: 0;
+  z-index: 1040;
+  display: flex;
+  justify-content: flex-end;
+  padding: 1.1rem var(--gutter) 0.9rem;
+  pointer-events: none;                      /* solo el enlace recibe clics */
+}
+.historia-volver {
+  pointer-events: auto;
+  font-family: var(--font-family-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--tinta);
+  font-size: 1rem;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+/* El contenido arranca a la MISMA altura que las fotos de Sobre mí (28vh) */
+.historia {
+  align-self: stretch;
+  max-width: none;
+  padding: 28vh var(--gutter) 3rem;   /* el 3rem es el aire hasta el footer morado */
+}
+
+/* Foto de pequeña, a todo el ancho (la que crece al entrar). Se recorta a un
+   banner para que no ocupe toda la pantalla (la foto es apaisada y muy grande). */
+.historia-hero {
+  display: block;
+  width: 100%;
+  height: 40vh;
+  object-fit: cover;
+  margin: 0 0 2.6rem;
+}
+
+/* Debajo: fecha (izquierda, mismo hueco que la foto azul de Sobre mí) + texto */
+.historia-cols {
+  display: grid;
+  grid-template-columns: calc(39vh + 2rem) 1fr;
+  align-items: start;
+}
+.historia-meta {
+  font-family: var(--font-family-wide-medium);   /* wide medium, como pidió Lorena */
+  color: var(--tinta);
+  font-size: clamp(1.4rem, 1.9vw, 2rem);          /* más grande y responsive */
+  line-height: 1;
+  margin: 0;
+}
+.historia-body p {
+  font-family: var(--font-family-regular);
+  font-size: clamp(1rem, 1.05vw, 1.2rem);
+  line-height: 1.6;
+  margin: 0 0 1.3rem;
+  color: var(--tinta);
+}
+.historia-body p:last-child { margin-bottom: 0; }
+.historia-body a {
+  color: var(--tinta);
+  text-decoration: underline !important;   /* gana al global a{text-decoration:none!important} */
+  text-underline-offset: 3px;
+}
+
+/* Foto de mayor: FLOTA a la izquierda; el texto la rodea por la derecha y, cuando
+   la imagen se termina, el párrafo pasa a ocupar todo el ancho (como los de arriba). */
+.historia-img {
+  float: left;
+  width: 30rem;
+  max-width: 45%;
+  margin: 0.3rem 2rem 1.2rem 0;
+}
+
+/* La foto de pequeña "crece" desde Sobre mí a esta grande (solo navegadores con
+   View Transitions, p. ej. Chrome). No toca el resto de páginas. */
+
+/* Móvil: título en flujo, una sola columna (fecha arriba), fotos a todo el ancho */
+@media (max-width: 900px) {
+  .historia-title {
+    position: static;
+    top: auto;
+    white-space: normal;                 /* puede partirse en móvil */
+    max-width: none;
+    font-size: clamp(2rem, 10vw, 3.4rem) !important;
+    padding: calc(var(--nav-h) + 1rem) var(--gutter) 0;
+  }
+  .historia-title .ht-lead { display: none; }   /* sin línea vacía en móvil */
+  .historia { padding: 1.4rem var(--gutter) 3rem; }
+  .historia-cols { grid-template-columns: 1fr; gap: 0.6rem; }
+  .historia-meta { margin-bottom: 0.4rem; }
+  .historia-img { float: none; width: 100%; max-width: 100%; margin: 1.6rem 0; }
+}
+
+/* Footer antiguo (MADRID/©). Se excluye el footer nuevo .site-footer para que
+   no herede width:100% + flex en sus tarjetas/columnas. */
+footer:not(.site-footer) div {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+
+
+
+
+
+
+
+
+/* SOBRE MÍ (Lorena)
+---------------------------------------------------------------------------------------------------------------- */
+.sobremi {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;                 /* en móvil descuenta la barra del navegador */
+}
+
+/* Capa fija: nombre + foto azul. No se mueve con el scroll (mismo efecto de siempre) */
+.sm-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;        /* deja pasar clics al texto de debajo */
+}
+
+/* Nombre arriba a la derecha, grande. SIEMPRE a la derecha, por encima de las
+   fotos y por debajo del navbar, con aire al borde. */
+.sm-name {
+  position: absolute;
+  top: calc(var(--nav-h) + 1.4rem);
+  right: var(--gutter);
+  text-align: right;
+  color: var(--tinta);
+  line-height: 0.9;
+  z-index: 4;                 /* siempre legible por encima de las fotos */
+  max-width: min(52vw, 40rem);
+}
+
+.sm-name-2 {
+  display: block;
+  font-family: var(--font-family-bold);
+  text-transform: uppercase;
+  font-size: clamp(1.8rem, 3.8vw, 4.4rem);
+  letter-spacing: -0.01em;
+}
+
+/* La foto de la puerta azul, fija arriba a la izquierda */
+.sm-photos {
+  position: absolute;
+  top: 28vh;
+  left: var(--gutter);
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.sm-photo { display: block; width: auto; }
+.sm-photo--azul  { height: 52vh; }   /* 1200x1600 vertical */
+
+/* La foto de pequeña va DENTRO del texto (sube con él, como antes) */
+.sm-photo--peque {
+  height: 26vh;                      /* 2048x1361 horizontal */
+  align-self: flex-start;
+  margin-bottom: 0.4rem;
+}
+
+/* Texto: a la derecha de la foto azul y por debajo (misma posición de antes) */
+.sm-text {
+  position: relative;
+  z-index: 1;
+  /* gutter + ancho de la foto puerta-azul (0.75 * 52vh = 39vh) + gap */
+  margin-left: calc(var(--gutter) + 39vh + 2rem);
+  padding-top: 28vh;
+  padding-right: var(--gutter);
+  padding-bottom: 24vh;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2.2rem;
+}
+
+/* Bloque que se repite para el scroll INFINITO (lo clona el JS). El margin-bottom
+   deja el mismo hueco al reiniciar que entre apartados. */
+.sm-loop {
+  display: flex;
+  flex-direction: column;
+  gap: 2.2rem;
+  margin-bottom: 7rem;
+}
+/* En el frame del salto del bucle, sin transiciones (reinicio imperceptible) */
+.sm-jump .reveal { transition: none !important; }
+
+/* Intro corta y cercana (misma posición que la intro de antes) */
+.sm-intro {
+  font-family: var(--font-family-regular);
+  font-size: clamp(1rem, 1.05vw, 1.2rem);
+  line-height: 1.55;
+  max-width: 44rem;      /* medida cómoda de lectura */
+}
+.sm-intro p { text-align: left; margin: 0; }
+
+/* Enlace a la historia larga (página "quién es Lore"), debajo de la intro */
+.sm-more {
+  align-self: flex-start;
+  margin-top: -0.6rem;
+  font-family: var(--font-family-bold);
+  color: var(--tinta);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* CV en TRES columnas (como el currículum): CONTACTO arriba a la izquierda,
+   RECONOCIMIENTOS en el centro y DISCIPLINAS + SOFTWARE a la derecha. */
+.sm-cv {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 2.5rem;
+  row-gap: 2.2rem;
+  align-items: start;
+  margin-top: 0.6rem;
+}
+/* Pantallas medias: dos columnas (tres se quedan muy estrechas). */
+@media (max-width: 1280px) {
+  .sm-cv { grid-template-columns: 1fr 1fr; column-gap: 2rem; }
+}
+.sm-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2.2rem;
+  min-width: 0;
+}
+
+/* Al venir desde "Escríbeme" (historia -> sobremi.html#contacto), que CONTACTO
+   no quede pegado arriba bajo el menú, sino hacia la mitad de la pantalla. */
+#contacto { scroll-margin-top: 40vh; }
+
+/* Que el enlace "Escríbeme" (desde la historia) no caiga bajo el menú */
+#contacto { scroll-margin-top: calc(var(--nav-h) + 1rem); }
+
+/* Los apartados (educación, prácticas…) también estrechos para leerse bien */
+.sm-block { max-width: 44rem; }
+
+.sm-block p {
+  text-align: left;
+  line-height: 1.4;
+  font-size: 1rem;
+}
+
+.sm-tag {
+  font-family: var(--font-family-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--tinta);
+  font-size: 0.95rem;
+  margin-bottom: 0.7rem !important;
+}
+
+.sm-list {
+  line-height: 1.7 !important;
+  /* El correo es una palabra larguísima sin espacios: en pantallas estrechas
+     se salía del margen. Así se parte solo cuando no cabe. */
+  overflow-wrap: break-word;
+}
+
+/* Entradas del CV (educación, experiencia, idiomas, reconocimientos): como en
+   el currículum — año arriba, título en negrita y texto, cada uno en su línea,
+   con aire entre entradas. */
+.sm-entry {
+  display: block;
+  margin-bottom: 1.3rem;
+  font-size: 1rem;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+.sm-entry:last-child { margin-bottom: 0; }
+.sm-entry .sm-year,
+.sm-entry .sm-role,
+.sm-entry .sm-desc { display: block; }
+.sm-entry .sm-role { font-family: var(--font-family-bold); }
+.sm-entry .sm-year { color: var(--tinta); }
+
+.sm-text a {
+  color: var(--tinta);
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+/* Palabra "SCROLL" bajo la bola del cursor (solo Sobre mí, puntero fino).
+   EN NEGRO y FUERA de la bola (la bola usa mix-blend-mode y el negro se
+   volvía invisible). La mueve el JS junto al cursor; se apaga al bajar. */
+.cursor-scroll {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin-top: 20px;              /* justo debajo de la bola */
+  transform: translateX(-50%);   /* centrada en el cursor */
+  z-index: 1100;
+  font-family: var(--font-family-bold);
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  color: #000;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+body.show-scrollcue .cursor-scroll { opacity: 1; }
+
+/* SIN VELADURAS ------------------------------------------------------------
+   Se quitó el degradado de todas las páginas. La idea nueva: los textos fijos
+   (menú, MADRID/2026, VOLVER, título) van SIEMPRE por encima y SIN fondo de
+   color; el contenido scrollea a lo largo de todo el espacio y pasa por detrás
+   de ellos, solapándose. Es el mismo criterio que el nombre fijo de Sobre mí. */
+
+
+
+/* Entradas con IntersectionObserver (una sola vez) */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Móvil / tablet: se apila todo, sin elementos fijos. Primero el NOMBRE, debajo
+   la foto CENTRADA y luego el texto; el CV pasa a una sola columna (CONTACTO primero). */
+@media (max-width: 900px) {
+  .sm-fixed {
+    position: static;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .sm-name {
+    order: 1;                               /* el nombre ENCIMA de la foto */
+    position: static;
+    text-align: right;                      /* SIEMPRE a la derecha */
+    max-width: none;
+    padding: calc(var(--nav-h) + 1rem) var(--gutter) 0;
+  }
+  .sm-photos {
+    order: 2;                               /* la foto debajo del nombre */
+    position: static;
+    justify-content: center;                /* foto CENTRADA */
+    padding: 1.4rem var(--gutter) 0;
+    gap: 1rem;
+  }
+  .sm-name-2 { font-size: clamp(2.2rem, 11vw, 4rem); }
+
+  /* Manda la foto "de mayor"; la de pequeña se oculta en móvil para no recargar */
+  .sm-photo--azul  { height: auto; width: 78%; }
+  .sm-photo--peque { display: none; }
+
+  .sm-text {
+    margin-left: 0;
+    padding: 2.2rem var(--gutter) 12vh;
+    max-width: none;
+    gap: 2.2rem;
+  }
+  .sm-cv { grid-template-columns: 1fr; row-gap: 2.2rem; }
+  .sm-col { gap: 2.2rem; }
+}
+
+
+/* PROYECTOS (Lorena)
+---------------------------------------------------------------------------------------------------------------- */
+.proyectos {
+  padding: calc(var(--nav-h) + 1.4rem) var(--gutter) 2rem;   /* hueco para el nav fijo */
+}
+
+.proy-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gutter);
+  align-items: start;
+  margin-bottom: 2.5rem;
+}
+
+.proy-title {
+  font-family: var(--font-family-bold) !important;
+  font-size: clamp(2.4rem, 5.5vw, 5rem) !important;
+  line-height: 0.98;
+  color: var(--tinta);
+  margin: 0;
+}
+
+.proy-desc {
+  text-align: left;
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  line-height: 1.4;
+  max-width: 34rem;
+  color: var(--tinta);
+}
+
+.proy-filter {
+  display: flex;
+  justify-content: flex-start;   /* todo alineado a la izquierda */
+  align-items: baseline;
+  gap: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.filter-cats {
+  display: flex;
+  flex-wrap: wrap;          /* en pantallas muy estrechas bajan de línea */
+  gap: 0.5rem 2.2rem;
+}
+
+.filter-item {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-family-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: clamp(1rem, 1.5vw, 1.4rem);
+  color: var(--tinta);
+  opacity: 0.5;
+  transition: opacity 0.25s ease;
+}
+
+.filter-item.is-active,
+.filter-item:hover {
+  opacity: 1;
+}
+
+.filter-count {
+  font-size: 0.85em;
+  vertical-align: super;
+  margin-left: 0.15em;
+}
+
+.proy-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.proy-card {
+  display: block;
+}
+
+.proy-grid .img-wrapper {
+  aspect-ratio: 1 / 1;      /* cuadrado; se ajusta en su fase con las fotos reales */
+}
+
+/* La rejilla baja de columnas de forma progresiva (4 → 3 → 2 → 1)
+   para que las imágenes nunca queden demasiado pequeñas ni salte de 4 a 2 */
+@media (max-width: 1180px) {
+  .proy-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 820px) {
+  .proy-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 520px) {
+  .proy-grid { grid-template-columns: 1fr; }
+}
+
+/* Cabecera y filtros en una sola columna al estrecharse */
+@media (max-width: 900px) {
+  .proy-head {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .proy-filter {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .filter-cats {
+    gap: 0.4rem 1.6rem;
+  }
+}
+
+
+/* FICHA DE PROYECTO (Lorena)
+---------------------------------------------------------------------------------------------------------------- */
+/* La ficha entera. La barra de arriba y la lista de la izquierda son "sticky":
+   acompañan al scroll y se van cuando se acaba la ficha (al llegar al footer). */
+.ficha {
+  padding: 0 var(--gutter) 3rem;   /* el 3rem es el aire hasta el footer morado */
+}
+
+/* Barra (CATEGORÍA) + VOLVER. En escritorio va "sticky": se queda fija mientras
+   scrolleas el contenido de la derecha y, cuando la columna izquierda (la lista)
+   empieza a irse al final, la barra se va CON ella (lo sincroniza el JS con un
+   translateY). En móvil va en el flujo normal. */
+.ficha-top {
+  position: static;
+  margin-top: calc(var(--nav-h) - 1px);   /* hueco para el menú fijo */
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1.1rem 0 0.9rem;
+  background: transparent;
+}
+@media (min-width: 901px) {
+  .ficha-top {
+    position: sticky;
+    top: calc(var(--nav-h) - 1px);
+    z-index: 1040;
+  }
+}
+
+.ficha-cat {
+  font-family: var(--font-family-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--tinta);
+  font-size: 1rem;
+}
+
+.ficha-volver {
+  font-family: var(--font-family-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--tinta);
+  font-size: 1rem;
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+}
+
+/* Las dos columnas: lista de proyectos | contenido */
+.ficha-cols {
+  display: flex;
+  gap: 3rem;
+  padding-top: 1.5rem;
+}
+
+/* Izquierda "sticky": acompaña al scroll del contenido, pero al llegar al final
+   de la ficha se va con todo lo demás (y el footer queda a lo ancho, sin solaparse). */
+.ficha-menu {
+  position: sticky;
+  /* Este valor es solo el de partida — el JS lo sustituye por la posición
+     EXACTA en la que ya está la lista al cargar la página. Si no coincide, la
+     lista se desplaza un poco al empezar a hacer scroll antes de quedarse
+     quieta, y eso es justo lo que no queremos. */
+  top: calc(var(--nav-h) + 3.4rem);
+  align-self: flex-start;             /* necesario para que sticky no se estire */
+  flex: 0 0 var(--fmenu);
+  width: var(--fmenu);
+  z-index: 3;
+}
+
+.ficha-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.ficha-item a {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--tinta);
+}
+
+.ficha-item h5 {
+  font-size: 1.15rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+.ficha-item p {
+  text-align: left;
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+  margin: 0.15rem 0 0;
+}
+
+.ficha-item .ficha-year {
+  font-size: 1.15rem;
+  white-space: nowrap;
+}
+
+.ficha-item.is-current h5,
+.ficha-item.is-current .ficha-year {
+  font-family: var(--font-family-bold);
+}
+
+.ficha-item.is-current p {
+  color: var(--tinta);
+}
+
+/* Derecha: el contenido. En escritorio NO llega hasta el borde derecho (como el
+   texto de Sobre mí): se deja un margen a la derecha para que el texto y las
+   imágenes no choquen con MADRID / 2026 (fijos abajo a la derecha). */
+.ficha-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+@media (min-width: 901px) {
+  .ficha-content { margin-right: clamp(6rem, 15vw, 20rem); }
+}
+
+/* Nombre + fecha del proyecto: oculto en escritorio (la lista fija ya lo muestra) */
+.ficha-title {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .ficha-top { padding: 1rem 0 0.9rem; }
+  .ficha { padding: 0 var(--gutter) 3rem; }
+  /* Una sola columna: la lista de la izquierda se quita en pantallas pequeñas */
+  .ficha-cols { display: block; padding-top: 1.2rem; }
+  .ficha-menu { display: none; }
+  /* ...y el nombre + fecha del proyecto aparecen arriba en la columna derecha */
+  .ficha-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--linea);
+  }
+  .ficha-title-name {
+    font-family: var(--font-family-bold);
+    font-size: clamp(1.6rem, 6vw, 2.4rem);
+    margin: 0;
+  }
+  .ficha-title-year {
+    font-family: var(--font-family-bold);
+    font-size: clamp(1.2rem, 4vw, 1.6rem);
+    white-space: nowrap;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  body {
+    cursor: default;
+  }
+  .cursor-ball {
+    display: none;
+  }
+}
+
+
+/* FICHA — contenido de la derecha (se genera desde los datos de js/script.js)
+---------------------------------------------------------------------------------------------------------------- */
+.ficha-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+/* Los textos ocupan TODO el ancho de la columna y crecen con la pantalla,
+   igual que las imágenes. */
+.ficha-body .fb-text {
+  max-width: none;
+}
+.ficha-body .fb-text p {
+  font-size: clamp(0.98rem, 0.95vw, 1.4rem);
+  line-height: 1.55;
+  margin: 0 0 0.7rem;
+}
+.ficha-body .fb-text p:last-child {
+  margin-bottom: 0;
+}
+.ficha-body .ficha-lead {
+  max-width: none;
+  font-family: var(--font-family-wide-medium);
+  font-size: clamp(1.15rem, 1.9vw, 2.6rem);
+  line-height: 1.25;
+}
+.ficha-body .ficha-meta strong {
+  display: inline-block;
+  min-width: 8.5rem;
+}
+.ficha-badge {
+  display: inline-block;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  margin-left: 0.4rem;
+}
+
+/* GALERÍA MOSAICO ----------------------------------------------------------
+   Filas justificadas: todas las fotos de una misma fila tienen el mismo alto
+   y un ancho proporcional a su forma, así ocupan el ancho completo y NINGUNA
+   se recorta ni se deforma. El reparto exacto lo calcula js/script.js
+   (función ajustarMosaicos), que además vuelve a repartir al cambiar el
+   tamaño de la ventana. */
+.fb-mosaico {
+  display: flex;
+  flex-direction: column;   /* una fila debajo de otra */
+  gap: 0.6rem;
+}
+
+/* Cada fila del mosaico. Dentro van fotos sueltas o COLUMNAS de fotos
+   apiladas (cuando una vertical convive con dos apaisadas). */
+.fb-fila {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+/* Columna de fotos apiladas dentro de una fila */
+.fb-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.fb-col figure { width: 100% !important; }
+
+.fb-mosaico figure {
+  margin: 0;
+  flex: 1 1 0;             /* reparto provisional hasta que el JS mide las fotos */
+  min-width: 0;
+}
+.fb-mosaico img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Las fotos se pueden pinchar para verlas grandes (ver "lupa" más abajo) */
+.fb-mosaico img,
+.ficha-body .fb-full img {
+  cursor: zoom-in;
+}
+
+/* En móvil el mosaico se convierte en una foto debajo de otra. De eso se
+   encarga el JS (CUANTAS_POR_FILA devuelve 1 y no llega a crear filas), así
+   que aquí no hace falta ninguna media query. */
+
+/* Imagen suelta a todo el ancho (bloque "full") */
+.ficha-body .fb-full img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 3px;
+}
+
+
+/* LUPA — al pinchar una foto de la ficha se abre una GALERÍA con todas las
+   fotos del proyecto, que se recorre con scroll horizontal (o con las flechas
+   del teclado). Se cierra pinchando fuera, en CERRAR o con Escape.
+   El HTML lo crea js/script.js, aquí no hay que tocar nada.
+
+   TOPES DE TAMAÑO — las fotos se ven más grandes, pero NI a pantalla completa
+   ni estiradas más allá de su tamaño real (se verían pixeladas). Los tres
+   límites están en .lupa-foto img: el ancho de la pantalla, un máximo fijo, y
+   el tamaño original de cada foto (que el JS pasa en --nat-w / --nat-h).
+---------------------------------------------------------------------------------------------------------------- */
+.lupa {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  cursor: zoom-out;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  /* Fondo del color del papel, con la página de detrás desenfocada */
+  background: rgba(255, 251, 245, 0.94);
+  -webkit-backdrop-filter: blur(22px) saturate(120%);
+  backdrop-filter: blur(22px) saturate(120%);
+}
+.lupa.is-open { opacity: 1; }
+
+/* Si el navegador no sabe desenfocar, el fondo se pone opaco del todo */
+@supports not (backdrop-filter: blur(2px)) {
+  .lupa { background: var(--papel); }
+}
+
+/* OJO — hace falta, porque "display: flex" de arriba le gana al hidden del
+   navegador y la lupa se quedaría tapando la página (invisible, pero
+   robándose todos los clics). */
+.lupa[hidden] { display: none; }
+
+/* La tira que se desplaza en horizontal. Cada foto ocupa una "pantalla",
+   así el scroll va saltando de una a otra y siempre quedan centradas. */
+.lupa-pista {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;              /* sin barra a la vista */
+  overscroll-behavior: contain;
+}
+.lupa-pista::-webkit-scrollbar { display: none; }
+
+.lupa-foto {
+  flex: 0 0 100%;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1rem, 5vw, 4rem);
+  overflow: hidden;      /* al ampliar, la foto se recorta aquí dentro */
+}
+
+.lupa-foto img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width:  min(100%, 62rem, var(--nat-w, 62rem));
+  max-height: min(100%, 72vh,  var(--nat-h, 72vh));
+  object-fit: contain;
+  cursor: default;
+  border-radius: 3px;
+  transform: scale(0.98);
+  transition: transform 0.25s ease;
+}
+.lupa.is-open .lupa-foto img { transform: scale(1); }
+
+/* AMPLIAR PARA VER EL DETALLE — al pinchar la foto se agranda todavía más y se
+   recorre moviendo el ratón (o el dedo). La rueda cambia cuánto se amplía.
+   El zoom de partida y el máximo están en js/script.js (ZOOM_*). */
+.lupa.is-open .lupa-foto.is-zoom img {
+  transform: scale(var(--zoom, 2.4));
+  transform-origin: var(--ox, 50%) var(--oy, 50%);
+  transition: transform .12s linear;
+  cursor: zoom-out;
+}
+.lupa-foto img { cursor: zoom-in; }
+
+/* Al ampliar, la foto tapa el fondo y los botones se quedan encima de ella.
+   Mismo truco que en el Archivo: un halo de papel alrededor de las letras. */
+.lupa-cerrar,
+.lupa-ir,
+.lupa-cuenta,
+.lupa-ayuda {
+  text-shadow: 0 0 6px var(--papel), 0 0 14px var(--papel), 0 0 26px var(--papel);
+}
+
+.lupa-ayuda {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(clamp(0.9rem, 2.4vw, 1.8rem) + 1.5rem);
+  color: var(--tinta-suave);
+  font-family: var(--font-family-regular);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Botones — CERRAR, las flechas y el contador. En tinta, porque el fondo
+   ahora es claro. */
+.lupa-cerrar,
+.lupa-ir {
+  position: absolute;
+  z-index: 2;
+  background: none;
+  border: 0;
+  color: var(--tinta);
+  font-family: var(--font-family-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  line-height: 1;
+}
+.lupa-cerrar {
+  top: clamp(0.9rem, 2.4vw, 1.8rem);
+  right: clamp(0.9rem, 2.4vw, 1.8rem);
+  padding: 0.3rem 0.5rem;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.lupa-ir {
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.6rem 0.9rem;
+  font-size: 1.6rem;
+}
+.lupa-ir--izq { left: clamp(0.2rem, 1.6vw, 1rem); }
+.lupa-ir--der { right: clamp(0.2rem, 1.6vw, 1rem); }
+.lupa-ir[disabled] { opacity: 0.25; cursor: default; }
+
+.lupa-cuenta {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: clamp(0.9rem, 2.4vw, 1.8rem);
+  color: var(--tinta);
+  font-family: var(--font-family-bold);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+}
+
+/* En móvil no hacen falta flechas: se pasa arrastrando */
+@media (max-width: 620px) {
+  .lupa-ir { display: none; }
+}
+
+/* Mientras la lupa está abierta, la página de detrás no se mueve */
+body.lupa-abierta { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lupa,
+  .lupa-foto img,
+  .lupa.is-open .lupa-foto.is-zoom img { transition: none; }
+  .lupa-pista { scroll-behavior: auto; }
+}
+
+
+/* Enlace "Escríbeme" de Sobre mí */
+.sm-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1.5px solid currentColor;
+  padding-bottom: 1px;
+}
+.sm-link:hover {
+  opacity: 0.7;
+}
+
+
+/* ============================================================================
+   EMAIL COPIABLE (reutilizable) — al pasar el ratón se destaca y aparece
+   "Copiar"; al hacer clic copia el correo y muestra "¡Copiado!".
+   Se usa en el footer y en la sección (CONTACTO) de Sobre mí.
+   ========================================================================== */
+.copyable {
+  position: relative;
+  cursor: inherit;                 /* respeta el cursor personalizado */
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1.5px solid currentColor;
+  border-radius: 1px;
+  transition: background-color .18s ease, color .18s ease, box-shadow .18s ease;
+  -webkit-box-decoration-break: clone;
+          box-decoration-break: clone;
+}
+/* Al pasar el ratón se destaca en morado, con AIRE alrededor del texto
+   (el box-shadow agranda el recuadro sin desplazar el texto de al lado). */
+.copyable:hover,
+.copyable:focus-visible {
+  background: var(--tinta);
+  color: var(--papel);
+  box-shadow: 0 0 0 0.32em var(--tinta);
+  border-bottom-color: transparent;
+  outline: none;
+}
+/* Etiqueta flotante "Copiar" / "¡Copiado!"
+   Va AL LADO del texto, centrada en vertical, no debajo: así nunca se sale de
+   la tarjeta morada ni choca con la línea de abajo.
+   Por defecto a la derecha; si ahí no cabe, js/script.js le pone la clase
+   .hint-izq y se pasa a la izquierda. */
+.copyable::after {
+  content: attr(data-hint);
+  position: absolute;
+  top: 50%;
+  /* Por defecto sale a la IZQUIERDA del texto. Es importante que NO sea a la
+     derecha: aunque esté invisible, una etiqueta colocada más allá del borde
+     derecho ensancha la página en móvil (aparece scroll horizontal fantasma).
+     Al pasar el ratón, js/script.js mide el sitio real y la manda al lado que
+     toque con las clases hint-izq / hint-der / hint-abajo. */
+  right: calc(100% + 0.85em);
+  font-family: var(--font-family-regular);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  /* Fuera del footer va en morado sólido: se ve mucho mejor sobre el papel */
+  color: var(--papel);
+  background: var(--tinta);
+  border: 1px solid var(--tinta);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(0, -50%) scale(0.92);
+  transform-origin: right center;
+  transition: opacity .18s ease, transform .18s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+.copyable:hover::after,
+.copyable:focus-visible::after,
+.copyable.is-copied::after {
+  opacity: 1;
+  transform: translate(0, -50%) scale(1);
+}
+.copyable.is-copied::after { content: "¡Copiado!"; }
+@media (hover: none), (pointer: coarse) {
+  .copyable::after { display: none; }   /* en táctil no hay hover: sin etiqueta */
+}
+/* Variante para fondo morado (dentro de la tarjeta del footer): se invierte */
+.copyable--dark:hover,
+.copyable--dark:focus-visible {
+  background: var(--papel);
+  color: var(--tinta);
+  box-shadow: 0 0 0 0.32em var(--papel);
+}
+.copyable--dark { border-bottom-color: var(--papel); }
+.copyable--dark::after {
+  color: var(--tinta);            /* pastilla clara sobre la tarjeta morada */
+  background: var(--papel);
+  border-color: transparent;
+}
+
+/* js/script.js puede forzar el lado según el sitio que haya de verdad.
+   Van al final para que manden sobre las reglas de arriba. */
+.copyable.hint-izq::after {
+  left: auto;
+  right: calc(100% + 0.85em);
+  transform-origin: right center;
+}
+.copyable.hint-der::after {
+  left: calc(100% + 0.85em);
+  right: auto;
+  transform-origin: left center;
+}
+
+/* Si no cabe ni a un lado ni al otro (pantallas muy estrechas), debajo y
+   pegada al borde izquierdo del texto, que es donde sí hay sitio. */
+.copyable.hint-abajo::after {
+  top: calc(100% + 0.25em);
+  left: 0;
+  right: auto;
+  transform: translate(0, 0) scale(0.92);
+  transform-origin: left top;
+}
+.copyable.hint-abajo:hover::after,
+.copyable.hint-abajo:focus-visible::after,
+.copyable.hint-abajo.is-copied::after {
+  transform: translate(0, 0) scale(1);
+}
+
+
+/* ============================================================================
+   FOOTER DE CONTACTO — tarjeta morada (adaptación de la referencia).
+   Muestra los datos de "sobre mí" (que no salen en esa página) + nombre
+   gigante. NO repite Madrid/2026 (eso va en la línea fija .site-baseline).
+   Se usa en PROYECTOS y FICHA.
+   ========================================================================== */
+footer.site-footer {
+  display: block;                  /* anula el flex genérico de footer */
+  padding: 0;
+  width: 100%;
+}
+
+/* El footer es lo ÚNICO que pasa POR DELANTE de los textos fijos: al subir con
+   el scroll tapa MADRID / 2026 (en vez de quedar detrás, morado sobre morado).
+   Debajo se reserva hueco para que, al terminar el scroll, MADRID quede LIMPIO
+   por debajo de la tarjeta, con aire, igual que enmarca abajo el resto de la web.
+   Solo en escritorio: en móvil MADRID va al final del contenido, sin solaparse. */
+@media (min-width: 901px) {
+  .page-proyectos .site-footer,
+  .page-ficha .site-footer,
+  .page-historia .site-footer {
+    position: relative;
+    z-index: 1046;          /* por encima de MADRID (1045); por debajo del menú (1050) */
+    margin-bottom: 7rem;    /* espacio extra de scroll para ver MADRID debajo */
+  }
+}
+
+/* --- Tarjeta morada --- */
+.foot-card {
+  /* Permite preguntar por el ancho de la TARJETA (no el de la ventana), que es
+     lo que de verdad decide si las dos columnas de la bio caben o no. */
+  container-type: inline-size;
+  container-name: pie;
+  background: var(--tinta);
+  color: var(--papel);
+  margin: 0 var(--gutter);
+  padding: clamp(1.8rem, 3vw, 3rem) clamp(1.5rem, 3vw, 2.8rem) clamp(1.6rem, 2.6vw, 2.4rem);
+}
+.foot-card a { color: var(--papel); }
+
+/* --- Bio a dos columnas. Se apilan solas cuando no caben --- */
+.foot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.4rem 3rem;
+  flex-wrap: wrap;
+}
+.foot-bio {
+  text-align: left;                /* sin justificar: en columnas estrechas se abren huecos */
+  margin: 0;
+  font-size: clamp(0.88rem, 2.6vw, 0.95rem);
+  line-height: 1.5;
+  flex: 1 1 17rem;          /* si no caben las dos, pasan a una debajo de otra */
+  max-width: 24rem;
+}
+.foot-bio--right { text-align: right; }
+
+/* Cuando la bio ya no cabe en dos columnas dentro de la tarjeta, se apila y
+   TODO queda alineado a la izquierda (antes la segunda línea se quedaba
+   alineada a la derecha ella sola, y quedaba raro). */
+@container pie (max-width: 37rem) {
+  .foot-row--bio,
+  .foot-row--contact {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .foot-bio { flex: 0 0 auto; max-width: none; }
+  .foot-bio--right { text-align: left; }
+}
+
+/* --- Fila de contacto (IG · LinkedIn · email) --- */
+.foot-row--contact {
+  margin-top: clamp(1rem, 2.4vw, 1.6rem);
+  align-items: flex-end;
+  gap: 0.9rem 2rem;
+}
+.foot-social-link {
+  border-bottom: 1px solid rgba(255, 251, 245, .45);
+  padding-bottom: 1px;
+  transition: border-color .18s ease;
+}
+.foot-social-link:hover { border-bottom-color: var(--papel); }
+
+/* --- Nombre gigante. Al pasar el ratón aparece un botón "Ver sobre mí",
+       SIN cambiar el fondo del texto (solo aparece la pastilla).
+       El tamaño exacto lo calcula js/script.js para que llene la tarjeta
+       sin salirse nunca; el clamp de aquí es la red de seguridad sin JS. --- */
+.foot-name {
+  position: relative;
+  display: block;
+  text-align: center;
+  font-family: var(--font-family-bold);
+  letter-spacing: -0.02em;
+  line-height: 0.86;
+  font-size: clamp(1.9rem, 9vw, 9.5rem);
+  white-space: nowrap;
+  margin: clamp(1.6rem, 5vw, 3rem) 0 clamp(1rem, 2.4vw, 1.6rem);
+}
+/* Nombre responsive — tres versiones, de más larga a más corta:
+   "LORENA SÁNCHEZ"  ·  "LORENA SHZ."  ·  "L.S."
+   Las dos primeras las decide el ancho de la ventana. La tercera la decide
+   js/script.js cuando "LORENA SHZ." saldría ya demasiado pequeña. */
+.foot-name .nn-short,
+.foot-name .nn-mini { display: none; }
+@media (max-width: 720px) {
+  .foot-name .nn-full  { display: none; }
+  .foot-name .nn-short { display: inline; }
+}
+.foot-name.es-mini .nn-full,
+.foot-name.es-mini .nn-short { display: none; }
+.foot-name.es-mini .nn-mini  { display: inline; }
+/* Botón "Ver sobre mí": aparece ARRIBA del nombre (no debajo) */
+.foot-name::after {
+  content: attr(data-hint);
+  position: absolute;
+  right: 0;                          /* arriba a la DERECHA, no en el medio */
+  left: auto;
+  bottom: calc(100% + 0.55em);       /* más arriba: no toca la tilde de SÁNCHEZ */
+  transform: translateY(6px);
+  font-family: var(--font-family-regular);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  line-height: 1;
+  color: var(--tinta);
+  background: var(--papel);
+  padding: 7px 13px;
+  border-radius: 999px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .2s ease, transform .2s ease;
+  pointer-events: none;
+}
+.foot-name:hover::after,
+.foot-name:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.foot-mail {
+  font-family: var(--font-family-regular);
+  font-size: clamp(0.85rem, 3.2vw, 1.05rem);
+  max-width: 100%;
+  overflow-wrap: anywhere;        /* un correo largo nunca desborda la tarjeta */
+}
+
+/* --- Línea MADRID / 2026 — como footer normal, al final de la página
+       (sin degradado ni posición fija). En PROYECTOS y FICHA. --- */
+.site-baseline {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 2rem var(--gutter);
+  font-family: var(--font-family-regular);
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--tinta);
+}
+.site-baseline span { display: block; }
+
+/* Fija en las esquinas inferiores. SIN fondo de color: el contenido pasa por
+   detrás y se solapa (como el nombre fijo de Sobre mí). */
+.site-baseline--fixed {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 1045;
+  pointer-events: none;
+  padding: 1.3rem var(--gutter);
+  background: transparent;
+}
+/* En la GALERÍA sí lleva fondo (marco de la página, con imágenes arrastrables). */
+.page-archivo .site-baseline--fixed { background: var(--papel); }
+
+/* --- Footer responsive --------------------------------------------------- */
+@media (max-width: 900px) {
+  .site-baseline { font-size: 1.4rem; padding: 1.6rem var(--gutter); }
+  .site-baseline--fixed { font-size: 1.4rem; }
+  /* MADRID/© de Sobre mí (footer sencillo) */
+  footer:not(.site-footer) h1 { font-size: 1.4rem !important; }
+  /* En móvil, como en Sobre mí, MADRID/2026 deja de ir fijo y baja al final
+     del contenido (proyectos, ficha e historia). */
+  .page-proyectos .site-baseline--fixed,
+  .page-ficha .site-baseline--fixed,
+  .page-historia .site-baseline--fixed {
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+  }
+}
+@media (max-width: 640px) {
+  /* texto justificado en columnas estrechas = huecos feos: se alinea a la izquierda */
+  .ficha-body .fb-text p { text-align: left; }
+  .foot-row { gap: 1rem 1.5rem; }
+  /* Bio y contacto en una sola columna, todo alineado a la izquierda */
+  .foot-row--bio,
+  .foot-row--contact {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  /* en columna, el flex-basis pasaría a ser ALTO: se anula */
+  .foot-bio { flex: 0 0 auto; }
+  .foot-bio,
+  .foot-bio--right { max-width: none; text-align: left; }
+}
+@media (max-width: 380px) {
+  .site-baseline { font-size: 1.15rem; }
+  .site-baseline--fixed { font-size: 1.15rem; }
+  footer:not(.site-footer) h1 { font-size: 1.15rem !important; }
+}
+
+
+
+/* ============================================================================
+   ARCHIVO (landing) — pared de trabajos. Las piezas llenan un lienzo mayor que
+   la pantalla; se ARRASTRA para explorar (no hay scroll). Un texto fijo en el
+   centro cambia al pasar el ratón por una pieza. Marco crema fijo alrededor.
+   ========================================================================== */
+.page-archivo {
+  height: 100vh;
+  height: 100svh;                     /* en móvil la barra del navegador no recorta */
+  overflow: hidden;
+}
+.archivo { position: absolute; inset: 0; }
+
+/* En ARCHIVO los rótulos NO llevan fondo: se superponen a las imágenes.
+   Es la única página donde pasa — hace que se vea más pantalla y queda más
+   artístico. En el resto el fondo de papel se mantiene para que se lean. */
+.page-archivo .site-nav,
+.page-archivo .site-baseline--fixed {
+  background: transparent;
+}
+
+/* Sin halo detrás de las palabras (Lorena lo quiere limpio). Para que el texto
+   se lea, el reparto de fotos aparta las que caen sobre los rótulos, el texto
+   central y "Arrastra para explorar" (ver zonas + separarDeRotulos en el JS). */
+.page-archivo .nav-link.is-active { text-decoration-thickness: 2px; }
+
+/* La ventana donde se ve el lienzo ocupa TODA la pantalla: las piezas pasan por
+   debajo del menú y de MADRID/© y así se nota que hay más pared fuera. */
+.archivo-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  cursor: inherit;
+  z-index: 1;
+}
+
+/* Lienzo grande y arrastrable (tamaño y posición inicial los pone el JS) */
+.archivo-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+.archivo-item {
+  position: absolute;
+  display: block;
+  color: var(--tinta);
+  transition: opacity 0.35s ease;   /* para atenuar las demás al hacer hover */
+}
+.archivo-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 2px;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+/* Al pasar el ratón por una pieza: se resalta (escala) y las demás se atenúan */
+.archivo-canvas.has-hover .archivo-item:not(.is-hover) { opacity: 0.35; }
+.archivo-item.is-hover { z-index: 100; }   /* al pasar el ratón, la pieza va DELANTE de las que solapa */
+.archivo-item.is-hover img { transform: scale(1.08); }
+
+/* Texto del centro — vive DENTRO de la pared, en su centro exacto (el JS lo
+   coloca). Es decir, forma parte de la composición: al arrastrar se queda
+   donde está, con sus imágenes alrededor, no te persigue por la pantalla.
+   Va SIEMPRE por delante de las imágenes. */
+.archivo-center {
+  position: absolute;
+  left: 0;                       /* el JS pone el centro real del lienzo */
+  top: 0;
+  transform: translate(-50%, -50%);
+  /* Caja ESTRECHA a propósito: así el texto (y el nombre del proyecto al pasar
+     el ratón) se parte en dos o tres líneas y ocupa un bloque cuadrado, en vez
+     de una línea larguísima. El hueco que se le deja en la pared también es
+     cuadrado — lo calcula el JS con lo que mide este bloque. */
+  width: min(19rem, 70vw);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 20;
+}
+.archivo-center-text {
+  text-align: center;
+  font-family: var(--font-family-bold);
+  text-transform: uppercase;
+  color: var(--tinta);
+  font-size: clamp(1.05rem, 1.9vw, 1.7rem);   /* contenido y minimalista */
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  max-width: 100%;
+  /* Reparte las líneas para que queden parecidas de largo en vez de dejar una
+     palabra suelta abajo (Four Seasons × / Veuve Clicquot). */
+  text-wrap: balance;
+  transition: opacity .18s ease;
+}
+.archivo-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4.7rem;
+  text-align: center;
+  font-family: var(--font-family-wide-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--tinta-suave);
+  margin: 0;
+  z-index: 20;               /* el hint, delante */
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  /* (el lienzo ya ocupa toda la pantalla, aquí solo se ajusta el texto) */
+  .archivo-center { width: min(18rem, 78vw); }
+}
+
+
+/* ============================================================================
+   BOTONES DE LA FICHA (prototipo de Figma y memoria en PDF)
+   Se usan dentro de un bloque de texto del proyecto, en la clase .ficha-cta-row
+   ========================================================================== */
+.ficha-body .ficha-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.1rem;
+}
+.ficha-body .ficha-cta {
+  display: inline-block;
+  text-decoration: none;
+  background: var(--tinta);
+  color: var(--papel, #fffbf5);
+  border: 1.5px solid var(--tinta);
+  border-radius: 999px;
+  padding: 0.62rem 1.15rem;
+  font-size: clamp(0.9rem, 0.9vw, 1.05rem);
+  line-height: 1;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+/* Hover: se quita el fondo morado y quedan el texto y el borde en morado. */
+.ficha-body .ficha-cta:hover {
+  background: transparent;
+  color: var(--tinta);
+  transform: translateY(-1px);
+}

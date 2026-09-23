@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Lorena Sánchez Morgado">
+  <meta name="description" content="Sobre Lorena Sánchez, diseñadora gráfica y multimedia. Madrid.">
+  <title>Sobre mí — Lorena Sánchez</title>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link href="css/style.css" rel="stylesheet">
+  <link rel="icon" href="media/icon/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="media/icon/favicon.ico" sizes="32x32">
+  <link rel="apple-touch-icon" href="media/icon/apple-touch-icon.png">
+</head>
+
+<body class="page-sobremi">
+  <nav class="site-nav">
+    <ul class="nav-links">
+      <li><a class="nav-link" href="index.html">GALERÍA</a></li>
+      <li><a class="nav-link" href="project.html">PROYECTOS</a></li>
+      <li><a class="nav-link is-active" href="sobremi.html">SOBRE MÍ</a></li>
+    </ul>
+    <a class="nav-name" href="sobremi.html"><span class="nn-full">LORENA SÁNCHEZ</span><span class="nn-short">LORENA
+        SHZ</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="navMenu">MENÚ</button>
+  </nav>
+  <div class="nav-menu" id="navMenu" aria-hidden="true">
+    <button class="nav-menu-close" type="button" aria-label="Cerrar menú">CERRAR</button>
+    <ul class="nav-menu-links">
+      <li><a href="index.html">GALERÍA</a></li>
+      <li><a href="project.html">PROYECTOS</a></li>
+      <li><a class="is-active" href="sobremi.html">SOBRE MÍ</a></li>
+    </ul>
+  </div>
+
+  <main class="sobremi">
+    <!-- Capa fija: nombre (derecha) + foto de la puerta azul (izquierda).
+         Se queda quieta mientras el texto scrollea por detrás (mismo efecto de siempre). -->
+    <div class="sm-fixed">
+      <div class="sm-name">
+        <span class="sm-name-2">Diseñadora,<br>creativa y artista</span>
+      </div>
+      <div class="sm-photos">
+        <img class="sm-photo sm-photo--azul" src="media/img/lorena-puerta-azul.jpeg" alt="Retrato de Lorena Sánchez">
+      </div>
+    </div>
+
+    <!-- Texto: a la derecha de la foto y por debajo. La foto de pequeña va DENTRO,
+         como primer elemento, igual que antes. Intro corta + enlace a la historia
+         larga y, al bajar, el CV en dos columnas. -->
+    <div class="sm-text">
+      <!-- Todo lo que scrollea va en .sm-loop  el JS lo clona para el bucle infinito -->
+      <div class="sm-loop">
+        <img class="sm-photo sm-photo--peque" src="media/img/lorena-pequena.jpeg" alt="Lorena Sánchez de pequeña">
+
+        <div class="sm-intro">
+          <p>¡Hola! Soy Lorena y tengo veintidós años. Soy diseñadora multimedia y gráfica recién graduada en UDIT.
+            Me gusta entender qué hay detrás de cada proyecto, encontrar una idea y convertirla en algo que comunique
+            o ayude a resolver un problema. Me interesa crear, pero sobre todo cuando hay algo detrás que merece la pena contar. Suelo tener demasiadas ideas y le doy mil vueltas a todo hasta dar con la dirección
+            correcta. Fuera del diseño pinto, sobre todo al óleo. ¡Encantada de conocerte!</p> <br><a class="sm-more" href="historia.html">¿Quieres conocer más mi historia?</a>
+        </div><br>
+        
+        <!-- CV en TRES columnas (como en el currículum). Arranca SIEMPRE por
+             CONTACTO arriba a la izquierda. En pantallas medias baja a dos
+             columnas y en móvil a una sola, con CONTACTO primero. -->
+        <div class="sm-cv">
+          <!-- Columna 1: CONTACTO (arriba, único cambio respecto al CV) + educación,
+               experiencia e idiomas. -->
+          <div class="sm-col">
+            <section class="sm-block reveal" id="contacto">
+              <p class="sm-tag">(CONTACTO)</p>
+              <p class="sm-list">
+                Teléfono  <a class="copyable" href="tel:+34744401909"
+                  data-copy="744 40 19 09" data-hint="Copiar">744 40 19 09</a><br>
+                Email  <a class="copyable" href="mailto:lorena.sanchezmorgado25@gmail.com"
+                  data-copy="lorena.sanchezmorgado25@gmail.com" data-hint="Copiar">lorena.sanchezmorgado25@gmail.com</a><br>
+                LinkedIn  <a href="https://www.linkedin.com/in/lorena-sanchez" target="_blank"
+                  rel="noopener noreferrer">Lorena Sánchez</a><br>
+                Instagram  <a href="https://www.instagram.com/lore.shz/" target="_blank"
+                  rel="noopener noreferrer">@lore.shz</a>
+              </p>
+            </section>
+
+            <section class="sm-block reveal">
+              <p class="sm-tag">(EDUCACIÓN)</p>
+              <div class="sm-entry">
+                <span class="sm-year">2022 - 2026</span>
+                <span class="sm-role">UDIT, Madrid</span>
+                <span class="sm-desc">Graduada en Diseño Multimedia y Gráfico</span>
+              </div>
+              <div class="sm-entry">
+                <span class="sm-year">2020 - 2022</span>
+                <span class="sm-role">IES Antonio Machado, Madrid</span>
+                <span class="sm-desc">Graduada en Bachillerato en la modalidad de Artes Plásticas, Imagen y Diseño</span>
+              </div>
+            </section>
+
+            <section class="sm-block reveal">
+              <p class="sm-tag">(EXPERIENCIA)</p>
+              <div class="sm-entry">
+                <span class="sm-year">oct. 2024 - mar. 2025</span>
+                <span class="sm-role">El Corte Inglés, Madrid</span>
+                <span class="sm-desc">Prácticas en el departamento de Marca Propia. Diseño y actualización de manuales de identidad y packaging para las marcas internas. Prototipado web en Figma para escritorio y móvil</span>
+              </div>
+            </section>
+
+            <section class="sm-block reveal">
+              <p class="sm-tag">(IDIOMAS)</p>
+              <div class="sm-entry">
+                <span class="sm-role">Español</span>
+                <span class="sm-desc">Nativo</span>
+              </div>
+              <div class="sm-entry">
+                <span class="sm-role">Inglés</span>
+                <span class="sm-desc">B2 First Cambridge, 2024</span>
+              </div>
+            </section>
+          </div>
+
+          <!-- Columna 2: reconocimientos. -->
+          <div class="sm-col">
+            <section class="sm-block reveal">
+              <p class="sm-tag">(RECONOCIMIENTOS)</p>
+              <div class="sm-entry">
+                <span class="sm-year">2025</span>
+                <span class="sm-role">Puerta de Alcalá</span>
+                <span class="sm-desc">Finalista entre 100 propuestas para el concurso de rediseño para el Ayuntamiento de Madrid</span>
+              </div>
+              <div class="sm-entry">
+                <span class="sm-year">2024</span>
+                <span class="sm-role">Cartel Gaia</span>
+                <span class="sm-desc">Seleccionada por UDIT para participar en la exposición internacional Gaia, desarrollada junto a la USC Roski School of Art and Design, universidad de arte del sur de California</span>
+              </div>
+              <div class="sm-entry">
+                <span class="sm-year">2023</span>
+                <span class="sm-role">Hotel Thompson Madrid</span>
+                <span class="sm-desc">Ganadora en la categoría de diseño textil corporativo para el concurso Inspirathon'23 by Thompson Madrid</span>
+              </div>
+              <div class="sm-entry">
+                <span class="sm-year">2022</span>
+                <span class="sm-role">Proyecto VOLUMA</span>
+                <span class="sm-desc">Ganadora del concurso para la creación del imagotipo base del voluntariado IES Machado, el cual se mantiene activo</span>
+              </div>
+            </section>
+          </div>
+
+          <!-- Columna 3: disciplinas, software y otros. -->
+          <div class="sm-col">
+            <section class="sm-block reveal">
+              <p class="sm-tag">(DISCIPLINAS)</p>
+              <p class="sm-list">
+                branding e identidad visual<br>diseño editorial<br>dirección de arte<br>diseño digital y UX/UI
+              </p>
+            </section>
+
+            <section class="sm-block reveal">
+              <p class="sm-tag">(SOFTWARE)</p>
+              <p class="sm-list">
+                Illustrator<br>Photoshop<br>InDesign<br>After Effects<br>Premiere<br>Cinema 4D<br>Figma<br>HTML, CSS y JavaScript
+              </p>
+            </section>
+
+            <section class="sm-block reveal">
+              <p class="sm-tag">(OTROS)</p>
+              <p class="sm-list">
+                Carnet B<br>Vehículo propio
+              </p>
+            </section>
+          </div>
+
+        </div>
+      </div><!-- /.sm-loop -->
+    </div>
+  </main>
+
+  <div class="site-baseline site-baseline--fixed" aria-hidden="true"><span>MADRID, SP</span><span>2026 ©</span></div>
+  <div class="cursor-ball"></div>
+  <span class="cursor-scroll" aria-hidden="true">SCROLL</span>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script defer src="js/script.js"></script>
+  <script defer src="js/cursor.js"></script>
+
+</body>
+
+</html>
