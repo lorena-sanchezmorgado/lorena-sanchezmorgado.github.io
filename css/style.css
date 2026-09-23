@@ -1074,7 +1074,7 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
   min-width: 0;
 }
 @media (min-width: 901px) {
-  .ficha-content { margin-right: clamp(6rem, 15vw, 20rem); }
+  .ficha-content { margin-right: clamp(6rem, 11vw, 20rem); }
 }
 
 /* Nombre + fecha del proyecto: oculto en escritorio (la lista fija ya lo muestra) */
@@ -1268,6 +1268,7 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
   scroll-snap-type: x mandatory;
   scrollbar-width: none;              /* sin barra a la vista */
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 .lupa-pista::-webkit-scrollbar { display: none; }
 
@@ -1275,6 +1276,7 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
   flex: 0 0 100%;
   margin: 0;
   height: 100%;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1312,24 +1314,8 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
    Mismo truco que en el Archivo: un halo de papel alrededor de las letras. */
 .lupa-cerrar,
 .lupa-ir,
-.lupa-cuenta,
-.lupa-ayuda {
+.lupa-cuenta {
   text-shadow: 0 0 6px var(--papel), 0 0 14px var(--papel), 0 0 26px var(--papel);
-}
-
-.lupa-ayuda {
-  position: absolute;
-  z-index: 2;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: calc(clamp(0.9rem, 2.4vw, 1.8rem) + 1.5rem);
-  color: var(--tinta-suave);
-  font-family: var(--font-family-regular);
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  pointer-events: none;
 }
 
 /* Botones — CERRAR, las flechas y el contador. En tinta, porque el fondo
@@ -1380,6 +1366,8 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
 /* En móvil no hacen falta flechas: se pasa arrastrando */
 @media (max-width: 620px) {
   .lupa-ir { display: none; }
+  .lupa-foto { padding: 4rem 2.75rem 3.5rem; }
+  .lupa-foto img { max-width: 100%; max-height: 78vh; }
 }
 
 /* Mientras la lupa está abierta, la página de detrás no se mueve */

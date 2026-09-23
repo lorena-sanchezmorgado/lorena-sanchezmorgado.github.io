@@ -1107,13 +1107,11 @@ document.addEventListener("DOMContentLoaded", () => {
     `<button class="lupa-cerrar" type="button">Cerrar</button>` +
     `<button class="lupa-ir lupa-ir--izq" type="button" aria-label="Anterior">&#8592;</button>` +
     `<button class="lupa-ir lupa-ir--der" type="button" aria-label="Siguiente">&#8594;</button>` +
-    `<div class="lupa-ayuda"></div>` +
     `<div class="lupa-cuenta"></div>`;
   document.body.appendChild(lupa);
 
   const pista  = lupa.querySelector(".lupa-pista");
   const cuenta = lupa.querySelector(".lupa-cuenta");
-  const ayuda  = lupa.querySelector(".lupa-ayuda");
   const irIzq  = lupa.querySelector(".lupa-ir--izq");
   const irDer  = lupa.querySelector(".lupa-ir--der");
 
@@ -1151,7 +1149,6 @@ document.addEventListener("DOMContentLoaded", () => {
       fig.style.removeProperty("--ox");
       fig.style.removeProperty("--oy");
     }
-    pintarAyuda();
   }
 
   function quitarZoom() {
@@ -1161,14 +1158,6 @@ document.addEventListener("DOMContentLoaded", () => {
       f.style.removeProperty("--oy");
     });
     zoom = 0;
-    pintarAyuda();
-  }
-
-  function pintarAyuda() {
-    if (!ayuda) return;
-    ayuda.textContent = zoom
-      ? "Pincha para reducir · la rueda amplía más"
-      : "Pincha la foto para ver el detalle";
   }
 
   // Una "pantalla" por cada foto del proyecto. Se vuelve a montar si alguna
@@ -1200,7 +1189,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
     celdas = Array.from(pista.children);
-    pintarAyuda();
     pintarEstado();
   }
 
