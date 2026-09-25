@@ -149,7 +149,7 @@
   {
     "slug": "libelula",
     "titulo": "Libélula",
-    "publicar": true,
+    "publicar": false,
     "tecnica": "Pastel",
     "descripcion": "",
     "principal": {

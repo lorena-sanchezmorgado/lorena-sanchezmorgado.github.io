@@ -1070,32 +1070,8 @@ document.addEventListener("DOMContentLoaded", () => {
    hayas puesto en los bloques del proyecto.
    ========================================================================== */
 document.addEventListener("DOMContentLoaded", () => {
-  const body = document.querySelector(".ficha-body");
-  if (!body) return;
-
-  let fuentes = Array.from(body.querySelectorAll("img"));
-  if (!fuentes.length) return;
-
-  /* Si una foto NO carga (ruta mal escrita, archivo que falta...) no se deja
-     el hueco roto: se quita del proyecto y se recoloca el mosaico. Ojo, eso
-     significa que un fallo de ruta no se ve en la web — si echas en falta una
-     foto, mira la consola (F12): el navegador dice cuál no encuentra. */
-  body.addEventListener("error", (e) => {
-    const img = e.target;
-    if (!img || img.tagName !== "IMG") return;
-    const fig = img.closest("figure") || img.closest(".fb-full");
-    const galeria = img.closest(".fb-mosaico");
-    if (fig) fig.remove(); else img.remove();
-    if (galeria) {
-      galeria._figs = Array.from(galeria.querySelectorAll("figure"));
-      galeria._firma = null;
-      if (!galeria._figs.length) galeria.remove();
-      else if (window.ajustarMosaicos) window.ajustarMosaicos(body);
-    }
-    // La galería grande se vuelve a montar con lo que queda
-    fuentes = Array.from(body.querySelectorAll("img"));
-    montarPista();
-  }, true);   // true = captura, el evento error de las imágenes no burbujea
+  // La lupa (ampliar fotos) es de la ficha de un proyecto. Se crea siempre y se
+  // abre con window.abrirLupa(lista, i) por si se reutiliza desde otra página.
 
   // --- El HTML de la lupa, una sola vez -----------------------------------
   const lupa = document.createElement("div");
@@ -1160,17 +1136,18 @@ document.addEventListener("DOMContentLoaded", () => {
     zoom = 0;
   }
 
-  // Una "pantalla" por cada foto del proyecto. Se vuelve a montar si alguna
-  // foto desaparece (porque no cargaba).
+  // Las fotos a mostrar: { src, alt, w, h }. Se rellena al abrir (window.abrirLupa).
+  let fuentes = [];
+  // Una "pantalla" por cada foto. Se vuelve a montar cada vez que se abre.
   let celdas = [];
   function montarPista() {
     pista.textContent = "";
-    fuentes.forEach(src => {
+    fuentes.forEach(f => {
       const fig = document.createElement("figure");
       fig.className = "lupa-foto";
       const img = document.createElement("img");
-      img.src = src.getAttribute("src");
-      img.alt = src.alt || "";
+      img.src = f.src;
+      img.alt = f.alt || "";
       img.loading = "lazy";
       fig.appendChild(img);
       pista.appendChild(fig);
@@ -1181,9 +1158,11 @@ document.addEventListener("DOMContentLoaded", () => {
         fig.style.setProperty("--nat-w", img.naturalWidth + "px");
         fig.style.setProperty("--nat-h", img.naturalHeight + "px");
       };
-      if (src.naturalWidth) {
-        fig.style.setProperty("--nat-w", src.naturalWidth + "px");
-        fig.style.setProperty("--nat-h", src.naturalHeight + "px");
+      if (f.w && f.h) {
+        fig.style.setProperty("--nat-w", f.w + "px");
+        fig.style.setProperty("--nat-h", f.h + "px");
+      } else if (img.naturalWidth) {
+        tope();
       } else {
         img.addEventListener("load", tope);
       }
@@ -1234,14 +1213,16 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => { if (!lupa.classList.contains("is-open")) lupa.hidden = true; }, 260);
   }
 
-  // Pinchar una foto del proyecto -> se abre la galería por esa foto
-  body.addEventListener("click", (e) => {
-    const img = e.target.closest("img");
-    if (!img || !body.contains(img)) return;
-    e.preventDefault();
-    const i = fuentes.indexOf(img);
-    abrir(i < 0 ? 0 : i);
-  });
+  // API global: abre la lupa con una lista de fotos (cadenas de src o { src, alt,
+  // w, h }) y arranca por la i-ésima. La usan la ficha y la galería.
+  window.abrirLupa = function (lista, i) {
+    fuentes = (lista || [])
+      .map(x => (typeof x === "string" ? { src: x } : x))
+      .filter(x => x && x.src);
+    if (!fuentes.length) return;
+    montarPista();
+    abrir((i == null || i < 0) ? 0 : Math.min(i, fuentes.length - 1));
+  };
 
   // Pinchar LA FOTO -> amplía / reduce. Pinchar fuera (o en CERRAR) -> cierra
   lupa.addEventListener("click", (e) => {
@@ -1293,7 +1274,40 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (e.key === "ArrowLeft")  irA(objetivo - 1, true);
   });
 
-  montarPista();
+  // --- FICHA de proyecto: al pinchar una foto del contenido, abre la lupa con
+  //     TODAS las fotos del proyecto, empezando por esa. --------------------
+  const body = document.querySelector(".ficha-body");
+  if (body) {
+    const fotos = () => Array.from(body.querySelectorAll("img"));
+    /* Si una foto NO carga (ruta mal escrita, archivo que falta...) no se deja
+       el hueco roto: se quita del proyecto y se recoloca el mosaico. */
+    body.addEventListener("error", (e) => {
+      const img = e.target;
+      if (!img || img.tagName !== "IMG") return;
+      const fig = img.closest("figure") || img.closest(".fb-full");
+      const galeria = img.closest(".fb-mosaico");
+      if (fig) fig.remove(); else img.remove();
+      if (galeria) {
+        galeria._figs = Array.from(galeria.querySelectorAll("figure"));
+        galeria._firma = null;
+        if (!galeria._figs.length) galeria.remove();
+        else if (window.ajustarMosaicos) window.ajustarMosaicos(body);
+      }
+    }, true);   // true = captura, el evento error de las imágenes no burbujea
+
+    body.addEventListener("click", (e) => {
+      const img = e.target.closest("img");
+      if (!img || !body.contains(img)) return;
+      e.preventDefault();
+      const els = fotos();
+      const lista = els.map(im => ({
+        src: im.getAttribute("src"), alt: im.alt || "",
+        w: im.naturalWidth || 0, h: im.naturalHeight || 0
+      }));
+      const i = els.indexOf(img);
+      window.abrirLupa(lista, i < 0 ? 0 : i);
+    });
+  }
 });
 
 
@@ -2011,17 +2025,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const bucleVertical = window.matchMedia("(min-width: 901px)").matches;  // el bucle solo en escritorio
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Entrada tipo el resto de páginas (fade + leve desplazamiento). Reutilizable:
-  // al cargar anima el texto + las obras; al VOLVER anima SOLO la rejilla (lo que cambia).
-  function animarEntrada(conTexto) {
-    if (reduce || !window.gsap) { grid.style.opacity = ""; return; }
-    const els = conTexto
-      ? [page.querySelector(".lienzo-eyebrow"), info, grid].filter(Boolean)
-      : [grid];
+  const eyebrowEl = () => page.querySelector(".lienzo-eyebrow");
+  // Fundido + leve desplazamiento (como el resto de páginas). Reutilizable.
+  function fade(els) {
+    els = (els || []).filter(Boolean);
+    if (!els.length) return;
+    if (reduce || !window.gsap) { els.forEach(el => { el.style.opacity = ""; }); return; }
     gsap.killTweensOf(els);
     gsap.fromTo(els,
       { opacity: 0, y: 24 },
-      { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: conTexto ? 0.1 : 0, clearProps: "transform,opacity" });
+      { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: els.length > 1 ? 0.1 : 0, clearProps: "transform,opacity" });
+  }
+  // Al VOLVER anima SOLO la rejilla (lo que cambia).
+  function animarEntrada(conTexto) {
+    if (reduce || !window.gsap) { grid.style.opacity = ""; return; }
+    fade(conTexto ? [eyebrowEl(), info, grid] : [grid]);
   }
 
   const grande = im => {
@@ -2075,13 +2093,31 @@ document.addEventListener("DOMContentLoaded", () => {
     grid.innerHTML = bucleVertical ? (uno + uno + uno) : uno;
 
     grid.addEventListener("click", e => {
+      if (gridMov > 6) { gridMov = 0; return; }   // fue un arrastre, no un clic
       const fig = e.target.closest(".lienzo-item");
       if (fig) abrirObra(parseInt(fig.dataset.i, 10));
     });
 
-    if (bucleVertical) alCargar(grid, centrarEntrada);
     hoverCue();
-    animarEntrada(true);   // carga como las demás páginas (texto + obras)
+    if (bucleVertical) {
+      // El texto entra como en el resto de páginas. La rejilla se coloca YA en su
+      // sitio (centrada) y se mantiene invisible hasta entonces; después solo hace
+      // un fundido de OPACIDAD (sin desplazarse), así las imágenes aparecen ya
+      // colocadas en su sitio, no "entran" moviéndose.
+      fade([eyebrowEl(), info]);
+      grid.style.opacity = "0";
+      centrarEntrada();                        // los altos están reservados (width/height): coloca bien ya
+      let revelada = false;                    // alCargar puede llamar 2 veces (carga + red de seguridad)
+      alCargar(grid, () => {
+        centrarEntrada();                      // reafirma cuando las imágenes tienen su alto real
+        if (revelada) return;
+        revelada = true;
+        grid.style.opacity = "";
+        if (!reduce && window.gsap) gsap.fromTo(grid, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" });
+      });
+    } else {
+      animarEntrada(true);   // móvil: texto + obras juntos, sin bucle
+    }
   }
 
   // Coloca la PRIMERA obra centrada en pantalla (copia del medio), con la anterior
@@ -2099,6 +2135,27 @@ document.addEventListener("DOMContentLoaded", () => {
     if (grid.scrollTop < periodo * 0.5) grid.scrollTop += periodo;
     else if (grid.scrollTop > periodo * 1.5) grid.scrollTop -= periodo;
   }, { passive: true });
+
+  // Arrastrar para desplazar la columna vertical (además de la rueda). Solo en
+  // escritorio (en móvil manda el scroll táctil de la página). No pone "manita":
+  // con la bola personalizada solo se ve el círculo (lo fuerza el CSS).
+  let gDrag = false, gY0 = 0, gS0 = 0, gridMov = 0, gCap = false, gPid = null;
+  grid.addEventListener("pointerdown", e => {
+    if (!bucleVertical || page.classList.contains("is-detail")) return;
+    gDrag = true; gY0 = e.clientY; gS0 = grid.scrollTop; gridMov = 0; gCap = false; gPid = e.pointerId;
+  });
+  grid.addEventListener("pointermove", e => {
+    if (!gDrag) return;
+    const dy = e.clientY - gY0;
+    if (Math.abs(dy) > gridMov) gridMov = Math.abs(dy);
+    // Capturamos el puntero SOLO cuando ya es un arrastre (>6px). Si capturásemos
+    // en el pointerdown, el 'click' se redirigiría a la rejilla y no abriría la obra.
+    if (!gCap && gridMov > 6) { gCap = true; try { grid.setPointerCapture(gPid); } catch (_) {} }
+    if (gCap) grid.scrollTop = gS0 - dy;
+  });
+  const finGDrag = () => { gDrag = false; gCap = false; };
+  grid.addEventListener("pointerup", finGDrag);
+  grid.addEventListener("pointercancel", finGDrag);
 
   /* ---- Etiqueta "CLICK" bajo el cursor (solo aparece; no atenúa las demás) - */
   function hoverCue() {
@@ -2174,6 +2231,7 @@ document.addEventListener("DOMContentLoaded", () => {
     montarTira(items);
     swapInfo(infoObra(o));
     document.body.classList.remove("show-vercue");
+    if (!bucleVertical) window.scrollTo({ top: 0, behavior: "auto" });   // móvil: al abrir, arriba
 
     grid.style.opacity = "0";                 // las obras se van (fundido)
     setTimeout(() => {
@@ -2219,10 +2277,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }, { passive: false });
 
   // Arrastrar para desplazar
-  let drag = false, x0 = 0, s0 = 0;
-  strip.addEventListener("pointerdown", e => { drag = true; x0 = e.clientX; s0 = strip.scrollLeft; strip.classList.add("is-drag"); try { strip.setPointerCapture(e.pointerId); } catch (_) {} });
-  strip.addEventListener("pointermove", e => { if (drag) strip.scrollLeft = s0 - (e.clientX - x0); });
-  const finDrag = () => { drag = false; strip.classList.remove("is-drag"); };
+  let drag = false, x0 = 0, s0 = 0, stripMov = 0, sCap = false, sPid = null;
+  strip.addEventListener("pointerdown", e => { drag = true; x0 = e.clientX; s0 = strip.scrollLeft; stripMov = 0; sCap = false; sPid = e.pointerId; });
+  strip.addEventListener("pointermove", e => {
+    if (!drag) return;
+    const dx = e.clientX - x0;
+    if (Math.abs(dx) > stripMov) stripMov = Math.abs(dx);
+    // Igual que en la columna: capturar solo al arrastrar, para que el click en
+    // una imagen siga abriendo la lupa.
+    if (!sCap && stripMov > 6) { sCap = true; strip.classList.add("is-drag"); try { strip.setPointerCapture(sPid); } catch (_) {} }
+    if (sCap) strip.scrollLeft = s0 - dx;
+  });
+  const finDrag = () => { drag = false; sCap = false; strip.classList.remove("is-drag"); };
   strip.addEventListener("pointerup", finDrag);
   strip.addEventListener("pointercancel", finDrag);
 

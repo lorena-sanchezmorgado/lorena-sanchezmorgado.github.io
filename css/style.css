@@ -63,8 +63,11 @@ body {
 }
 
 /* Solo ocultamos el cursor nativo cuando la bola personalizada está activa
-   (la activa js/cursor.js si hay puntero fino). Así nunca te quedas sin puntero. */
-body.cursor-custom { cursor: none; }
+   (la activa js/cursor.js si hay puntero fino). Así nunca te quedas sin puntero.
+   La bola es el ÚNICO cursor: con ella activa, NADA muestra la manita ni ningún
+   otro cursor nativo en ninguna parte (enlaces, botones, imágenes, arrastre...). */
+body.cursor-custom,
+body.cursor-custom * { cursor: none !important; }
 
 .cursor-ball {
   position: fixed;
@@ -295,6 +298,14 @@ body.nav-open .nav-menu {
   }
   .site-nav .nav-name { font-size: clamp(1.15rem, 2.9vw, 1.45rem); }   /* igual que MENÚ */
   body.nav-open .nav-toggle { visibility: hidden; }
+}
+
+/* En la GALERÍA el MENÚ aparece antes (pantallas más anchas): los enlaces de la
+   barra chocaban con las imágenes que suben a lo alto. */
+@media (max-width: 1300px) {
+  .page-lienzo .site-nav .nav-links { display: none; }
+  .page-lienzo .site-nav .nav-toggle { display: block; order: -1; }
+  .page-lienzo.nav-open .nav-toggle { visibility: hidden; }
 }
 
 /* Móviles pequeños (iPhone SE y parecidos). MENÚ + LORENA SHZ. no cabían en
@@ -1745,6 +1756,16 @@ footer.site-footer {
    central y "Arrastra para explorar" (ver zonas + separarDeRotulos en el JS). */
 .page-archivo .nav-link.is-active { text-decoration-thickness: 2px; }
 
+/* En la portada, el NOMBRE va subrayado: es la página donde estás y, a la vez,
+   el enlace para volver a verla (pinchando LORENA SÁNCHEZ). El !important gana
+   al reset global a{ text-decoration:none !important }. */
+.page-archivo .nav-name {
+  text-decoration: underline !important;
+  text-underline-offset: 5px;
+  text-decoration-thickness: 2px;
+}
+
+
 /* La ventana donde se ve el lienzo ocupa TODA la pantalla: las piezas pasan por
    debajo del menú y de MADRID/© y así se nota que hay más pared fuera. */
 .archivo-viewport {
@@ -1886,6 +1907,7 @@ footer.site-footer {
   /* de dónde empieza la columna de la derecha (para alinear la tira del detalle) */
   --stage-left: calc(var(--gutter) + var(--fmenu) + 3rem);
   --vert-w: clamp(18rem, 27vw, 34rem);   /* ancho común de TODAS las verticales */
+  --gal-gap: 3vh;                        /* MISMO aire entre imágenes en vertical y en horizontal */
 }
 .lienzo-cols {
   display: flex;
@@ -1950,7 +1972,7 @@ footer.site-footer {
   display: flex;
   flex-direction: column;
   align-items: flex-start;      /* todas las obras pegadas a la izquierda */
-  gap: 3vh;                     /* poco aire: la anterior/siguiente asoman */
+  gap: var(--gal-gap);          /* poco aire: la anterior/siguiente asoman */
   transition: opacity 0.3s ease;
 }
 .lienzo-grid::-webkit-scrollbar { display: none; }
@@ -2036,16 +2058,18 @@ body.show-vercue .cursor-ver { opacity: 1; }
   height: calc(100vh - var(--nav-h) - 22vh);   /* aire arriba y abajo: no choca con 2026 */
   display: flex;
   align-items: flex-end;        /* todas las imágenes apoyadas en la misma línea de abajo */
-  gap: 3vw;
+  gap: var(--gal-gap);          /* MISMA separación que en el scroll vertical */
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
   padding-left: var(--stage-left);   /* la 1ª imagen empieza donde estaba la columna */
   padding-right: 40vw;               /* aire al final para poder desplazar la última */
-  cursor: grab;
 }
 .gal-strip::-webkit-scrollbar { display: none; }
-.gal-strip.is-drag { cursor: grabbing; }
+/* Sin la bola (equipos sin puntero fino) el carrusel invita a arrastrar. Con la
+   bola activa, el cursor global (arriba) lo deja en solo-círculo. */
+body:not(.cursor-custom) .gal-strip { cursor: grab; }
+body:not(.cursor-custom) .gal-strip.is-drag { cursor: grabbing; }
 .gal-strip figure {
   flex: 0 0 auto;
   height: 100%;
