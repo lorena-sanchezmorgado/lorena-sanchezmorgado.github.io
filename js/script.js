@@ -2022,8 +2022,6 @@ document.addEventListener("DOMContentLoaded", () => {
     gsap.fromTo(els,
       { opacity: 0, y: 24 },
       { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: conTexto ? 0.1 : 0, clearProps: "transform,opacity" });
-    // red de seguridad: si la animación no corre (pestaña en 2º plano), visible igual
-    setTimeout(() => { gsap.set(els, { clearProps: "transform,opacity" }); }, 1600);
   }
 
   const grande = im => {
