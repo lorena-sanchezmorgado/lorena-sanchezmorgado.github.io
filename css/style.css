@@ -131,7 +131,7 @@ strong, b {
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding: 2.4rem var(--gutter) 1.3rem;   /* más aire arriba */
+  padding: 1.5rem var(--gutter) 1.05rem;   /* barra fina */
   color: var(--tinta);
   background: transparent;            /* sin rectángulo: el contenido pasa por detrás y se solapa */
   pointer-events: none;               /* deja pasar el cursor sobre la barra */
@@ -147,7 +147,7 @@ strong, b {
   font-family: var(--font-family-regular);
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  font-size: 1.45rem;                  /* más pequeño = más minimalista */
+  font-size: 1.2rem;                   /* barra fina y minimalista */
   line-height: 1;
   white-space: nowrap;                /* "SOBRE MÍ" nunca se parte en dos líneas */
 }
@@ -171,7 +171,7 @@ strong, b {
   color: var(--tinta);
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  font-size: 1.45rem;           /* igual que los enlaces del menú */
+  font-size: 1.2rem;            /* igual que los enlaces del menú */
   line-height: 1;
   white-space: nowrap;
 }
@@ -192,7 +192,7 @@ strong, b {
   font-family: var(--font-family-regular);
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  font-size: clamp(1.15rem, 2.9vw, 1.45rem);   /* igual que SOBRE MÍ / PROYECTOS */
+  font-size: clamp(1.05rem, 2.7vw, 1.2rem);   /* igual que SOBRE MÍ / PROYECTOS */
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -1690,7 +1690,8 @@ footer.site-footer {
      del contenido (proyectos, ficha e historia). */
   .page-proyectos .site-baseline--fixed,
   .page-ficha .site-baseline--fixed,
-  .page-historia .site-baseline--fixed {
+  .page-historia .site-baseline--fixed,
+  .page-lienzo .site-baseline--fixed {
     position: relative;
     z-index: 2;
     pointer-events: auto;
@@ -1866,4 +1867,246 @@ footer.site-footer {
   background: transparent;
   color: var(--tinta);
   transform: translateY(-1px);
+}
+
+
+/* ============================================================================
+   GALERÍA — estudios de arte (pintura.html)
+   ENTRADA: texto FIJO a la izquierda (título + descripción DE LA PÁGINA) + las
+   obras en UNA columna a la derecha (portada = principal de cada obra), scroll
+   vertical, con la etiqueta de técnica al lado. Al pasar el ratón sale "CLICK".
+   DETALLE (al pinchar una obra): el texto de la izquierda cambia al de esa obra
+   y a la derecha aparece una TIRA HORIZONTAL EN BUCLE con sus imágenes. Solo las
+   imágenes cambian (con fundido, tipo cambio de página); el resto queda quieto.
+   Todo sale de media/proyectos/pintura/web-obras.json.
+   ========================================================================== */
+.lienzo {
+  position: relative;
+  padding: calc(var(--nav-h) + 3vh) var(--gutter) 0;
+  /* de dónde empieza la columna de la derecha (para alinear la tira del detalle) */
+  --stage-left: calc(var(--gutter) + var(--fmenu) + 3rem);
+  --vert-w: clamp(18rem, 27vw, 34rem);   /* ancho común de TODAS las verticales */
+}
+.lienzo-cols {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+}
+
+/* Izquierda FIJA: epígrafe + bloque (título/técnica/descripción) que el JS
+   intercambia entre la PÁGINA (por defecto) y la OBRA abierta. Va por DELANTE de
+   las imágenes (el detalle pasa por detrás). */
+.lienzo-intro {
+  position: sticky;
+  top: calc(var(--nav-h) + 3vh);
+  align-self: flex-start;
+  flex: 0 0 var(--fmenu);
+  width: var(--fmenu);
+  z-index: 20;
+}
+.lienzo-eyebrow {
+  font-family: var(--font-family-wide-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--tinta-suave);
+  margin: 0 0 1.8rem;
+}
+.lienzo-info { transition: opacity 0.3s ease; }
+.lienzo-info.is-swap { opacity: 0; }        /* estado intermedio del fundido de texto */
+.lienzo-info-title {
+  font-family: var(--font-family-bold);
+  font-size: clamp(1.2rem, 1.7vw, 1.7rem);
+  line-height: 1.15;
+  color: var(--tinta);
+  margin: 0 0 0.55rem;
+}
+.lienzo-info-tecnica {
+  font-family: var(--font-family-wide-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.66rem;
+  color: var(--tinta-suave);
+  margin: 0 0 0.8rem;
+}
+.lienzo-info-desc {
+  color: var(--tinta);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 24rem;
+}
+
+/* Derecha (ENTRADA): las obras en UNA columna con scroll vertical EN BUCLE.
+   Alto fijo dejando aire arriba y abajo (no toca MADRID/2026). Las imágenes son
+   pequeñas para que asomen la anterior y la siguiente. */
+.lienzo-grid {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: calc(100vh - var(--nav-h) - 15vh);   /* (móvil) — en escritorio pasa a 100vh abajo */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;      /* todas las obras pegadas a la izquierda */
+  gap: 3vh;                     /* poco aire: la anterior/siguiente asoman */
+  transition: opacity 0.3s ease;
+}
+.lienzo-grid::-webkit-scrollbar { display: none; }
+/* En escritorio la galería es UNA pantalla: el scroll vertical ocupa el 100% del
+   alto (las imágenes pasan por detrás de la navbar y de MADRID/2026) y hace bucle. */
+@media (min-width: 901px) {
+  .lienzo { height: 100vh; overflow: hidden; padding: 0; }
+  .lienzo-cols { display: block; height: 100vh; }
+  .lienzo-intro {
+    position: absolute;
+    left: var(--gutter);
+    top: calc(var(--nav-h) + 3vh);
+    width: var(--fmenu);
+  }
+  .lienzo-grid {
+    position: absolute;
+    top: 0;
+    left: var(--stage-left);
+    right: var(--gutter);
+    height: 100vh;
+  }
+}
+.lienzo-item {
+  position: relative;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.lienzo-item img {
+  display: block;
+  height: auto;
+  border-radius: 2px;
+  background: rgba(77, 18, 76, 0.04);   /* tono papel/tinta mientras carga */
+}
+.lienzo-item.is-horiz img { width: 44vw; }             /* horizontales: más pequeñas, se ven bien */
+.lienzo-item.is-vert  img { width: var(--vert-w); }    /* verticales: mismo ancho, la altura que sea */
+/* técnica a la DERECHA de la imagen y alineada ABAJO (como en el frame 61) */
+.lienzo-tag {
+  position: absolute;
+  left: calc(100% + 1rem);
+  bottom: 0.2rem;
+  white-space: nowrap;
+  font-family: var(--font-family-wide-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.66rem;
+  color: var(--tinta-suave);
+}
+
+/* ---- Etiqueta "CLICK" bajo el cursor (solo con puntero fino) ---------------
+   Mismo efecto que la bola: color papel + mix-blend difference (se invierte
+   sobre lo que tiene debajo), sin fondo. La mueve el JS con left/top. */
+.cursor-ver {
+  position: fixed;
+  left: 0; top: 0;
+  transform: translate(-50%, 1.1rem);
+  font-family: var(--font-family-wide-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.6rem;
+  color: var(--papel);
+  mix-blend-mode: difference;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  z-index: 99999;
+}
+body.show-vercue .cursor-ver { opacity: 1; }
+
+/* ---- DETALLE de una obra: tira horizontal en bucle, a TODO el ancho y por
+   DETRÁS de los textos (nav, MADRID/2026 y el texto de la izquierda) --------- */
+.gal-detail {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 2;                   /* detrás de la intro (20), nav (1050), baseline (1045) */
+}
+.page-lienzo.is-detail .lienzo-grid { display: none; }
+.page-lienzo.is-detail .gal-detail { display: block; }
+.gal-strip {
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(var(--nav-h) + 8vh);
+  height: calc(100vh - var(--nav-h) - 22vh);   /* aire arriba y abajo: no choca con 2026 */
+  display: flex;
+  align-items: flex-end;        /* todas las imágenes apoyadas en la misma línea de abajo */
+  gap: 3vw;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  padding-left: var(--stage-left);   /* la 1ª imagen empieza donde estaba la columna */
+  padding-right: 40vw;               /* aire al final para poder desplazar la última */
+  cursor: grab;
+}
+.gal-strip::-webkit-scrollbar { display: none; }
+.gal-strip.is-drag { cursor: grabbing; }
+.gal-strip figure {
+  flex: 0 0 auto;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  align-items: flex-end;        /* la imagen se apoya en la línea de abajo */
+}
+.gal-strip img {
+  height: 100%;
+  width: auto;
+  max-width: none;
+  border-radius: 2px;
+  display: block;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+/* las verticales llenan el alto; las horizontales, más pequeñas y centradas */
+.gal-strip figure.is-horiz img { height: 62%; }
+/* fundido de entrada de las imágenes (tipo cambio de página) */
+.gal-detail.is-enter .gal-strip { animation: galIn 0.5s ease both; }
+@keyframes galIn { from { opacity: 0; transform: translateY(1.6rem); } to { opacity: 1; transform: none; } }
+/* VOLVER — mismo aspecto que en proyectos/ficha (negrita + subrayado) */
+.gal-cerrar {
+  position: fixed;
+  top: calc(var(--nav-h) + 0.6rem);
+  right: var(--gutter);
+  z-index: 1060;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-family-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 1rem;
+  color: var(--tinta);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Móvil / tablet (<901px): sin bucle interno; una columna normal con scroll de
+   página. El DETALLE va en flujo — texto de la obra arriba y la tira horizontal
+   debajo (nada de solaparse). */
+@media (max-width: 900px) {
+  .lienzo { padding: calc(var(--nav-h) + 1rem) var(--gutter) 14vh; }
+  .lienzo-cols { display: block; }
+  .lienzo-intro { position: static; width: auto; margin-bottom: 2rem; z-index: auto; }
+  .lienzo-grid { height: auto; overflow: visible; margin-right: 0; gap: 4vh; align-items: flex-start; }
+  .lienzo-item.is-vert img  { width: min(70%, 22rem); }
+  .lienzo-item.is-horiz img { width: 100%; }
+  /* en móvil la técnica va debajo, a la derecha (no cabe al lado) */
+  .lienzo-tag { position: static; display: block; text-align: right; margin-top: 0.4rem; }
+  /* el detalle deja de ser una capa fija: fluye bajo el texto de la obra */
+  .gal-detail { position: static; inset: auto; }
+  .gal-strip {
+    position: static;
+    top: auto;
+    height: 58vh;
+    margin-top: 1.4rem;
+    padding-left: 0;
+    padding-right: 30vw;
+    align-items: flex-end;
+  }
+  .cursor-ver { display: none; }
 }

@@ -33,6 +33,7 @@ media/proyectos/*
 !media/proyectos/puerta-alcala/
 !media/proyectos/pichi/
 !media/proyectos/cata-la-lata/
+!media/proyectos/pintura/
 
 # Dentro de esas carpetas slug, versiona SOLO las imágenes finales de la web
 # (web-01.jpg, web-portada.jpg...). El material en crudo que dejes suelto ahí

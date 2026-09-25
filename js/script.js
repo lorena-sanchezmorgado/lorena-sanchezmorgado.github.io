@@ -1985,3 +1985,248 @@ document.addEventListener("DOMContentLoaded", () => {
 /* La foto de pequeña ya no se aparta al hacer scroll — ahora vive DENTRO del
    texto (ver sobremi.html), así que sube con él y vuelve a salir en cada vuelta
    del bucle. Por eso aquí ya no hace falta ningún código. */
+
+
+/* ============================================================================
+   GALERÍA — estudios de arte  [pintura.html]
+   ----------------------------------------------------------------------------
+   - Fuente de verdad: media/proyectos/pintura/web-obras.json (ver web-LEEME-obras.md).
+     Cada OBRA lleva titulo, tecnica, descripcion, principal + detalles[] + proceso[].
+     La ENTRADA muestra SOLO la `principal` de cada obra con publicar:true (portada),
+     en una columna, con su técnica al lado. NO se deduce nada del nombre del archivo.
+   - Al pinchar una obra: el texto de la izquierda cambia al de la obra (titulo/
+     tecnica/descripcion) y a la derecha aparece una TIRA HORIZONTAL EN BUCLE con
+     principal -> detalles -> proceso. Solo las imágenes cambian (fundido).
+   - Para cambiar textos, qué se publica, principal/detalle/proceso o el orden, se
+     edita el JSON. Aquí NO se toca nada.
+   ========================================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+  const page = document.querySelector(".page-lienzo");
+  const grid = page && page.querySelector(".lienzo-grid");
+  const info = page && page.querySelector("#galInfo");
+  if (!grid) return;
+
+  const DIR = "media/proyectos/pintura/";
+  const infoDefault = info ? info.innerHTML : "";   // texto de la PÁGINA (para restaurar)
+  const bucleVertical = window.matchMedia("(min-width: 901px)").matches;  // el bucle solo en escritorio
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Entrada tipo el resto de páginas (fade + leve desplazamiento). Reutilizable:
+  // al cargar anima el texto + las obras; al VOLVER anima SOLO la rejilla (lo que cambia).
+  function animarEntrada(conTexto) {
+    if (reduce || !window.gsap) { grid.style.opacity = ""; return; }
+    const els = conTexto
+      ? [page.querySelector(".lienzo-eyebrow"), info, grid].filter(Boolean)
+      : [grid];
+    gsap.killTweensOf(els);
+    gsap.fromTo(els,
+      { opacity: 0, y: 24 },
+      { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: conTexto ? 0.1 : 0, clearProps: "transform,opacity" });
+    // red de seguridad: si la animación no corre (pestaña en 2º plano), visible igual
+    setTimeout(() => { gsap.set(els, { clearProps: "transform,opacity" }); }, 1600);
+  }
+
+  const grande = im => {
+    const partes = (im.srcset || "").split(",").map(s => s.trim()).filter(Boolean);
+    return partes.length ? partes[partes.length - 1].split(/\s+/)[0] : im.src;
+  };
+  const esc = s => (s || "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // Cuando TODAS las imágenes de un contenedor tienen tamaño real, ejecuta cb.
+  function alCargar(cont, cb) {
+    const els = Array.from(cont.querySelectorAll("img"));
+    let quedan = els.length || 1;
+    const listo = () => { if (--quedan <= 0) cb(); };
+    if (!els.length) return cb();
+    els.forEach(im => { if (im.complete) listo(); else { im.addEventListener("load", listo, { once: true }); im.addEventListener("error", listo, { once: true }); } });
+    setTimeout(cb, 700);   // red de seguridad
+  }
+
+  let obras = [], oneLen = 0, periodo = 0;
+
+  // Escondemos el texto de la izquierda desde ya, para que no parpadee antes de
+  // que la animación de entrada lo revele (el fetch tarda un instante).
+  if (!reduce && window.gsap) gsap.set([page.querySelector(".lienzo-eyebrow"), info].filter(Boolean), { opacity: 0 });
+
+  fetch(DIR + "web-obras.json")
+    .then(r => r.json())
+    .then(construir)
+    .catch(err => {
+      console.warn("GALERÍA — no se pudo cargar web-obras.json:", err);
+      if (window.gsap) gsap.set([page.querySelector(".lienzo-eyebrow"), info].filter(Boolean), { opacity: 1 });
+    });
+
+  const itemHTML = (o, i, eager) => {
+    const im = o.principal;
+    const horiz = (im.w || 0) >= (im.h || 0);
+    const alt = (o.titulo ? o.titulo + " — " : "") + "obra de Lorena Sánchez";
+    const tag = o.tecnica ? `<span class="lienzo-tag">(${esc(o.tecnica)})</span>` : "";
+    return `<figure class="lienzo-item ${horiz ? "is-horiz" : "is-vert"}" data-i="${i}">
+      <img src="${im.src}" srcset="${im.srcset}" sizes="(max-width: 900px) 92vw, ${horiz ? "60vw" : "20vw"}"
+           width="${im.w}" height="${im.h}" alt="${esc(alt)}"
+           ${eager ? 'fetchpriority="high"' : 'loading="lazy" decoding="async"'}>
+      ${tag}
+    </figure>`;
+  };
+
+  function construir(data) {
+    obras = (data || []).filter(o => o && o.publicar);
+    oneLen = obras.length;
+
+    const uno = obras.map((o, i) => itemHTML(o, i, i === 0)).join("");
+    // En escritorio, 3 copias para el scroll vertical EN BUCLE. En móvil, una.
+    grid.innerHTML = bucleVertical ? (uno + uno + uno) : uno;
+
+    grid.addEventListener("click", e => {
+      const fig = e.target.closest(".lienzo-item");
+      if (fig) abrirObra(parseInt(fig.dataset.i, 10));
+    });
+
+    if (bucleVertical) alCargar(grid, centrarEntrada);
+    hoverCue();
+    animarEntrada(true);   // carga como las demás páginas (texto + obras)
+  }
+
+  // Coloca la PRIMERA obra centrada en pantalla (copia del medio), con la anterior
+  // y la siguiente asomando arriba y abajo.
+  function centrarEntrada() {
+    const items = grid.children;
+    if (items.length < oneLen * 2) return;
+    periodo = items[oneLen].offsetTop - items[0].offsetTop;
+    const primera = items[oneLen];
+    grid.scrollTop = primera.offsetTop - (grid.clientHeight - primera.clientHeight) / 2;
+  }
+  // Bucle vertical: al acercarse a un borde, salta un juego (imperceptible).
+  grid.addEventListener("scroll", () => {
+    if (!bucleVertical || !periodo || page.classList.contains("is-detail")) return;
+    if (grid.scrollTop < periodo * 0.5) grid.scrollTop += periodo;
+    else if (grid.scrollTop > periodo * 1.5) grid.scrollTop -= periodo;
+  }, { passive: true });
+
+  /* ---- Etiqueta "CLICK" bajo el cursor (solo aparece; no atenúa las demás) - */
+  function hoverCue() {
+    const label = document.querySelector(".cursor-ver");
+    const fino  = window.matchMedia("(pointer: fine)");
+    const moveL = (label && window.gsap) ? gsap.quickTo(label, "left", { duration: 0.3, ease: "power3.out" }) : null;
+    const moveT = (label && window.gsap) ? gsap.quickTo(label, "top",  { duration: 0.3, ease: "power3.out" }) : null;
+
+    grid.addEventListener("mouseover", e => {
+      if (e.target.closest(".lienzo-item") && fino.matches) document.body.classList.add("show-vercue");
+    });
+    grid.addEventListener("mouseout", e => {
+      if (e.target.closest(".lienzo-item")) document.body.classList.remove("show-vercue");
+    });
+    if (label) window.addEventListener("mousemove", e => {
+      if (moveL) { moveL(e.clientX); moveT(e.clientY); }
+      else { label.style.left = e.clientX + "px"; label.style.top = e.clientY + "px"; }
+    });
+  }
+
+  /* ---- DETALLE de una obra: tira horizontal a todo el ancho, en bucle ----- */
+  const detail = document.createElement("div");
+  detail.className = "gal-detail";
+  const strip = document.createElement("div");
+  strip.className = "gal-strip";
+  detail.appendChild(strip);
+  page.querySelector(".lienzo-cols").appendChild(detail);
+
+  const cerrarBtn = document.createElement("button");
+  cerrarBtn.type = "button";
+  cerrarBtn.className = "gal-cerrar";
+  cerrarBtn.textContent = "VOLVER";
+  cerrarBtn.hidden = true;
+  document.body.appendChild(cerrarBtn);
+
+  let abierta = false, unSet = 0, oneLenDet = 0;
+
+  function swapInfo(html) {
+    if (!info) return;
+    info.classList.add("is-swap");
+    setTimeout(() => { info.innerHTML = html; info.classList.remove("is-swap"); }, 200);
+  }
+  const infoObra = o =>
+    `<p class="lienzo-info-title">${esc(o.titulo || "")}</p>` +
+    (o.tecnica ? `<p class="lienzo-info-tecnica">${esc(o.tecnica)}</p>` : "") +
+    `<p class="lienzo-info-desc">${esc(o.descripcion || "")}</p>`;
+
+  // Tira con 3 copias del juego -> bucle horizontal. La 1ª imagen (principal)
+  // queda alineada con la columna (padding-left en el CSS) y no se mueve.
+  function montarTira(items) {
+    oneLenDet = items.length;
+    let html = "";
+    for (let c = 0; c < 3; c++) {
+      items.forEach(im => {
+        const horiz = (im.w || 0) >= (im.h || 0);
+        html += `<figure class="${horiz ? "is-horiz" : "is-vert"}"><img src="${grande(im)}" alt="Obra de Lorena Sánchez" draggable="false"></figure>`;
+      });
+    }
+    strip.innerHTML = html;
+    alCargar(strip, centrar);
+  }
+  function centrar() {
+    const figs = strip.children;
+    unSet = (figs.length >= oneLenDet * 2)
+      ? (figs[oneLenDet].offsetLeft - figs[0].offsetLeft)   // ancho exacto de un juego (con el gap)
+      : (strip.scrollWidth / 3);
+    strip.scrollLeft = 0;   // arranca en la 1ª imagen (medio escondida): solo se ve de ahí a la derecha
+  }
+
+  function abrirObra(i) {
+    const o = obras[i]; if (!o) return;
+    const items = [o.principal, ...(o.detalles || []), ...(o.proceso || [])].filter(Boolean);
+    montarTira(items);
+    swapInfo(infoObra(o));
+    document.body.classList.remove("show-vercue");
+
+    grid.style.opacity = "0";                 // las obras se van (fundido)
+    setTimeout(() => {
+      page.classList.add("is-detail");
+      grid.style.opacity = "";
+      detail.classList.remove("is-enter");
+      void detail.offsetWidth;                // reinicia la animación de entrada
+      detail.classList.add("is-enter");
+      cerrarBtn.hidden = false;
+      alCargar(strip, centrar);
+    }, 260);
+    abierta = true;
+  }
+
+  function cerrarObra() {
+    if (!abierta) return;
+    abierta = false;
+    page.classList.remove("is-detail");
+    cerrarBtn.hidden = true;
+    swapInfo(infoDefault);
+    animarEntrada(false);                      // al VOLVER solo animan las obras (lo que cambia)
+    setTimeout(() => { strip.innerHTML = ""; }, 320);
+  }
+
+  cerrarBtn.addEventListener("click", cerrarObra);
+  window.addEventListener("keydown", e => { if (abierta && e.key === "Escape") cerrarObra(); });
+
+  // Bucle horizontal HACIA DELANTE: tras la última imagen viene la primera. Se
+  // arranca en 0 (1ª imagen) y, al avanzar un par de juegos, se salta uno hacia
+  // atrás de forma imperceptible (contenido idéntico) -> scroll infinito a la dcha.
+  strip.addEventListener("scroll", () => {
+    if (!abierta || !unSet) return;
+    if (strip.scrollLeft >= unSet * 2) strip.scrollLeft -= unSet;
+  }, { passive: true });
+
+  // Rueda vertical -> desplazamiento horizontal
+  strip.addEventListener("wheel", e => {
+    if (!abierta) return;
+    const d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    if (!d) return;
+    e.preventDefault();
+    strip.scrollLeft += d;
+  }, { passive: false });
+
+  // Arrastrar para desplazar
+  let drag = false, x0 = 0, s0 = 0;
+  strip.addEventListener("pointerdown", e => { drag = true; x0 = e.clientX; s0 = strip.scrollLeft; strip.classList.add("is-drag"); try { strip.setPointerCapture(e.pointerId); } catch (_) {} });
+  strip.addEventListener("pointermove", e => { if (drag) strip.scrollLeft = s0 - (e.clientX - x0); });
+  const finDrag = () => { drag = false; strip.classList.remove("is-drag"); };
+  strip.addEventListener("pointerup", finDrag);
+  strip.addEventListener("pointercancel", finDrag);
+
+  window.addEventListener("resize", () => { if (abierta) centrar(); else if (bucleVertical) centrarEntrada(); });
+});

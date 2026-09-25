@@ -1,0 +1,590 @@
+[
+  {
+    "slug": "desnudo-panuelo",
+    "titulo": "Desnudo con pañuelo",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 6,
+      "original": "IMG_20240922_171654.jpg",
+      "w": 1047,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-06-800.webp 523w, media/proyectos/pintura/web-06-1600.webp 1047w, media/proyectos/pintura/web-06-2514.webp 1645w",
+      "src": "media/proyectos/pintura/web-06-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 11,
+        "original": "IMG_20240923_183446.jpg",
+        "w": 720,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-11-800.webp 360w, media/proyectos/pintura/web-11-1600.webp 720w, media/proyectos/pintura/web-11-2560.webp 1152w",
+        "src": "media/proyectos/pintura/web-11-1600.webp"
+      },
+      {
+        "n": 12,
+        "original": "IMG_20240923_183459.jpg",
+        "w": 720,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-12-800.webp 360w, media/proyectos/pintura/web-12-1600.webp 720w, media/proyectos/pintura/web-12-2560.webp 1152w",
+        "src": "media/proyectos/pintura/web-12-1600.webp"
+      }
+    ],
+    "proceso": [
+      {
+        "n": 1,
+        "original": "IMG_20240524_202635_1.jpg",
+        "w": 720,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-01-800.webp 360w, media/proyectos/pintura/web-01-1600.webp 720w, media/proyectos/pintura/web-01-2560.webp 1152w",
+        "src": "media/proyectos/pintura/web-01-1600.webp"
+      }
+    ],
+    "nota": ""
+  },
+  {
+    "slug": "mujer-abanico",
+    "titulo": "Mujer con abanico",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 21,
+      "original": "IMG_20260215_160308.jpg",
+      "w": 1600,
+      "h": 1200,
+      "srcset": "media/proyectos/pintura/web-21-800.webp 800w, media/proyectos/pintura/web-21-1600.webp 1600w, media/proyectos/pintura/web-21-2560.webp 2560w",
+      "src": "media/proyectos/pintura/web-21-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 22,
+        "original": "IMG_20260718_192700.jpg",
+        "w": 1600,
+        "h": 1200,
+        "srcset": "media/proyectos/pintura/web-22-800.webp 800w, media/proyectos/pintura/web-22-1600.webp 1600w, media/proyectos/pintura/web-22-2560.webp 2560w",
+        "src": "media/proyectos/pintura/web-22-1600.webp"
+      }
+    ],
+    "proceso": [
+      {
+        "n": 2,
+        "original": "IMG_20240607_123137.jpg",
+        "w": 1600,
+        "h": 720,
+        "srcset": "media/proyectos/pintura/web-02-800.webp 800w, media/proyectos/pintura/web-02-1600.webp 1600w, media/proyectos/pintura/web-02-2560.webp 2560w",
+        "src": "media/proyectos/pintura/web-02-1600.webp"
+      },
+      {
+        "n": 3,
+        "original": "IMG_20240711_195841.jpg",
+        "w": 1600,
+        "h": 720,
+        "srcset": "media/proyectos/pintura/web-03-800.webp 800w, media/proyectos/pintura/web-03-1600.webp 1600w, media/proyectos/pintura/web-03-2560.webp 2560w",
+        "src": "media/proyectos/pintura/web-03-1600.webp"
+      },
+      {
+        "n": 4,
+        "original": "IMG_20240909_124949.jpg",
+        "w": 1600,
+        "h": 721,
+        "srcset": "media/proyectos/pintura/web-04-800.webp 800w, media/proyectos/pintura/web-04-1600.webp 1600w, media/proyectos/pintura/web-04-2560.webp 2560w",
+        "src": "media/proyectos/pintura/web-04-1600.webp"
+      },
+      {
+        "n": 5,
+        "original": "IMG_20240918_125921.jpg",
+        "w": 1600,
+        "h": 720,
+        "srcset": "media/proyectos/pintura/web-05-800.webp 800w, media/proyectos/pintura/web-05-1600.webp 1600w, media/proyectos/pintura/web-05-2560.webp 2560w",
+        "src": "media/proyectos/pintura/web-05-1600.webp"
+      }
+    ],
+    "nota": "detalle web-22: abanico con la firma"
+  },
+  {
+    "slug": "jarron-flores-frutas",
+    "titulo": "Jarrón con flores y frutas",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 7,
+      "original": "IMG_20240922_171804.jpg",
+      "w": 1047,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-07-800.webp 523w, media/proyectos/pintura/web-07-1600.webp 1047w, media/proyectos/pintura/web-07-2449.webp 1602w",
+      "src": "media/proyectos/pintura/web-07-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 8,
+        "original": "IMG_20240923_183415.jpg",
+        "w": 720,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-08-800.webp 360w, media/proyectos/pintura/web-08-1600.webp 720w, media/proyectos/pintura/web-08-2560.webp 1152w",
+        "src": "media/proyectos/pintura/web-08-1600.webp"
+      },
+      {
+        "n": 9,
+        "original": "IMG_20240923_183422.jpg",
+        "w": 1600,
+        "h": 720,
+        "srcset": "media/proyectos/pintura/web-09-800.webp 800w, media/proyectos/pintura/web-09-1600.webp 1600w, media/proyectos/pintura/web-09-2560.webp 2560w",
+        "src": "media/proyectos/pintura/web-09-1600.webp"
+      },
+      {
+        "n": 10,
+        "original": "IMG_20240923_183436.jpg",
+        "w": 720,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-10-800.webp 360w, media/proyectos/pintura/web-10-1600.webp 720w, media/proyectos/pintura/web-10-2560.webp 1152w",
+        "src": "media/proyectos/pintura/web-10-1600.webp"
+      }
+    ],
+    "proceso": [],
+    "nota": ""
+  },
+  {
+    "slug": "libelula",
+    "titulo": "Libélula",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 18,
+      "original": "IMG_20250702_122705.jpg",
+      "w": 720,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-18-800.webp 360w, media/proyectos/pintura/web-18-1600.webp 720w, media/proyectos/pintura/web-18-2560.webp 1152w",
+      "src": "media/proyectos/pintura/web-18-1600.webp"
+    },
+    "detalles": [],
+    "proceso": [
+      {
+        "n": 13,
+        "original": "IMG_20250509_125333.jpg",
+        "w": 720,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-13-800.webp 360w, media/proyectos/pintura/web-13-1600.webp 720w, media/proyectos/pintura/web-13-2560.webp 1152w",
+        "src": "media/proyectos/pintura/web-13-1600.webp"
+      },
+      {
+        "n": 14,
+        "original": "IMG_20250530_125847.jpg",
+        "w": 720,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-14-800.webp 360w, media/proyectos/pintura/web-14-1600.webp 720w, media/proyectos/pintura/web-14-2560.webp 1152w",
+        "src": "media/proyectos/pintura/web-14-1600.webp"
+      },
+      {
+        "n": 15,
+        "original": "IMG_20250604_183454.jpg",
+        "w": 720,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-15-800.webp 360w, media/proyectos/pintura/web-15-1600.webp 720w, media/proyectos/pintura/web-15-2560.webp 1152w",
+        "src": "media/proyectos/pintura/web-15-1600.webp"
+      },
+      {
+        "n": 16,
+        "original": "IMG_20250606_125225.jpg",
+        "w": 720,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-16-800.webp 360w, media/proyectos/pintura/web-16-1600.webp 720w, media/proyectos/pintura/web-16-2560.webp 1152w",
+        "src": "media/proyectos/pintura/web-16-1600.webp"
+      },
+      {
+        "n": 17,
+        "original": "IMG_20250618_125933.jpg",
+        "w": 720,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-17-800.webp 360w, media/proyectos/pintura/web-17-1600.webp 720w, media/proyectos/pintura/web-17-2560.webp 1152w",
+        "src": "media/proyectos/pintura/web-17-1600.webp"
+      }
+    ],
+    "nota": ""
+  },
+  {
+    "slug": "velero-atardecer",
+    "titulo": "Velero al atardecer",
+    "publicar": false,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 19,
+      "original": "IMG_20250912_115820.jpg",
+      "w": 720,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-19-800.webp 360w, media/proyectos/pintura/web-19-1600.webp 720w, media/proyectos/pintura/web-19-2560.webp 1152w",
+      "src": "media/proyectos/pintura/web-19-1600.webp"
+    },
+    "detalles": [],
+    "proceso": [],
+    "nota": "pendiente de decidir si se publica"
+  },
+  {
+    "slug": "avestruz",
+    "titulo": "Avestruz con sombrero",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 45,
+      "original": "IMG_20260924_154615.jpg",
+      "w": 1132,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-45-800.webp 566w, media/proyectos/pintura/web-45-1600.webp 1132w, media/proyectos/pintura/web-45-2560.webp 1811w",
+      "src": "media/proyectos/pintura/web-45-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 33,
+        "original": "IMG_20260924_153316.jpg",
+        "w": 1192,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-33-800.webp 596w, media/proyectos/pintura/web-33-1600.webp 1192w, media/proyectos/pintura/web-33-2560.webp 1907w",
+        "src": "media/proyectos/pintura/web-33-1600.webp"
+      },
+      {
+        "n": 34,
+        "original": "IMG_20260924_153325.jpg",
+        "w": 1600,
+        "h": 1205,
+        "srcset": "media/proyectos/pintura/web-34-800.webp 800w, media/proyectos/pintura/web-34-1600.webp 1600w, media/proyectos/pintura/web-34-2560.webp 2560w",
+        "src": "media/proyectos/pintura/web-34-1600.webp"
+      }
+    ],
+    "proceso": [
+      {
+        "n": 20,
+        "original": "IMG_20250919_195408.jpg",
+        "w": 720,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-20-800.webp 360w, media/proyectos/pintura/web-20-1600.webp 720w, media/proyectos/pintura/web-20-2560.webp 1152w",
+        "src": "media/proyectos/pintura/web-20-1600.webp"
+      }
+    ],
+    "nota": ""
+  },
+  {
+    "slug": "ramo-bodegon",
+    "titulo": "Ramo con frutas",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 23,
+      "original": "IMG_20260924_152207.jpg",
+      "w": 1165,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-23-800.webp 582w, media/proyectos/pintura/web-23-1600.webp 1165w, media/proyectos/pintura/web-23-2560.webp 1864w",
+      "src": "media/proyectos/pintura/web-23-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 49,
+        "original": "bodegon.jpg",
+        "w": 1600,
+        "h": 1280,
+        "srcset": "media/proyectos/pintura/web-49-800.webp 800w, media/proyectos/pintura/web-49-1600.webp 1600w, media/proyectos/pintura/web-49-2560.webp 2560w",
+        "src": "media/proyectos/pintura/web-49-1600.webp"
+      }
+    ],
+    "proceso": [],
+    "nota": ""
+  },
+  {
+    "slug": "girasoles",
+    "titulo": "Girasoles",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 38,
+      "original": "IMG_20260924_153901.jpg",
+      "w": 1131,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-38-800.webp 566w, media/proyectos/pintura/web-38-1600.webp 1131w, media/proyectos/pintura/web-38-2560.webp 1810w",
+      "src": "media/proyectos/pintura/web-38-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 24,
+        "original": "IMG_20260924_152830.jpg",
+        "w": 1201,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-24-800.webp 601w, media/proyectos/pintura/web-24-1600.webp 1201w, media/proyectos/pintura/web-24-2560.webp 1922w",
+        "src": "media/proyectos/pintura/web-24-1600.webp"
+      },
+      {
+        "n": 25,
+        "original": "IMG_20260924_152837.jpg",
+        "w": 1210,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-25-800.webp 605w, media/proyectos/pintura/web-25-1600.webp 1210w, media/proyectos/pintura/web-25-2560.webp 1936w",
+        "src": "media/proyectos/pintura/web-25-1600.webp"
+      }
+    ],
+    "proceso": [],
+    "nota": ""
+  },
+  {
+    "slug": "koi",
+    "titulo": "Peces koi",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 39,
+      "original": "IMG_20260924_153950.jpg",
+      "w": 1003,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-39-800.webp 501w, media/proyectos/pintura/web-39-1600.webp 1003w, media/proyectos/pintura/web-39-2560.webp 1605w",
+      "src": "media/proyectos/pintura/web-39-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 26,
+        "original": "IMG_20260924_153029.jpg",
+        "w": 1182,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-26-800.webp 591w, media/proyectos/pintura/web-26-1600.webp 1182w, media/proyectos/pintura/web-26-2560.webp 1891w",
+        "src": "media/proyectos/pintura/web-26-1600.webp"
+      },
+      {
+        "n": 27,
+        "original": "IMG_20260924_153036.jpg",
+        "w": 1200,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-27-800.webp 600w, media/proyectos/pintura/web-27-1600.webp 1200w, media/proyectos/pintura/web-27-2560.webp 1920w",
+        "src": "media/proyectos/pintura/web-27-1600.webp"
+      }
+    ],
+    "proceso": [],
+    "nota": ""
+  },
+  {
+    "slug": "mascaras",
+    "titulo": "Máscaras venecianas",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 41,
+      "original": "IMG_20260924_154212.jpg",
+      "w": 1600,
+      "h": 1058,
+      "srcset": "media/proyectos/pintura/web-41-800.webp 800w, media/proyectos/pintura/web-41-1600.webp 1600w, media/proyectos/pintura/web-41-2485.webp 2485w",
+      "src": "media/proyectos/pintura/web-41-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 28,
+        "original": "IMG_20260924_153120.jpg",
+        "w": 1600,
+        "h": 1188,
+        "srcset": "media/proyectos/pintura/web-28-800.webp 800w, media/proyectos/pintura/web-28-1600.webp 1600w, media/proyectos/pintura/web-28-2560.webp 2560w",
+        "src": "media/proyectos/pintura/web-28-1600.webp"
+      }
+    ],
+    "proceso": [],
+    "nota": ""
+  },
+  {
+    "slug": "pelirroja-flores",
+    "titulo": "Pelirroja con flores",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 42,
+      "original": "IMG_20260924_154347.jpg",
+      "w": 1132,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-42-800.webp 566w, media/proyectos/pintura/web-42-1600.webp 1132w, media/proyectos/pintura/web-42-2560.webp 1810w",
+      "src": "media/proyectos/pintura/web-42-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 29,
+        "original": "IMG_20260924_153143.jpg",
+        "w": 1201,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-29-800.webp 601w, media/proyectos/pintura/web-29-1600.webp 1201w, media/proyectos/pintura/web-29-2560.webp 1922w",
+        "src": "media/proyectos/pintura/web-29-1600.webp"
+      }
+    ],
+    "proceso": [],
+    "nota": ""
+  },
+  {
+    "slug": "caballitos-mar",
+    "titulo": "Caballitos de mar",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 43,
+      "original": "IMG_20260924_154456.jpg",
+      "w": 1331,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-43-800.webp 665w, media/proyectos/pintura/web-43-1600.webp 1331w, media/proyectos/pintura/web-43-2560.webp 2130w",
+      "src": "media/proyectos/pintura/web-43-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 30,
+        "original": "IMG_20260924_153217.jpg",
+        "w": 1158,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-30-800.webp 579w, media/proyectos/pintura/web-30-1600.webp 1158w, media/proyectos/pintura/web-30-2560.webp 1853w",
+        "src": "media/proyectos/pintura/web-30-1600.webp"
+      }
+    ],
+    "proceso": [],
+    "nota": ""
+  },
+  {
+    "slug": "abstracto-ocre",
+    "titulo": "Abstracto ocre y azul",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 44,
+      "original": "IMG_20260924_154543.jpg",
+      "w": 1276,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-44-800.webp 638w, media/proyectos/pintura/web-44-1600.webp 1276w, media/proyectos/pintura/web-44-2560.webp 2041w",
+      "src": "media/proyectos/pintura/web-44-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 31,
+        "original": "IMG_20260924_153246.jpg",
+        "w": 1203,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-31-800.webp 601w, media/proyectos/pintura/web-31-1600.webp 1203w, media/proyectos/pintura/web-31-2560.webp 1925w",
+        "src": "media/proyectos/pintura/web-31-1600.webp"
+      },
+      {
+        "n": 32,
+        "original": "IMG_20260924_153252.jpg",
+        "w": 1185,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-32-800.webp 593w, media/proyectos/pintura/web-32-1600.webp 1185w, media/proyectos/pintura/web-32-2560.webp 1897w",
+        "src": "media/proyectos/pintura/web-32-1600.webp"
+      }
+    ],
+    "proceso": [],
+    "nota": ""
+  },
+  {
+    "slug": "geisha",
+    "titulo": "Geisha",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 46,
+      "original": "IMG_20260924_154645.jpg",
+      "w": 1131,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-46-800.webp 566w, media/proyectos/pintura/web-46-1600.webp 1131w, media/proyectos/pintura/web-46-2560.webp 1810w",
+      "src": "media/proyectos/pintura/web-46-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 35,
+        "original": "IMG_20260924_153443.jpg",
+        "w": 1600,
+        "h": 1199,
+        "srcset": "media/proyectos/pintura/web-35-800.webp 800w, media/proyectos/pintura/web-35-1600.webp 1600w, media/proyectos/pintura/web-35-2560.webp 2560w",
+        "src": "media/proyectos/pintura/web-35-1600.webp"
+      },
+      {
+        "n": 36,
+        "original": "IMG_20260924_153458.jpg",
+        "w": 1231,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-36-800.webp 615w, media/proyectos/pintura/web-36-1600.webp 1231w, media/proyectos/pintura/web-36-2560.webp 1969w",
+        "src": "media/proyectos/pintura/web-36-1600.webp"
+      }
+    ],
+    "proceso": [],
+    "nota": ""
+  },
+  {
+    "slug": "desnudo-azul",
+    "titulo": "Desnudo en azul",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 47,
+      "original": "IMG_20260924_154759.jpg",
+      "w": 1233,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-47-800.webp 616w, media/proyectos/pintura/web-47-1600.webp 1233w, media/proyectos/pintura/web-47-2560.webp 1972w",
+      "src": "media/proyectos/pintura/web-47-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 37,
+        "original": "IMG_20260924_153617.jpg",
+        "w": 1192,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-37-800.webp 596w, media/proyectos/pintura/web-37-1600.webp 1192w, media/proyectos/pintura/web-37-2560.webp 1907w",
+        "src": "media/proyectos/pintura/web-37-1600.webp"
+      }
+    ],
+    "proceso": [],
+    "nota": ""
+  },
+  {
+    "slug": "ojo",
+    "titulo": "Ojo",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 48,
+      "original": "IMG_20260924_154847.jpg",
+      "w": 953,
+      "h": 1600,
+      "srcset": "media/proyectos/pintura/web-48-800.webp 476w, media/proyectos/pintura/web-48-1600.webp 953w, media/proyectos/pintura/web-48-2560.webp 1524w",
+      "src": "media/proyectos/pintura/web-48-1600.webp"
+    },
+    "detalles": [
+      {
+        "n": 40,
+        "original": "IMG_20260924_154056.jpg",
+        "w": 1197,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-40-800.webp 598w, media/proyectos/pintura/web-40-1600.webp 1197w, media/proyectos/pintura/web-40-2560.webp 1915w",
+        "src": "media/proyectos/pintura/web-40-1600.webp"
+      }
+    ],
+    "proceso": [],
+    "nota": "no hay foto del cuadro completo; web-48 es la más abierta"
+  },
+  {
+    "slug": "toledo",
+    "titulo": "Toledo",
+    "publicar": true,
+    "tecnica": "Pastel",
+    "descripcion": "Pequeña descripción de la obra. Edítame en web-obras.json.",
+    "principal": {
+      "n": 50,
+      "original": "toledo_cuadro.jpg",
+      "w": 1600,
+      "h": 1280,
+      "srcset": "media/proyectos/pintura/web-50-800.webp 800w, media/proyectos/pintura/web-50-1600.webp 1600w, media/proyectos/pintura/web-50-2560.webp 2560w",
+      "src": "media/proyectos/pintura/web-50-1600.webp"
+    },
+    "detalles": [],
+    "proceso": [],
+    "nota": ""
+  }
+]
