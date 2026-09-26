@@ -298,7 +298,7 @@
     "slug": "girasoles",
     "titulo": "Girasoles",
     "publicar": true,
-    "tecnica": "Pastel",
+    "tecnica": "Oleo sobre lienzo",
     "descripcion": "",
     "principal": {
       "n": 38,
@@ -333,7 +333,7 @@
     "slug": "koi",
     "titulo": "Peces koi",
     "publicar": true,
-    "tecnica": "Pastel",
+    "tecnica": "Acrílico sobre papel",
     "descripcion": "",
     "principal": {
       "n": 39,
@@ -368,7 +368,7 @@
     "slug": "mascaras",
     "titulo": "Máscaras venecianas",
     "publicar": true,
-    "tecnica": "Pastel",
+    "tecnica": "Oleo sobre lienzo",
     "descripcion": "",
     "principal": {
       "n": 41,
@@ -395,7 +395,7 @@
     "slug": "pelirroja-flores",
     "titulo": "Pelirroja con flores",
     "publicar": true,
-    "tecnica": "Pastel",
+    "tecnica": "Oleo sobre lienzo",
     "descripcion": "",
     "principal": {
       "n": 42,
@@ -422,7 +422,7 @@
     "slug": "caballitos-mar",
     "titulo": "Caballitos de mar",
     "publicar": true,
-    "tecnica": "Pastel",
+    "tecnica": "Oleo sobre lienzo",
     "descripcion": "",
     "principal": {
       "n": 43,
@@ -447,9 +447,9 @@
   },
   {
     "slug": "abstracto-ocre",
-    "titulo": "Abstracto ocre y azul",
+    "titulo": "Nadadores en busca de la superficie",
     "publicar": true,
-    "tecnica": "Pastel",
+    "tecnica": "Oleo sobre lienzo",
     "descripcion": "",
     "principal": {
       "n": 44,
@@ -484,7 +484,7 @@
     "slug": "geisha",
     "titulo": "Geisha",
     "publicar": true,
-    "tecnica": "Pastel",
+    "tecnica": "Oleo sobre tabla",
     "descripcion": "",
     "principal": {
       "n": 46,
@@ -519,7 +519,7 @@
     "slug": "desnudo-azul",
     "titulo": "Desnudo en azul",
     "publicar": true,
-    "tecnica": "Pastel",
+    "tecnica": "Oleo sobre papel",
     "descripcion": "",
     "principal": {
       "n": 47,
@@ -544,9 +544,9 @@
   },
   {
     "slug": "ojo",
-    "titulo": "Ojo",
+    "titulo": "La mirada",
     "publicar": true,
-    "tecnica": "Pastel",
+    "tecnica": "Tinta china sobre papel",
     "descripcion": "",
     "principal": {
       "n": 48,
@@ -571,9 +571,9 @@
   },
   {
     "slug": "toledo",
-    "titulo": "Toledo",
+    "titulo": "Toledo vista desde el cielo",
     "publicar": true,
-    "tecnica": "Pastel",
+    "tecnica": "Oleo sobre lienzo",
     "descripcion": "",
     "principal": {
       "n": 50,
