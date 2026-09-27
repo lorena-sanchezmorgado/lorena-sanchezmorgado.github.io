@@ -36,6 +36,7 @@ media/proyectos/*
 !media/proyectos/pintura/
 !media/proyectos/abuela/
 !media/proyectos/mi-pueblo/
+!media/proyectos/twin-peaks/
 
 # Dentro de esas carpetas slug, versiona SOLO las imágenes finales de la web
 # (web-01.jpg, web-portada.jpg...). El material en crudo que dejes suelto ahí

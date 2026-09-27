@@ -98,9 +98,11 @@ def main():
 
     total_kb, n_img = 0, 0
     for carpeta in carpetas:
-        # fuentes = web-*.{jpg,jpeg,png} originales (las variantes son .webp, se excluyen solas)
+        # fuentes = web-*.{jpg,jpeg,png} originales (las variantes .webp y las
+        # miniaturas -thumb.jpg de las hojas de contactos se excluyen)
         fuentes = sorted(p for p in carpeta.iterdir()
-                         if p.suffix.lower() in EXT and p.name.startswith("web-"))
+                         if p.suffix.lower() in EXT and p.name.startswith("web-")
+                         and not p.stem.endswith("-thumb"))
         if not fuentes:
             continue
         print(f"\n== {carpeta.name} ==")

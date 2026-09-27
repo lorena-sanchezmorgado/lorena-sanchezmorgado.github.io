@@ -710,12 +710,8 @@ const PROYECTOS = [
     bloques: [
       { t: "texto", html: "<p>Thompson Madrid organizó un concurso para crear una propuesta inspirada en la identidad y la cultura de la ciudad, formada por una camiseta y un amenity para sus huéspedes. Mi propuesta parte de algunos de los símbolos más reconocibles de Madrid para crear dos piezas con una misma identidad, pero con historias diferentes. <br><br> El reto era encontrar una forma de hablar de Madrid que fuese reconocible para quien visita la ciudad, pero que también tuviese una historia detrás y se sintiera cercana y auténtica.</p>" },
 
-      {
-        t: "mosaico", imgs: [
-          "media/proyectos/thompson/web-06.jpg"
-        ]
-      },
-
+      { t: "full", img: "media/proyectos/thompson/web-06.jpg" },
+      
       { t: "texto", html: "<p>Para la camiseta quise representar Madrid desde una perspectiva diferente, alejándome de una representación literal de sus monumentos. La idea surgió de imaginar que estamos tumbados y miramos hacia el cielo, rodeados por algunos de los edificios y símbolos más reconocibles de la ciudad. <br><br> A partir de esta perspectiva creé una composición circular en la que aparecen el Oso y el Madroño, la Puerta de Alcalá, las Cuatro Torres, el edificio Schweppes, el Tío Pepe, el edificio Metrópolis y la entrada de Metro. Todos ellos están dibujados de una forma más libre, como si fueran trazos de un boceto, buscando que la ilustración se sintiera espontánea y cercana. <br><br> La frase “De Madrid al cielo” completa la composición y refuerza esa idea de mirar hacia arriba. Es una expresión muy ligada a Madrid y que resume, de una forma sencilla, ese sentimiento de que no hay lugar como esta ciudad.</p>" },
 
       {
@@ -736,48 +732,54 @@ const PROYECTOS = [
 
       { t: "texto", html: "<p>Para la segunda parte del concurso diseñé un amenity en forma de lata de barquillos, buscando que el regalo fuese algo más que un simple objeto promocional. <br><br> La elección de los barquillos parte de su relación con la tradición madrileña y con las fiestas de San Isidro. A partir de ahí quise construir una pequeña historia alrededor de la lata y recuperar otra expresión muy característica de Madrid: “Más chulo que un ocho”. <br><br> El diseño está protagonizado por el tranvía número ocho, relacionado con el origen de esta expresión y con los chulapos y chulapas que lo utilizaban para acudir a las fiestas y verbenas madrileñas. La historia queda integrada en el propio packaging para que el huésped pueda descubrirla al abrir la lata. <br><br> Además, la lata está pensada para conservarse y reutilizarse después de consumir los barquillos, convirtiéndose también en un pequeño recuerdo del paso por Madrid.</p>" },
 
-      {
-        t: "mosaico", imgs: [
-          "media/proyectos/thompson/web-07.jpg"
-        ]
-      },
+      { t: "full", img: "media/proyectos/thompson/web-07.jpg" },
 
       { t: "texto", html: "<p>Este proyecto fue una experiencia especialmente significativa para mí, ya que surgió de una colaboración entre mi universidad y Thompson Madrid. Desde el primer momento me sentí muy cercana al proyecto, especialmente después de conocer de primera mano qué buscaba el hotel y cómo planteaban el concurso. <br><br> Fue un reto muy emocionante, pero también me daba cierto miedo. En ese momento estaba empezando segundo de carrera y el concurso estaba abierto a todos los estudiantes, así que sentía que muchas de las personas que participaban podían tener más experiencia que yo. Trabajar para una marca hotelera tan grande y con presencia internacional hacía que el proyecto fuese todavía más importante para mí. <br><br> Por eso, recibir el premio fue especialmente gratificante. Me quedo con la experiencia de haberme enfrentado a un proyecto que me sacaba de mi zona de confort, de haber aprendido durante el proceso y, sobre todo, con la ilusión y el agradecimiento de haber podido formar parte de una oportunidad así.</p>" },
 
-      {
-        t: "mosaico", imgs: [
-          "media/proyectos/thompson/web-08.jpg"
-        ]
-      }
+      { t: "full", img: "media/proyectos/thompson/web-08.jpg" }
+      
     ]
   },
 
   // ---------------------------------------------------------------- (03)
   {
-    id: 3, slug: "mapilo", nombre: "Kit Mapilo", anio: "2025", disc: "Packaging · Producto",
-    cat: "marca", img: "media/proyectos/mapilo/web-01.jpg", destacado: false,
+    id: 3, slug: "mapilo", nombre: "Kit Mapilo", anio: "2025", disc: "Packaging, Producto",
+    cat: "marca", img: "media/proyectos/mapilo/web-05.jpg", destacado: false,
     intro: "Un kit de juegos de mesa pensado para hacer una pausa y cuidar la mente lejos de la pantalla.",
     bloques: [
-      { t: "texto", html: "<p>Un kit físico que reúne varios juegos sencillos en un sistema de packaging coherente, pensado para desconectar un rato y ejercitar la mente sin pantallas.</p>" },
+      { t: "texto", html: "<p>Más que un envase, la propuesta es un pequeño sistema. Una funda exterior protege un contenedor con seis cajas, y en cada una vive un juego. No es un empaque de usar y tirar, sino un objeto que se queda cerca, se abre cuando apetece una pausa y se vuelve a guardar.</p>" },
 
+      { t: "full", img: "media/proyectos/kit mapilo/que es mapilo.png" },
+
+      { t: "texto", html: "<p>El punto de partida, un imaginario de formas planas, recortes y color en bloques, con el punto lúdico de lo hecho a mano. Ese cruce entre lo gráfico y lo artesanal marcó el tono de Mapilo, directo, amable y con carácter. Cada caja contiene un juego distinto y propone una forma diferente de trabajar la atención, la lógica, la memoria o la percepción espacial.</p>" },
+
+      { t: "full", img: "media/proyectos/kit mapilo/moodboard.png" },
       {
         t: "mosaico", imgs: [
-          "media/proyectos/mapilo/web-01.jpg",
-          "media/proyectos/mapilo/web-02.jpg"
+           "media/proyectos/kit mapilo/Frame 175.png",
+          "media/proyectos/kit mapilo/Frame 176.png"
         ]
       },
 
-      { t: "texto", html: "<p>Cada juego tiene su color y su icono, y todos comparten la misma retícula, así que el kit se lee como una familia aunque cada caja funcione por separado.</p>" },
+      { t: "texto", html: "<p>Este kit no es solo un contenedor. La experiencia empieza desde la forma en que la persona lo ve, lo abre y empieza a descubrirlo. La funda exterior troquelada deja ver partes de color de las cajas del interior, pero sin mostrarlo todo. Eso genera una primera curiosidad, una especie de adelanto visual que invita a abrirlo. Después aparece una segunda capa más sencilla, para ﬁnalmente llegar a las seis cajas interiores. La apertura funciona por niveles, primero se intuye, luego se revela y al ﬁnal se usa. <br> <br>El troquel no está pensado solo como elemento decorativos, si no que forme parte de la experiencia. Todo las fases de cajas convierten el momento de abrir el pack en un pequeño recorrido.</p>" },
 
       {
         t: "mosaico", imgs: [
-          "media/proyectos/mapilo/web-03.jpg",
           "media/proyectos/mapilo/web-04.jpg",
-          "media/proyectos/mapilo/web-05.jpg"
+          "media/proyectos/mapilo/web-06.jpg",
+          "media/proyectos/kit mapilo/c general detras.png"
         ]
       },
 
-      { t: "texto", html: "<p class=\"ficha-meta\"><strong>Rol</strong> Proyecto individual. Concepto, diseño de juegos y packaging.<br><strong>Herramientas</strong> Illustrator · Photoshop.</p>" }
+      { t: "texto", html: "<p> Para la funda exterior y las seis cajas interiores, se usaría un cartón compacto reciclado estucado de 350 g o 400 g. Para el contenedor interior como se necesita más resistencia se usaría un cartón gris reciclado de 1,5 mm, contracolado con papel impreso. <br><br> Para buscar la sostenibilidad, se evitar elementos innecesarios como una ventana plástica para los troquelados. Más que un empaque de un solo uso, el kit se piensa como un objeto que se quede en casa para guardar los juegos y seguir utilizándose de manera continuada.</p>" },
+
+      {
+        t: "mosaico", imgs: [
+          "media/proyectos/mapilo/web-05.jpg",
+          "media/proyectos/kit mapilo/c juegos.png",
+          "media/proyectos/kit mapilo/c juegos parte de atras.png"
+        ]
+      }
     ]
   },
 
@@ -850,11 +852,8 @@ const PROYECTOS = [
     bloques: [
       { t: "texto", html: "<p>Este proyecto parte de una campaña ficticia para Four Seasons y Veuve Clicquot que desarrollamos en clase. La propuesta buscaba unir las dos marcas a través de una serie de ilustraciones ambientadas en diferentes destinos del hotel. <br><br> Desde el principio tenía bastante claro que quería alejarme de una representación demasiado realista. En clase habíamos trabajado a Edward Penfield y René Gruau y su forma de utilizar las manchas, el contraste y el color me gustó muchísimo. Me interesaba especialmente cómo el fondo podía tener tanto peso como la propia figura y cómo unos pocos colores podían hacer que una composición destacara sin necesidad de llenarla de elementos.</p>" },
 
-      {
-        t: "mosaico", imgs: [
-          "media/proyectos/four-seasons/web-01.jpg"
-        ]
-      },
+      { t: "full", img: "media/proyectos/four-seasons/web-01.jpg" },
+      
 
       { t: "texto", html: "<p>Para conseguir ese acabado utilicé un pincel que imitaba el trazo de un rotulador seco, buscando que las formas quedaran algo irregulares y que se notara el gesto. También tomé como referencia las paletas de Edward Penfield, porque me gustaba esa sensación un poco vintage que podía aportar al proyecto. <br><br> Cada destino lo trabajé pensando primero en el propio Four Seasons y en cómo podía representar su personalidad a través de una escena concreta. Para Marrakech me fijé en una de las zonas de restaurante del hotel, jugando con las cortinas rojas, las lámparas y la atmósfera del espacio. En la Riviera Francesa quise llevar la escena al exterior y aprovechar la terraza y la piscina como parte de la composición, rodeada de vegetación y tumbonas. Para Nueva York decidí salir del interior del hotel y utilizar su propia fachada como protagonista, acompañándola de elementos muy reconocibles de la ciudad como el rascacielos y el taxi. <br><br> También diferencié cada destino a través del color. Marrakech tiene una paleta más cálida, con naranjas, turquesas y amarillo. La Riviera Francesa combina verdes oliva y turquesas con el amarillo, mientras que Nueva York se mueve entre azules y morados, manteniendo ese mismo toque amarillo que une toda la campaña.</p>" },
 
@@ -888,11 +887,7 @@ const PROYECTOS = [
     bloques: [
       { t: "texto", html: "<p>El concurso Reinterpreta la Puerta de Alcalá proponía crear una nueva versión de uno de los grandes símbolos de Madrid y aplicarla al diseño de una camiseta promocional para la ciudad. El reto era encontrar una forma de representar Madrid que fuese reconocible, pero que al mismo tiempo aportase una mirada personal y diferente a los símbolos que ya forman parte de su identidad. <br><br> Para comenzar, busqué referencias en elementos que forman parte del paisaje cotidiano de Madrid. Los mosaicos y azulejos de sus calles fueron el punto de partida, junto con una paleta de azules y pequeños toques amarillos y una tipografía de inspiración chulapa. Me interesaba conseguir una estética que mezclase la tradición madrileña con una interpretación más fresca y actual.</p>" },
 
-      {
-        t: "mosaico", imgs: [
-          "media/proyectos/puerta-alcala/web-07.jpg"
-        ]
-      },
+      { t: "full", img: "media/proyectos/puerta-alcala/web-07.jpg" },
 
       { t: "texto", html: "<p>A partir de estas referencias nació “Callejea por Madrid”. La idea era convertir la ciudad en un pequeño mosaico, donde cada pieza representase una parte de Madrid y, al unirse, construyese una imagen más completa. <br><br> La Puerta de Alcalá ocupa el centro como punto de partida del recorrido. A su alrededor desarrollé diferentes ilustraciones de iconos de la ciudad, como el Oso y el Madroño y el Templo de Debod. También introduje caminos entre las piezas para hacer referencia a las calles y reforzar la idea de recorrer y descubrir Madrid.</p>" },
 
@@ -968,7 +963,7 @@ const PROYECTOS = [
 
   {
     id: 8, slug: "abuela", nombre: "Mi abuela", anio: "2024", disc: "Fotografía documental",
-    cat: "fotografia", img: "media/proyectos/abuela/web-01.jpg", destacado: true,
+    cat: "fotografia", img: "media/proyectos/abuela/web-01.jpg", destacado: false,
     intro: "Un retrato íntimo de la vida diaria de mi abuela, donde cada gesto cotidiano habla del paso del tiempo y de la fuerza de los vínculos familiares.",
     bloques: [
       { t: "texto", html: "<p>Las fotografías de mi abuela, ocupada en sus quehaceres diarios, hablan del paso del tiempo y, a la vez, de la permanencia de ciertas actividades. Cada acción cotidiana, cada rincón de su hogar, evoca la nostalgia de mi infancia y la fortaleza de los vínculos familiares.</p><p>A través de su figura quise mostrar cómo los valores se mantienen y se transmiten de generación en generación, dando forma a la identidad de mi pueblo.</p>" },
@@ -983,16 +978,20 @@ const PROYECTOS = [
         "media/proyectos/abuela/web-19.jpg"
       ]},
 
-      { t: "texto", html: "<p>Un enfoque documental y narrativo, en blanco y negro, inspirado en la intimidad y la autenticidad de Robert Frank y Kaylynn Deveney. Trabajé con retrato ambiental, capturando momentos espontáneos en su propio entorno, siempre con su consentimiento.</p>" }
+      { t: "texto", html: "<p>Para la realización, he utilizado un enfoque documental y narrativo, inspirándome en la intimidad y la autenticidad que caracterizan el estilo de Robert Frank y Kaylynn Deveney.<br> He adoptado métodos de observación, capturando momentos espontáneos y naturales en la vida cotidiana de mi abuela. </p>" },
+
+      { t: "full", img: "media/proyectos/abuela/web-moodboard.jpg" },
+
+      { t: "texto", html: "<p>Para la inspiración: <br><br> ROBERT FRANK<br> Lo que más me gusta de este artista es que al ser sus fotografías en blanco y negro crea grandes contrastes y así dirige el foco de atención en cada obra. También me gusto mucho la idea de mostrar la realidad cruda sin que las personas posen forzadamente para el. <br><br> KAYLYNN DEVENEY <br> De este artista me enfoqué en la idea de mostrar la vida diaria y actividades comunes que todos hacemos, pero desde ángulos interesantes que resaltan la belleza de estos. </p>" }
     ]
   },
 
   {
     id: 9, slug: "mi-pueblo", nombre: "Mi pueblo", anio: "2024", disc: "Fotografía documental",
     cat: "fotografia", img: "media/proyectos/mi-pueblo/web-01.jpg", destacado: true,
-    intro: "La esencia de Daganzo de Arriba — su vida cotidiana, sus gentes y ese sentido de comunidad que define el lugar donde crecí.",
+    intro: "La esencia de Daganzo de Arriba, su vida cotidiana, sus gentes y ese sentido de comunidad que define el lugar donde crecí.",
     bloques: [
-      { t: "texto", html: "<p>Quise capturar la esencia de mi pueblo, un lugar que no solo es mi hogar, sino el escenario de mis recuerdos más preciados. Las imágenes de sus habitantes, jóvenes y adultos interactuando en su entorno diario, reflejan la vitalidad y el sentido de comunidad que lo caracterizan.</p><p>Momentos espontáneos, tareas compartidas y la convivencia con la naturaleza y los animales — pequeñas historias que muestran la belleza de la vida cotidiana y las relaciones humanas.</p>" },
+      { t: "texto", html: "<p>Para este trabajo de fotografía, quise capturar la esencia de mi pueblo, un lugar que no solo es mi hogar, sino el escenario de mis más preciadosrecuerdos. Las imágenes de sus habitantes, jóvenes y adultos interactuando en su entorno diario, reflejan la vitalidad y el sentido de comunidad que lo caracterizan.</p><p>Capturar a las personas en momentos espontáneos, compartiendo tareas y disfrutando de la compañía mutua, destaca la importancia de las relaciones humanas y la convivencia armónica con la naturaleza y los animales</p>" },
 
       { t: "contacto", imgs: [
         "media/proyectos/mi-pueblo/web-01.jpg", "media/proyectos/mi-pueblo/web-02.jpg", "media/proyectos/mi-pueblo/web-03.jpg",
@@ -1007,7 +1006,73 @@ const PROYECTOS = [
         "media/proyectos/mi-pueblo/web-28.jpg", "media/proyectos/mi-pueblo/web-29.jpg"
       ]},
 
-      { t: "texto", html: "<p>Un enfoque documental y narrativo, en blanco y negro, inspirado en Robert Frank y Kaylynn Deveney. Retrato ambiental y fotografía de estilo de vida, con momentos capturados de forma natural — primero la foto y después el consentimiento de cada persona.</p>" }
+      { t: "texto", html: "<p>Un enfoque documental y narrativo, en blanco y negro, inspirado en Robert Frank y Kaylynn Deveney. Retrato ambiental y fotografía de estilo de vida, con momentos capturados de forma natural. </p>" },
+
+      { t: "full", img: "media/proyectos/mi-pueblo/web-moodboard.jpg" },
+
+      { t: "texto", html: "<p>Para la inspiración: <br><br> ROBERT FRANK<br> Lo que más me gusta de este artista es que al ser sus fotografías en blanco y negro crea grandes contrastes y así dirige el foco de atención en cada obra. También me gusto mucho la idea de mostrar la realidad cruda sin que las personas posen forzadamente para el. <br><br> KAYLYNN DEVENEY <br> De este artista me enfoqué en la idea de mostrar la vida diaria y actividades comunes que todos hacemos, pero desde ángulos interesantes que resaltan la belleza de estos. </p>" }
+    ]
+  },
+
+  {
+    id: 10, slug: "twin-peaks", nombre: "Twin Peaks", anio: "2025", disc: "Editorial, Fotografía, Dirección de arte",
+    cat: "fotografia", img: "media/proyectos/twin-peaks/web-mockup-01.jpg", destacado: false,
+    intro: "Serie de bodegones que trascienden lo cotidiano,<em>Twin Peaks</em> y al universo inquietante de David Lynch, llevada a las páginas de la revista Aperture.",
+    bloques: [
+      // -- PROBLEMA --
+      { t: "texto", html: "<p>Twin Peaks no se explica, se siente. El reto era traducir en imágenes fijas ese universo donde lo cotidiano se vuelve extraño y cada objeto guarda un secreto. Mi equipo y yo quisimos contar la serie de David Lynch sin recurrir a sus escenas, solo a través de las cosas que rodean a sus personajes, y darle forma dentro de una publicación real, un número especial de la revista de fotografía Aperture.</p>" },
+
+      // -- CONCEPTO --
+      { t: "texto", html: "<p>La idea fue construir cinco bodegones, uno por personaje, hechos solo con los objetos que los definen. En lugar de retratar a Cooper, Laura, Audrey, James o Bob, dejamos que hablen sus cosas como una taza de café humeante y una tarta de cereza, unos tacones rojos junto a un cigarro a medio consumir, un espejo roto y un clavo oxidado. Cada composición es un retrato sin rostro, el rastro de quién estuvo ahí.</p>" },
+
+      {
+        t: "mosaico", imgs: [
+          "media/proyectos/twin-peaks/web-concepto-01.jpg",
+          "media/proyectos/twin-peaks/web-concepto-02.jpg",
+          "media/proyectos/twin-peaks/web-concepto-03.jpg"
+        ]
+      },
+
+      { t: "texto", html: "<p>Todo se sostiene sobre una misma estética, el estilo <em>whimsigoth</em>, ese cruce entre lo gótico y lo onírico que reinterpreta la oscuridad desde lo poético. Colores profundos, objetos simbólicos, luz tenue y una atmósfera melancólica donde lo mágico, lo extraño y lo común conviven de forma natural. Belleza y desasosiego a partes iguales, cien por cien Lynch. <br> Un imaginario propio para fijar el tono antes de hacer las fotografías, buscando texturas orgánicas, flores marchitas, claroscuros y objetos comunes cargados de misterio.</p>" },
+
+      {
+        t: "mosaico", imgs: [
+          "media/proyectos/twin-peaks/web-concepto-04.jpg",
+          "media/proyectos/twin-peaks/web-moodboard.jpg",
+          "media/proyectos/twin-peaks/web-concepto-05.jpg"
+        ]
+      },
+
+      // -- PROCESO --
+      { t: "texto", html: "<p>Para poder pasar del concepto al plató empecé dibujando cada bodegón a mano para decidir qué entra en el encuadre y cómo se coloca cada pieza, como planteamiento funcional pero tampoco como una composión totalmente cerrada. Y de ahí pasamos a montar y fotografiar las cinco composiciones, cuidando la luz baja y el color para que cada mesa respirara ese aire inquietante.</p>" },
+
+      { t: "full", img: "media/proyectos/twin-peaks/web-bocetos.jpg" },
+
+      { t: "texto", html: "<p>Las cinco fotografías finales fueron editadas para mantener la coherencia visual y resaltar la atmósfera melancólica que caracteriza este proyecto, pero únicamente el color y contrastes. Y mediante el uso de la doble exposición, técnica que consigue capturar dos imágenes al mismo tiempo sin el uso de la postproducción, logramos crear imágenes con una profundidad y una atmósfera únicas.</p>" },
+
+      {
+        t: "mosaico", imgs: [
+          "media/proyectos/twin-peaks/web-bodegon-01.jpg",
+          "media/proyectos/twin-peaks/web-bodegon-02.jpg",
+          "media/proyectos/twin-peaks/web-bodegon-03.jpg",
+          "media/proyectos/twin-peaks/web-bodegon-04.jpg",
+          "media/proyectos/twin-peaks/web-bodegon-05.jpg"
+        ]
+      },
+
+      // -- RESULTADO CON MOCKUPS --
+      { t: "texto", html: "<p>El resultado toma forma de revista, un número monográfico de Aperture dedicado a Twin Peaks. Una portada que resume la serie, un reportaje sobre David Lynch entre lo visible y lo oculto, y las imágenes saltando del papel a las vallas y a las redes con frases de la propia serie.</p>" },
+
+      {
+        t: "mosaico", imgs: [
+          "media/proyectos/twin-peaks/web-mockup-01.jpg",
+          "media/proyectos/twin-peaks/web-mockup-02.jpg",
+          "media/proyectos/twin-peaks/web-mockup-03.jpg",
+          "media/proyectos/twin-peaks/web-mockup-04.jpg",
+          "media/proyectos/twin-peaks/web-mockup-05.jpg",
+          "media/proyectos/twin-peaks/web-mockup-06.jpg"
+        ]
+      }
     ]
   }
 
@@ -1093,12 +1158,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } else if (b.t === "contacto") {
           // HOJA DE CONTACTOS — todas las fotos en una rejilla uniforme (mismo
-          // tamaño), tipo fotolibro. Se pinchan para verlas grandes (lupa).
-          // Columnas = fotos/4 para que salgan ~4 filas (en escritorio).
-          const cols = Math.max(1, Math.ceil((b.imgs || []).length / 4));
-          const fotos = (b.imgs || []).map(src =>
-            `<figure><img src="${src}" alt="${currentProj.nombre}" loading="lazy" decoding="async"></figure>`).join("");
-          html += `<div class="fb-contacto reveal" style="--cs-cols:${cols}">${fotos}</div>`;
+          // tamaño), tipo fotolibro. 4 columnas en escritorio (fotos grandes).
+          // La rejilla carga MINIATURAS ligeras (web-NN-thumb.jpg, ~640px) para
+          // que cargue rápido; la LUPA usa la foto grande (data-full).
+          const fotos = (b.imgs || []).map(src => {
+            const thumb = src.replace(/\.jpe?g$/i, "-thumb.jpg");
+            return `<figure><img src="${thumb}" data-full="${src}" alt="${currentProj.nombre}" loading="lazy" decoding="async"></figure>`;
+          }).join("");
+          html += `<div class="fb-contacto reveal">${fotos}</div>`;
         }
       });
       body.innerHTML = html;
@@ -1356,8 +1423,12 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       const els = fotos();
       const lista = els.map(im => ({
-        src: im.getAttribute("src"), alt: im.alt || "",
-        w: im.naturalWidth || 0, h: im.naturalHeight || 0
+        // si la imagen es una miniatura (hoja de contactos), la lupa usa la
+        // grande de data-full y deja que mida su tamaño real al cargar (w/h 0).
+        src: im.dataset.full || im.getAttribute("src"),
+        alt: im.alt || "",
+        w: im.dataset.full ? 0 : (im.naturalWidth || 0),
+        h: im.dataset.full ? 0 : (im.naturalHeight || 0)
       }));
       const i = els.indexOf(img);
       window.abrirLupa(lista, i < 0 ? 0 : i);
