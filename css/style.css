@@ -1215,9 +1215,35 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
 
 /* Las fotos se pueden pinchar para verlas grandes (ver "lupa" más abajo) */
 .fb-mosaico img,
+.fb-contacto img,
 .ficha-body .fb-full img {
   cursor: zoom-in;
 }
+
+/* HOJA DE CONTACTOS — todas las fotos en una rejilla uniforme (mismo tamaño),
+   tipo fotolibro / proof sheet. Para series de fotos (mismo formato). */
+.fb-contacto {
+  display: grid;
+  /* --cs-cols lo pone el JS (fotos/4) para que salgan ~4 filas en escritorio */
+  grid-template-columns: repeat(var(--cs-cols, 5), 1fr);
+  gap: 0.4rem;
+}
+.fb-contacto figure {
+  margin: 0;
+  aspect-ratio: 4 / 3;              /* todas las celdas iguales */
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(77, 18, 76, 0.04);
+}
+.fb-contacto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;               /* al ser todas 4/3, encajan sin recorte real */
+  display: block;
+}
+@media (max-width: 1100px) { .fb-contacto { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 720px)  { .fb-contacto { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 460px)  { .fb-contacto { grid-template-columns: repeat(2, 1fr); } }
 
 /* En móvil el mosaico se convierte en una foto debajo de otra. De eso se
    encarga el JS (CUANTAS_POR_FILA devuelve 1 y no llega a crear filas), así

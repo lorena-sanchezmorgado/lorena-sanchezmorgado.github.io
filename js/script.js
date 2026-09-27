@@ -382,7 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const filters = document.querySelectorAll(".proy-filter .filter-item");
   if (!grid || !filters.length) return;
 
-  const catLabel = { marca: "Marca", campana: "Campaña", ilustracion: "Ilustración" };
+  const catLabel = { marca: "Marca", campana: "Campaña", ilustracion: "Ilustración", fotografia: "Fotografía" };
 
   // Pinta las tarjetas. SIN numerar — al filtrar por "Seleccionados" los
   // números saldrían salteados (01, 02, 04, 06...) y quedaba raro.
@@ -964,6 +964,51 @@ const PROYECTOS = [
       },
 
     ]
+  },
+
+  {
+    id: 8, slug: "abuela", nombre: "Mi abuela", anio: "2024", disc: "Fotografía documental",
+    cat: "fotografia", img: "media/proyectos/abuela/web-01.jpg", destacado: true,
+    intro: "Un retrato íntimo de la vida diaria de mi abuela, donde cada gesto cotidiano habla del paso del tiempo y de la fuerza de los vínculos familiares.",
+    bloques: [
+      { t: "texto", html: "<p>Las fotografías de mi abuela, ocupada en sus quehaceres diarios, hablan del paso del tiempo y, a la vez, de la permanencia de ciertas actividades. Cada acción cotidiana, cada rincón de su hogar, evoca la nostalgia de mi infancia y la fortaleza de los vínculos familiares.</p><p>A través de su figura quise mostrar cómo los valores se mantienen y se transmiten de generación en generación, dando forma a la identidad de mi pueblo.</p>" },
+
+      { t: "contacto", imgs: [
+        "media/proyectos/abuela/web-01.jpg", "media/proyectos/abuela/web-02.jpg", "media/proyectos/abuela/web-03.jpg",
+        "media/proyectos/abuela/web-04.jpg", "media/proyectos/abuela/web-05.jpg", "media/proyectos/abuela/web-06.jpg",
+        "media/proyectos/abuela/web-07.jpg", "media/proyectos/abuela/web-08.jpg", "media/proyectos/abuela/web-09.jpg",
+        "media/proyectos/abuela/web-10.jpg", "media/proyectos/abuela/web-11.jpg", "media/proyectos/abuela/web-12.jpg",
+        "media/proyectos/abuela/web-13.jpg", "media/proyectos/abuela/web-14.jpg", "media/proyectos/abuela/web-15.jpg",
+        "media/proyectos/abuela/web-16.jpg", "media/proyectos/abuela/web-17.jpg", "media/proyectos/abuela/web-18.jpg",
+        "media/proyectos/abuela/web-19.jpg"
+      ]},
+
+      { t: "texto", html: "<p>Un enfoque documental y narrativo, en blanco y negro, inspirado en la intimidad y la autenticidad de Robert Frank y Kaylynn Deveney. Trabajé con retrato ambiental, capturando momentos espontáneos en su propio entorno, siempre con su consentimiento.</p>" }
+    ]
+  },
+
+  {
+    id: 9, slug: "mi-pueblo", nombre: "Mi pueblo", anio: "2024", disc: "Fotografía documental",
+    cat: "fotografia", img: "media/proyectos/mi-pueblo/web-01.jpg", destacado: true,
+    intro: "La esencia de Daganzo de Arriba — su vida cotidiana, sus gentes y ese sentido de comunidad que define el lugar donde crecí.",
+    bloques: [
+      { t: "texto", html: "<p>Quise capturar la esencia de mi pueblo, un lugar que no solo es mi hogar, sino el escenario de mis recuerdos más preciados. Las imágenes de sus habitantes, jóvenes y adultos interactuando en su entorno diario, reflejan la vitalidad y el sentido de comunidad que lo caracterizan.</p><p>Momentos espontáneos, tareas compartidas y la convivencia con la naturaleza y los animales — pequeñas historias que muestran la belleza de la vida cotidiana y las relaciones humanas.</p>" },
+
+      { t: "contacto", imgs: [
+        "media/proyectos/mi-pueblo/web-01.jpg", "media/proyectos/mi-pueblo/web-02.jpg", "media/proyectos/mi-pueblo/web-03.jpg",
+        "media/proyectos/mi-pueblo/web-04.jpg", "media/proyectos/mi-pueblo/web-05.jpg", "media/proyectos/mi-pueblo/web-06.jpg",
+        "media/proyectos/mi-pueblo/web-07.jpg", "media/proyectos/mi-pueblo/web-08.jpg", "media/proyectos/mi-pueblo/web-09.jpg",
+        "media/proyectos/mi-pueblo/web-10.jpg", "media/proyectos/mi-pueblo/web-11.jpg", "media/proyectos/mi-pueblo/web-12.jpg",
+        "media/proyectos/mi-pueblo/web-13.jpg", "media/proyectos/mi-pueblo/web-14.jpg", "media/proyectos/mi-pueblo/web-15.jpg",
+        "media/proyectos/mi-pueblo/web-16.jpg", "media/proyectos/mi-pueblo/web-17.jpg", "media/proyectos/mi-pueblo/web-18.jpg",
+        "media/proyectos/mi-pueblo/web-19.jpg", "media/proyectos/mi-pueblo/web-20.jpg", "media/proyectos/mi-pueblo/web-21.jpg",
+        "media/proyectos/mi-pueblo/web-22.jpg", "media/proyectos/mi-pueblo/web-23.jpg", "media/proyectos/mi-pueblo/web-24.jpg",
+        "media/proyectos/mi-pueblo/web-25.jpg", "media/proyectos/mi-pueblo/web-26.jpg", "media/proyectos/mi-pueblo/web-27.jpg",
+        "media/proyectos/mi-pueblo/web-28.jpg", "media/proyectos/mi-pueblo/web-29.jpg"
+      ]},
+
+      { t: "texto", html: "<p>Un enfoque documental y narrativo, en blanco y negro, inspirado en Robert Frank y Kaylynn Deveney. Retrato ambiental y fotografía de estilo de vida, con momentos capturados de forma natural — primero la foto y después el consentimiento de cada persona.</p>" }
+    ]
   }
 
 ];
@@ -972,7 +1017,8 @@ const CAT_NOMBRES = {
   seleccionados: "SELECCIONADOS",
   marca: "MARCA",
   campana: "CAMPAÑA",
-  ilustracion: "ILUSTRACIÓN"
+  ilustracion: "ILUSTRACIÓN",
+  fotografia: "FOTOGRAFÍA"
 };
 
 // FICHA — construye la lista del apartado del que vienes, con el actual en negrita
@@ -1044,6 +1090,15 @@ document.addEventListener("DOMContentLoaded", () => {
           const fotos = (b.imgs || []).map(src =>
             `<figure class="reveal"><img src="${src}" alt="${currentProj.nombre}" loading="lazy"></figure>`).join("");
           html += `<div class="fb-mosaico">${fotos}</div>`;
+
+        } else if (b.t === "contacto") {
+          // HOJA DE CONTACTOS — todas las fotos en una rejilla uniforme (mismo
+          // tamaño), tipo fotolibro. Se pinchan para verlas grandes (lupa).
+          // Columnas = fotos/4 para que salgan ~4 filas (en escritorio).
+          const cols = Math.max(1, Math.ceil((b.imgs || []).length / 4));
+          const fotos = (b.imgs || []).map(src =>
+            `<figure><img src="${src}" alt="${currentProj.nombre}" loading="lazy" decoding="async"></figure>`).join("");
+          html += `<div class="fb-contacto reveal" style="--cs-cols:${cols}">${fotos}</div>`;
         }
       });
       body.innerHTML = html;
