@@ -1255,6 +1255,14 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
   border-radius: 3px;
 }
 
+/* Vídeo a todo el ancho (bloque "video") — demo de movimiento */
+.ficha-body .fb-video video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 3px;
+}
+
 
 /* LUPA — al pinchar una foto de la ficha se abre una GALERÍA con todas las
    fotos del proyecto, que se recorre con scroll horizontal (o con las flechas
@@ -1344,14 +1352,6 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
   cursor: zoom-out;
 }
 .lupa-foto img { cursor: zoom-in; }
-
-/* Al ampliar, la foto tapa el fondo y los botones se quedan encima de ella.
-   Mismo truco que en el Archivo: un halo de papel alrededor de las letras. */
-.lupa-cerrar,
-.lupa-ir,
-.lupa-cuenta {
-  text-shadow: 0 0 6px var(--papel), 0 0 14px var(--papel), 0 0 26px var(--papel);
-}
 
 /* Botones — CERRAR, las flechas y el contador. En tinta, porque el fondo
    ahora es claro. */

@@ -1016,7 +1016,7 @@ const PROYECTOS = [
 
   {
     id: 10, slug: "twin-peaks", nombre: "Twin Peaks", anio: "2025", disc: "Editorial, Fotografía, Dirección de arte",
-    cat: "fotografia", img: "media/proyectos/twin-peaks/web-mockup-01.jpg", destacado: false,
+    cat: "fotografia", img: "media/proyectos/twin-peaks/web-mockup-05.jpg", destacado: false,
     intro: "Serie de bodegones que trascienden lo cotidiano,<em>Twin Peaks</em> y al universo inquietante de David Lynch, llevada a las páginas de la revista Aperture.",
     bloques: [
       // -- PROBLEMA --
@@ -1071,6 +1071,55 @@ const PROYECTOS = [
           "media/proyectos/twin-peaks/web-mockup-04.jpg",
           "media/proyectos/twin-peaks/web-mockup-05.jpg",
           "media/proyectos/twin-peaks/web-mockup-06.jpg"
+        ]
+      }
+    ]
+  },
+
+  {
+    id: 11, slug: "dicho-y-hecho", nombre: "Dicho y hecho", anio: "2025", disc: "Editorial, Dirección de arte",
+    cat: "marca", img: "media/proyectos/dicho-y-hecho/portada en plastico.png", destacado: true,
+    intro: "Una revista que rescata los refranes de siempre y los reinterpreta. Un proyecto en equipo donde la cultura popular se cruza con el diseño editorial.",
+    bloques: [
+      // -- CONTEXTO / CONCEPTO --
+      { t: "texto", html: "<p>Dicho y hecho nace de una idea sencilla, que los refranes son pequeñas cápsulas de sabiduría popular que llevan siglos pasando de boca en boca y que casi nadie se ha parado a mirar de cerca. Quisimos rescatarlos y darles una vuelta desde el diseño, cruzando cultura popular, humor, historia y estética Z. Cada página es una excusa para redescubrir lo que ya sabías, o creías saber. El propio nombre de la revista es un refrán, y marca el tono de todo lo demás.<br><br>La revista gira en torno a seis refranes y cada uno se despliega como su propio artículo. Rastreamos de dónde viene, cómo ha viajado a otras lenguas y culturas y cómo sigue vivo hoy en el cine, la música o los memes, hasta llegar a una versión actualizada para la generación de las stories.</p>" },
+
+      { t: "video", src: "media/proyectos/dicho-y-hecho/web-paginas.mp4" },
+
+      // -- SISTEMA VISUAL --
+      { t: "texto", html: "<p>El punto de partida visual, un imaginario de portadas y editoriales expresivas donde la tipografía manda y la imagen se trata sin miedo.<br><br> Toda la revista está diseñada en blanco y negro para darle un tono sobrio y atemporal. A partir de ahí, cada refrán cobra vida con un color propio que marca su espacio dentro de la revista.</p>" },
+
+      {
+        t: "mosaico", imgs: [
+          "media/proyectos/dicho-y-hecho/web-moodboard.jpg",
+          "media/proyectos/dicho-y-hecho/web-paleta.jpg"
+        ]
+      },
+
+      { t: "video", src: "media/proyectos/dicho-y-hecho/web-reticula.mp4" },
+      { t: "video", src: "media/proyectos/dicho-y-hecho/web-tipografia.mp4" },
+
+      // -- LOS REFRANES (RESULTADO) --
+      { t: "texto", html: "<p>Seis refranes, seis universos. A cada dicho le asignamos un color según lo que quiere expresar, aprovechando lo que ya asociamos a cada tono. El naranja es el del hambre y la comida, el morado el del misterio y lo oscuro, con sus brujas y sus cuervos, el amarillo el del oro y las apariencias, el rojo el de la prisa. Así cada refrán encuentra el color que mejor lo cuenta, y dentro de cada uno mezclamos duotonos, collage y tipografía a gran escala para llevarlo a su propio terreno visual.</p>" },
+
+        {
+        t: "mosaico", imgs: [
+          "media/proyectos/dicho-y-hecho/web-refran-01.jpg",
+          "media/proyectos/dicho-y-hecho/web-refran-02.jpg",
+          "media/proyectos/dicho-y-hecho/web-refran-03.jpg",
+          "media/proyectos/dicho-y-hecho/web-refran-04.jpg",
+          "media/proyectos/dicho-y-hecho/web-refran-05.jpg",
+          "media/proyectos/dicho-y-hecho/web-refran-06.jpg",
+          "media/proyectos/dicho-y-hecho/web-refran-07.jpg"
+        ]
+      },
+
+      { t: "texto", html: "<p>El azul, en cambio, es el color de la propia revista. Tiene su sección propia, un espacio de juegos, pasatiempos y sopa de letras donde descubrir refranes nuevos o recordar los de siempre.</p>" },
+
+      {
+        t: "mosaico", imgs: [
+          "media/proyectos/dicho-y-hecho/portada en plastico.png",
+          "media/proyectos/dicho-y-hecho/web-portada.jpg"
         ]
       }
     ]
@@ -1166,11 +1215,32 @@ document.addEventListener("DOMContentLoaded", () => {
             return `<figure><img src="${thumb}" data-full="${src}" alt="${currentProj.nombre}" loading="lazy" decoding="async"></figure>`;
           }).join("");
           html += `<div class="fb-contacto reveal">${fotos}</div>`;
+
+        } else if (b.t === "video") {
+          // VÍDEO a todo el ancho (demo de movimiento). Se reproduce solo, en
+          // silencio y en bucle cuando entra en pantalla, como un GIF. No carga
+          // hasta que hace falta (preload none + el observador de más abajo).
+          const poster = b.poster ? ` poster="${b.poster}"` : "";
+          html += `<div class="fb-video reveal"><video src="${b.src}"${poster} muted loop playsinline preload="none"></video></div>`;
         }
       });
       body.innerHTML = html;
       if (window.initReveals) window.initReveals(body);
       if (window.ajustarMosaicos) window.ajustarMosaicos(body);
+
+      // Los vídeos se reproducen solos (en silencio) cuando están a la vista y
+      // se pausan al salir, para no descargar ni decodificar todos a la vez.
+      const vids = body.querySelectorAll(".fb-video video");
+      if (vids.length && "IntersectionObserver" in window) {
+        const vObs = new IntersectionObserver((ents) => {
+          ents.forEach(e => {
+            const v = e.target;
+            if (e.isIntersecting) { v.preload = "auto"; const pr = v.play(); if (pr) pr.catch(() => {}); }
+            else v.pause();
+          });
+        }, { threshold: 0.25 });
+        vids.forEach(v => vObs.observe(v));
+      }
     }
   }
 });
