@@ -99,16 +99,16 @@ Es la duda más fácil de tener, así que aquí va clarito:
 
 | Campo | Qué decide |
 |---|---|
-| `cat: "marca"` | **en qué apartado** está — Marca, Campaña o Ilustración |
+| `cat: "packaging"` | **en qué apartado** está — UX/UI, Packaging, Editorial, Ilustración o Fotografía |
 | `destacado: true` | **si sale en tu escaparate**, el botón *Seleccionados* |
 
 - `destacado: true` → sale en *Seleccionados* **y** en su categoría.
 - `destacado: false` → **no** sale en *Seleccionados*, pero sí al pinchar su
   categoría. Sigue estando en la web, solo que no en la primera pantalla.
 
-Así eliges qué quieres enseñar primero sin borrar nada. Ahora mismo hay **5**
-destacados de 7 — fuera están *Kit Mapilo* y *Four Seasons*. Para cambiarlo,
-una sola palabra en `js/script.js`.
+Así eliges qué quieres enseñar primero sin borrar nada. Ahora mismo hay **6**
+destacados de 12 — Compás, Pichi, Los Americanos, Cata la lata, Hotel Thompson y
+Twin Peaks. Para cambiarlo, una sola palabra en `js/script.js`.
 
 ---
 

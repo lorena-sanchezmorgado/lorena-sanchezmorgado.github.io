@@ -389,12 +389,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const filters = document.querySelectorAll(".proy-filter .filter-item");
   if (!grid || !filters.length) return;
 
-  const catLabel = { marca: "Marca", campana: "Campaña", ilustracion: "Ilustración", fotografia: "Fotografía" };
+  const catLabel = { uxui: "UX/UI", packaging: "Packaging", editorial: "Editorial", ilustracion: "Ilustración", fotografia: "Fotografía" };
 
   // Pinta las tarjetas. SIN numerar — al filtrar por "Seleccionados" los
   // números saldrían salteados (01, 02, 04, 06...) y quedaba raro.
   grid.innerHTML = PROYECTOS.map(p => `
-     <a class="proy-card" href="proyecto.html?p=${p.slug}&cat=${p.cat}"
+    <a class="proy-card" draggable="false" href="proyecto.html?p=${p.slug}&cat=${p.cat}"
        data-cat="${p.cat}" data-p="${p.slug}" data-destacado="${p.destacado ? "1" : "0"}">
       <div class="img-wrapper">
         <img class="img-grid" src="${p.img}" alt="${p.nombre}" draggable="false" decoding="async">
@@ -435,56 +435,91 @@ document.addEventListener("DOMContentLoaded", () => {
      ------------------------------------------------------------------------ */
   const carrusel = (function () {
     const VELOCIDAD_CARRUSEL = 0.4;
-    // Las fotos MÁS anchas que esta proporción (ancho/alto) se recortan por los
-    // lados (sin deformar) para que se vean más estrechas. Súbelo para permitir
-    // fotos más panorámicas; bájalo para recortarlas más.
-    const RATIO_MAX = 1.5;
+    // TAMAÑO DE LAS TARJETAS — todas pegadas ARRIBA; el borde de ABAJO queda en
+    // SIERRA. La ALTURA de cada foto depende de su forma (sin deformar, object-fit
+    // cover): las verticales llegan hasta abajo y las horizontales quedan más
+    // bajitas pero anchas.
+    //   BASE_AR  = proporción (ancho/alto) hasta la que la foto ocupa TODO el alto
+    //              (<= BASE_AR -> vertical, llega abajo). Súbelo para que más fotos
+    //              lleguen abajo; bájalo para que solo lleguen las muy verticales.
+    //   MIN_ALTO = alto mínimo (fracción del alto disponible) de las más panorámicas.
+    const BASE_AR  = 1.0;
+    const MIN_ALTO = 0.7;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let setW = 0, raf = 0, token = 0;
+    let setW = 0, raf = 0, token = 0, cabe = false;
     let hovering = false, dragging = false, mov = 0, pausaHasta = 0;
 
     const visibles = () => cards.filter(c => c.style.display !== "none");
     const limpiarClones = () => grid.querySelectorAll(".proy-card--clone").forEach(c => c.remove());
 
-    // Recorta las demasiado horizontales: fija la proporción de la tarjeta al
-    // tope y deja que object-fit:cover recorte los lados sin deformar.
+    // Da a cada foto su alto (según lo vertical que sea) y su ancho (según su
+    // forma real, sin deformar). Tops iguales -> el borde de abajo queda en sierra.
     function ajustarFormas() {
+      const Hmax = grid.clientHeight;
+      if (!Hmax || Hmax <= 0) return;
+      // Con 1-2 fotos van GRANDES y ocupan todo el alto; con dos, clonar() activa
+      // el bucle solo si no caben. Con 3+ se usa la sierra habitual.
+      const pocas = visibles().length < 3;
       cards.forEach(c => {
         const im = c.querySelector("img");
         const wrap = c.querySelector(".img-wrapper");
         if (!im || !wrap || !im.naturalWidth) return;
-        const ar = im.naturalWidth / im.naturalHeight;
-        wrap.style.aspectRatio = String(Math.min(ar, RATIO_MAX));
+        const ar = im.naturalWidth / im.naturalHeight;         // >1 apaisada · <1 vertical
+        let h, w;
+        if (pocas) {
+          h = Hmax;                                            // completan el alto (grandes)
+          w = Math.round(h * ar);                              // ancho natural (sin recorte)
+        } else {
+          const frac = Math.max(MIN_ALTO, Math.min(1, BASE_AR / ar));
+          h = Math.round(Hmax * frac);                         // alto: verticales hasta abajo
+          w = Math.min(Math.round(h * ar), Math.round(Hmax * 1.35));   // ancho real (tope panorámicas)
+        }
+        wrap.style.height = h + "px";
+        wrap.style.width = w + "px";
+        wrap.style.aspectRatio = "";                           // mandan el alto/ancho explícitos
       });
     }
 
     function medir() {
-      const clon = grid.querySelector(".proy-card--clone");
       const vis = visibles();
-      setW = (clon && vis.length) ? (clon.offsetLeft - vis[0].offsetLeft) : 0;
+      const primero = vis[0];
+      const clonSiguiente = primero && Array.from(grid.querySelectorAll(".proy-card--clone"))
+        .find(c => c.offsetLeft > primero.offsetLeft);
+      setW = clonSiguiente ? clonSiguiente.offsetLeft - primero.offsetLeft : 0;
     }
 
     // Duplica el juego de tarjetas visible tantas veces como haga falta para
     // llenar la pantalla y que el bucle sea infinito SIEMPRE (aunque haya pocas).
     function clonar() {
       const vis = visibles();
-      if (!vis.length) { setW = 0; return; }
+      if (!vis.length) { setW = 0; cabe = false; return; }
+      // Una sola foto no forma un ciclo útil. Con dos, solo se activa el bucle
+      // cuando el juego completo no cabe en el ancho visible.
+      if (vis.length < 2) { setW = 0; cabe = true; return; }
       const anchoJuego = vis.reduce((s, c) => s + c.getBoundingClientRect().width, 0)
         + (vis.length - 1) * parseFloat(getComputedStyle(grid).columnGap || 0);
-      if (anchoJuego <= 0) { setW = 0; return; }   // aún sin medidas: se reintenta fuera
+      if (anchoJuego <= 0) { setW = 0; cabe = false; return; }   // aún sin medidas: se reintenta fuera
+      if (vis.length === 2 && anchoJuego <= grid.clientWidth) { setW = 0; cabe = true; return; }
       // Nº de copias para cubrir el ancho visible + un juego extra (colchón del bucle)
       const copias = Math.max(2, Math.ceil(grid.clientWidth / anchoJuego) + 1);
-      for (let k = 1; k < copias; k++) {
-        vis.forEach(c => {
+      const crearClon = c => {
           const cl = c.cloneNode(true);
           cl.classList.add("proy-card--clone");
+          cl.setAttribute("draggable", "false");
           cl.setAttribute("aria-hidden", "true");
           cl.setAttribute("tabindex", "-1");
           cl.removeAttribute("href");   // el clon no navega
-          grid.appendChild(cl);
-        });
+          return cl;
+      };
+      const anteriores = document.createDocumentFragment();
+      vis.forEach(c => anteriores.appendChild(crearClon(c)));
+      grid.insertBefore(anteriores, vis[0]);
+      for (let k = 1; k < copias; k++) {
+        vis.forEach(c => grid.appendChild(crearClon(c)));
       }
+      cabe = false;
       medir();
+      grid.scrollLeft = setW;
     }
 
     function esperarImgs(cb) {
@@ -506,7 +541,8 @@ document.addEventListener("DOMContentLoaded", () => {
       limpiarClones();
       ajustarFormas();
       if (grid.clientWidth > 0) clonar();
-      if ((!setW || grid.clientWidth <= 0) && intentos < 20) {
+      // Reintenta solo si aún no hay medidas — NO cuando simplemente "cabe" sin bucle.
+      if (((!setW && !cabe) || grid.clientWidth <= 0) && intentos < 20) {
         requestAnimationFrame(() => montar(t, intentos + 1));
       }
     }
@@ -526,13 +562,21 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Mantiene el scroll dentro de [0, setW): como las tarjetas están duplicadas,
-    // saltar de setW a 0 (o al revés) es imperceptible. Sirve para el bucle en
-    // ambos sentidos sin que el salto "pelee" con el arrastre.
+    // Mantiene el scroll dentro de las copias laterales; el juego original queda
+    // centrado para poder arrastrar en ambos sentidos antes de envolver.
     function envolver(sl) {
       if (!setW) return Math.max(0, sl);
-      return ((sl % setW) + setW) % setW;
+      const periodo = setW * 2;
+      return ((sl % periodo) + periodo) % periodo;
     }
+
+    // La rueda y el trackpad desplazan de forma nativa, fuera de envolver().
+    // Normalizar el evento scroll evita que lleguen al final físico de las copias.
+    grid.addEventListener("scroll", () => {
+      if (!setW) return;
+      const normalizado = envolver(grid.scrollLeft);
+      if (Math.abs(normalizado - grid.scrollLeft) > 0.5) grid.scrollLeft = normalizado;
+    }, { passive: true });
 
     function tick() {
       // No se mueve solo mientras arrastras, mientras el ratón está encima, ni
@@ -543,8 +587,13 @@ document.addEventListener("DOMContentLoaded", () => {
       raf = requestAnimationFrame(tick);
     }
 
-    // Parar al pasar el ratón (para mirar), seguir al salir
-    grid.addEventListener("pointerenter", e => { if (e.pointerType !== "touch") hovering = true; });
+    // Parar SOLO cuando el ratón está sobre una FOTO (no sobre el blanco de la
+    // sierra, aunque esté "dentro" del carrusel), para poder mirarla; seguir al salir.
+    grid.addEventListener("pointermove", e => {
+      if (e.pointerType === "touch") return;
+      const bajoPuntero = document.elementFromPoint(e.clientX, e.clientY);
+      hovering = !!bajoPuntero?.closest(".proy-card");
+    });
     grid.addEventListener("pointerleave", () => { hovering = false; });
     // La rueda/trackpad también pausa un momento el movimiento automático
     grid.addEventListener("wheel", () => { pausaHasta = performance.now() + 1200; }, { passive: true });
@@ -557,20 +606,23 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
       dragging = true; lastX = e.clientX; mov = 0; cap = false; pid = e.pointerId;
     });
-    grid.addEventListener("pointermove", e => {
-      if (!dragging) return;
+    window.addEventListener("pointermove", e => {
+      if (!dragging || e.pointerId !== pid) return;
       const dx = e.clientX - lastX;
       lastX = e.clientX;
       mov += Math.abs(dx);
       if (!cap && mov > 6) { cap = true; grid.classList.add("is-drag"); try { grid.setPointerCapture(pid); } catch (_) {} }
       if (cap) grid.scrollLeft = envolver(grid.scrollLeft - dx);   // tu mano manda
     });
-    const finDrag = () => {
+    const finDrag = e => {
+      if (!dragging || (e && e.pointerId !== pid)) return;
       if (dragging) pausaHasta = performance.now() + 1200;   // deja un respiro tras soltar
       dragging = false; cap = false; grid.classList.remove("is-drag");
+      pid = null;
     };
-    grid.addEventListener("pointerup", finDrag);
-    grid.addEventListener("pointercancel", finDrag);
+    window.addEventListener("pointerup", finDrag);
+    window.addEventListener("pointercancel", e => { if (e.pointerId === pid) { mov = 0; finDrag(e); } });
+    grid.addEventListener("lostpointercapture", () => { if (dragging) finDrag(); });
     // Si hubo arrastre, cancelar el clic de navegación (fase de captura)
     grid.addEventListener("click", e => { if (mov > 6) { e.preventDefault(); e.stopPropagation(); mov = 0; } }, true);
 
@@ -692,7 +744,7 @@ function fallbackCopy(text, done) {
           nombre: "Nombre del proyecto",          // lo que se ve en la lista
           anio: "2025",                           // se muestra entre paréntesis
           disc: "Disciplina · Disciplina",        // debajo del nombre, en pequeño
-          cat: "marca",                           // marca | campana | ilustracion
+          cat: "packaging",                       // uxui | packaging | editorial | ilustracion | fotografia
           img: "media/proyectos/mi-proyecto/web-01.jpg",   // miniatura del grid
           destacado: true,                        // ¿sale en "Seleccionados"? true | false
           badge: "Ganador",                       // OPCIONAL, pastilla junto a la intro
@@ -762,7 +814,7 @@ const PROYECTOS = [
   // ---------------------------------------------------------------- (01)
   {
     id: 1, slug: "compas", nombre: "Compás", anio: "2026", disc: "Branding, UX/UI, Campaña",
-    cat: "marca", img: "media/proyectos/compas/web-portada.jpg", destacado: true,
+    cat: "uxui", img: "media/proyectos/compas/web-portada.jpg", destacado: true,
     intro: "Mi Trabajo Fin de Grado, una app de bienestar y prevención que cambia las cifras por color para que cuidarse sea fácil y no dé miedo. <em>El bienestar no se mide, se ve.</em>",
     bloques: [
       { t: "texto", html: "<p>Compás nace de una idea sencilla, cuidarse no debería empezar cuando el cuerpo o la mente ya empiezan a fallar. Viene de cerca, de ver en mi entorno familiar cómo el envejecimiento cambia el día a día, y de una pregunta, ¿puede el diseño ayudar a que las personas se cuiden antes, con calma, mientras todavía es fácil? <br><br> El foco no está en la vejez avanzada, sino en el momento previo. Diseñé la experiencia para adultos de 50 a 65 años con poca o media soltura digital, alrededor de microhábitos de estimulación cognitiva, actividad física ligera y bienestar emocional. Es un proyecto de diseño, no de salud. Compás no diagnostica, no trata y no sustituye a ningún profesional. Solo acompaña desde lo cotidiano.</p>" },
@@ -912,7 +964,7 @@ const PROYECTOS = [
   // ---------------------------------------------------------------- (03)
   {
     id: 3, slug: "mapilo", nombre: "Kit Mapilo", anio: "2025", disc: "Packaging, Producto",
-    cat: "marca", img: "media/proyectos/mapilo/web-05.jpg", destacado: false,
+    cat: "packaging", img: "media/proyectos/mapilo/web-05.jpg", destacado: false,
     intro: "Un kit de juegos de mesa pensado para hacer una pausa y cuidar la mente lejos de la pantalla.",
     bloques: [
       { t: "texto", html: "<p>Más que un envase, la propuesta es un pequeño sistema. Una funda exterior protege un contenedor con seis cajas, y en cada una vive un juego. No es un empaque de usar y tirar, sino un objeto que se queda cerca, se abre cuando apetece una pausa y se vuelve a guardar.</p>" },
@@ -954,7 +1006,7 @@ const PROYECTOS = [
   // ---------------------------------------------------------------- (04)
   {
     id: 4, slug: "pichi", nombre: "Pichi", anio: "2025", disc: "Creación de Marca, Ilustración, Packaging",
-    cat: "campana", img: "media/proyectos/pichi/web-11.jpg", destacado: true,
+    cat: "packaging", img: "media/proyectos/pichi/web-11.jpg", destacado: true,
     intro: "Cerveza muy Madrileña.",
     bloques: [
       { t: "texto", html: "<p>Quería crear una cerveza que tuviera algo de Madrid, pero sin limitarme a utilizar los símbolos que ya conocemos de siempre. Hablándolo con mi familia surgió la idea de investigar canciones antiguas que se escuchaban durante las fiestas de San Isidro y fue ahí donde apareció Pichi. Empecé a investigar la canción, el personaje y todo lo que había detrás del nombre, y me gustó la idea de coger algo tan ligado a la tradición madrileña y darle una vuelta para convertirlo en una marca más actual.</p>" },
@@ -1015,7 +1067,7 @@ const PROYECTOS = [
   // ---------------------------------------------------------------- (05)
   {
     id: 5, slug: "four-seasons", nombre: "Four Seasons × Veuve Clicquot", anio: "2024", disc: "Campaña, Ilustración",
-    cat: "campana", img: "media/proyectos/four-seasons/web-07.jpg", destacado: true,
+    cat: "ilustracion", img: "media/proyectos/four-seasons/web-07.jpg", destacado: false,
     intro: "Campaña ilustrada de cobranding entre Four Seasons y Veuve Clicquot.",
     bloques: [
       { t: "texto", html: "<p>Este proyecto parte de una campaña ficticia para Four Seasons y Veuve Clicquot que desarrollamos en clase. La propuesta buscaba unir las dos marcas a través de una serie de ilustraciones ambientadas en diferentes destinos del hotel. <br><br> Desde el principio tenía bastante claro que quería alejarme de una representación demasiado realista. En clase habíamos trabajado a Edward Penfield y René Gruau y su forma de utilizar las manchas, el contraste y el color me gustó muchísimo. Me interesaba especialmente cómo el fondo podía tener tanto peso como la propia figura y cómo unos pocos colores podían hacer que una composición destacara sin necesidad de llenarla de elementos.</p>" },
@@ -1050,7 +1102,7 @@ const PROYECTOS = [
 
   {
     id: 6, slug: "puerta-alcala", nombre: "Puerta de Alcalá", anio: "2025", disc: "Ilustración, Cartel, Diseño textil",
-    cat: "ilustracion", img: "media/proyectos/puerta-alcala/web-01.jpg", destacado: true,
+    cat: "ilustracion", img: "media/proyectos/puerta-alcala/web-01.jpg", destacado: false,
     intro: "Callejea por Madrid es una propuesta de ilustración para el concurso Reinterpreta la Puerta de Alcalá de 2025.",
     bloques: [
       { t: "texto", html: "<p>El concurso Reinterpreta la Puerta de Alcalá proponía crear una nueva versión de uno de los grandes símbolos de Madrid y aplicarla al diseño de una camiseta promocional para la ciudad. El reto era encontrar una forma de representar Madrid que fuese reconocible, pero que al mismo tiempo aportase una mirada personal y diferente a los símbolos que ya forman parte de su identidad. <br><br> Para comenzar, busqué referencias en elementos que forman parte del paisaje cotidiano de Madrid. Los mosaicos y azulejos de sus calles fueron el punto de partida, junto con una paleta de azules y pequeños toques amarillos y una tipografía de inspiración chulapa. Me interesaba conseguir una estética que mezclase la tradición madrileña con una interpretación más fresca y actual.</p>" },
@@ -1081,7 +1133,7 @@ const PROYECTOS = [
 
   {
     id: 7, slug: "cata-la-lata", nombre: "Cata la lata", anio: "2026", disc: "Packaging, Producto",
-    cat: "marca", img: "media/proyectos/cata-la-lata/web-02.jpg", destacado: true,
+    cat: "packaging", img: "media/proyectos/cata-la-lata/web-02.jpg", destacado: true,
     intro: "Serie Atlántica es una propuesta de packaging para el concurso Cata la Lata del 2026.",
     bloques: [
       { t: "texto", html: "<p>Cata la Lata es un concurso de diseño organizado por ANFACO-CECOPESCA y la Fundación Banco Sabadell que busca nuevas propuestas para el packaging de sus conservas de pescado y marisco. En esta edición había que crear una colección para tres variedades, mejillones en escabeche, sardinillas en aceite de oliva y atún claro en aceite de oliva, manteniendo una identidad común entre ellas. <br><br> Desde el principio tenía claro que no quería hacer un packaging que simplemente enseñara el producto. Me apetecía buscar una forma de representar estas conservas desde otro sitio, y ahí fue cuando empecé a pensar en el mar, en el agua y en todo ese movimiento que tiene.</p>" },
@@ -1156,7 +1208,7 @@ const PROYECTOS = [
 
   {
     id: 9, slug: "mi-pueblo", nombre: "Mi pueblo", anio: "2024", disc: "Fotografía documental",
-    cat: "fotografia", img: "media/proyectos/mi-pueblo/web-01.jpg", destacado: true,
+    cat: "fotografia", img: "media/proyectos/mi-pueblo/web-01.jpg", destacado: false,
     intro: "La esencia de Daganzo de Arriba, su vida cotidiana, sus gentes y ese sentido de comunidad que define el lugar donde crecí.",
     bloques: [
       { t: "texto", html: "<p>Para este trabajo de fotografía, quise capturar la esencia de mi pueblo, un lugar que no solo es mi hogar, sino el escenario de mis más preciadosrecuerdos. Las imágenes de sus habitantes, jóvenes y adultos interactuando en su entorno diario, reflejan la vitalidad y el sentido de comunidad que lo caracterizan.</p><p>Capturar a las personas en momentos espontáneos, compartiendo tareas y disfrutando de la compañía mutua, destaca la importancia de las relaciones humanas y la convivencia armónica con la naturaleza y los animales</p>" },
@@ -1184,7 +1236,7 @@ const PROYECTOS = [
 
   {
     id: 10, slug: "twin-peaks", nombre: "Twin Peaks", anio: "2025", disc: "Editorial, Fotografía, Dirección de arte",
-    cat: "fotografia", img: "media/proyectos/twin-peaks/web-mockup-05.jpg", destacado: false,
+    cat: "fotografia", img: "media/proyectos/twin-peaks/web-mockup-05.jpg", destacado: true,
     intro: "Serie de bodegones que trascienden lo cotidiano,<em>Twin Peaks</em> y al universo inquietante de David Lynch, llevada a las páginas de la revista Aperture.",
     bloques: [
       // -- PROBLEMA --
@@ -1246,7 +1298,7 @@ const PROYECTOS = [
 
   {
     id: 11, slug: "dicho-y-hecho", nombre: "Dicho y hecho", anio: "2025", disc: "Editorial, Dirección de arte",
-    cat: "marca", img: "media/proyectos/dicho-y-hecho/portada en plastico.png", destacado: true,
+    cat: "editorial", img: "media/proyectos/dicho-y-hecho/portada en plastico.png", destacado: false,
     intro: "Una revista que rescata los refranes de siempre y los reinterpreta. Un proyecto en equipo donde la cultura popular se cruza con el diseño editorial.",
     bloques: [
       // -- CONTEXTO / CONCEPTO --
@@ -1295,7 +1347,7 @@ const PROYECTOS = [
 
   {
     id: 12, slug: "los-americanos", nombre: "Los Americanos", anio: "2025", disc: "Editorial, Dirección de arte",
-    cat: "marca", img: "media/proyectos/los-americanos/web-ticket-02.jpg", destacado: true,
+    cat: "editorial", img: "media/proyectos/los-americanos/web-ticket-02.jpg", destacado: true,
     intro: "Identidad para <em>Ojos de una Nación</em>, la exposición que trae a la fundación MOP el mítico fotolibro de Robert Frank. Una nación entera contada a través de una mirada extranjera.",
     bloques: [
       // -- PROBLEMA --
@@ -1366,8 +1418,9 @@ const PROYECTOS = [
 
 const CAT_NOMBRES = {
   seleccionados: "SELECCIONADOS",
-  marca: "MARCA",
-  campana: "CAMPAÑA",
+  uxui: "UX/UI",
+  packaging: "PACKAGING",
+  editorial: "EDITORIAL",
   ilustracion: "ILUSTRACIÓN",
   fotografia: "FOTOGRAFÍA"
 };

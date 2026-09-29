@@ -87,7 +87,7 @@ Resumen — el contenido está **dirigido por datos**, no se crea ningún .html 
    ```js
    {
      id: 7, slug: "nuevo", nombre: "Nombre", anio: "2025",
-     disc: "Disciplina · Disciplina", cat: "marca",   // marca | campana | ilustracion
+     disc: "Disciplina · Disciplina", cat: "packaging",   // uxui | packaging | editorial | ilustracion | fotografia
      img: "media/proyectos/nuevo/web-01.jpg",
      badge: "Ganador",                                 // opcional
      intro: "Frase de una línea.",
@@ -111,7 +111,7 @@ Resumen — el contenido está **dirigido por datos**, no se crea ningún .html 
 
 Las imágenes de los mosaicos aparecen solas en la portada ARCHIVO.
 
-Categorías (`CAT_NOMBRES`): `seleccionados` · `marca` · `campana` · `ilustracion`.
+Categorías (`CAT_NOMBRES`): `seleccionados` · `uxui` · `packaging` · `editorial` · `ilustracion` · `fotografia`.
 
 ---
 

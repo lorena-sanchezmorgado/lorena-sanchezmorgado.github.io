@@ -573,7 +573,7 @@
     "slug": "toledo",
     "titulo": "Toledo vista desde el cielo",
     "publicar": true,
-    "tecnica": "Oleo sobre lienzo",
+    "tecnica": "Óleo sobre lienzo",
     "descripcion": "",
     "principal": {
       "n": 50,
@@ -583,7 +583,24 @@
       "srcset": "media/proyectos/pintura/web-50-800.webp 800w, media/proyectos/pintura/web-50-1600.webp 1600w, media/proyectos/pintura/web-50-2560.webp 2560w",
       "src": "media/proyectos/pintura/web-50-1600.webp"
     },
-    "detalles": [],
+    "detalles": [
+      {
+        "n": 51,
+        "original": "toledo-detalle-alcazar.png",
+        "w": 1600,
+        "h": 1088,
+        "srcset": "media/proyectos/pintura/web-51-800.jpg 800w, media/proyectos/pintura/web-51-1600.jpg 1600w, media/proyectos/pintura/web-51-2560.jpg 2560w",
+        "src": "media/proyectos/pintura/web-51-1600.jpg"
+      },
+      {
+        "n": 52,
+        "original": "toledo-detalle-torre.png",
+        "w": 622,
+        "h": 1600,
+        "srcset": "media/proyectos/pintura/web-52-800.jpg 311w, media/proyectos/pintura/web-52-1600.jpg 622w, media/proyectos/pintura/web-52-2560.jpg 996w",
+        "src": "media/proyectos/pintura/web-52-1600.jpg"
+      }
+    ],
     "proceso": [],
     "nota": ""
   }
