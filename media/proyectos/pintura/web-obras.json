@@ -46,7 +46,7 @@
   {
     "slug": "mujer-abanico",
     "titulo": "Mujer con abanico",
-    "publicar": true,
+    "publicar": false,
     "tecnica": "Pastel",
     "descripcion": "",
     "principal": {

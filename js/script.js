@@ -1,7 +1,8 @@
 /* ============================================================================
    Portfolio Lorena Sánchez — comportamiento de la web
    Páginas: index (Archivo) · project (Proyectos) · proyecto (Ficha) · sobremi
-   Dependencias: GSAP (+ Draggable solo en Archivo). Sin jQuery ni Bootstrap.
+   Dependencias: GSAP. Sin jQuery ni Bootstrap. El lienzo del Archivo (zoom+pan)
+   es propio, con un bucle de suavizado por requestAnimationFrame.
    Cada bloque comprueba si sus elementos existen, así el mismo archivo sirve
    para todas las páginas.
    ========================================================================== */
@@ -29,6 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let t;
   window.addEventListener("resize", () => { clearTimeout(t); t = setTimeout(medir, 120); });
 });
+
+
+// FICHA — ENTRADA. Al pinchar una foto en la portada, allí las imágenes se abren
+// hacia los lados hasta vaciar la pantalla y solo entonces se navega, así que la
+// ficha entra directamente con sus propias apariciones (los "reveals" al cargar y
+// al hacer scroll). No hay relevo de imagen: la portada ya deja la pantalla vacía.
 
 
 /* ============================================================================
@@ -390,7 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
      <a class="proy-card" href="proyecto.html?p=${p.slug}&cat=${p.cat}"
        data-cat="${p.cat}" data-p="${p.slug}" data-destacado="${p.destacado ? "1" : "0"}">
       <div class="img-wrapper">
-        <img class="img-grid" src="${p.img}" alt="${p.nombre}" loading="lazy">
+        <img class="img-grid" src="${p.img}" alt="${p.nombre}" draggable="false" decoding="async">
         <div class="img-overlay"><span>${p.nombre}<br>${catLabel[p.cat] || ""}</span></div>
       </div>
     </a>`).join("");
@@ -415,10 +422,171 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   filters.forEach(btn => {
-    btn.addEventListener("click", () => applyFilter(btn.dataset.cat));
+    btn.addEventListener("click", () => { applyFilter(btn.dataset.cat); carrusel.rebuild(); });
   });
 
   applyFilter("todos");   // estado inicial: Seleccionados
+
+  /* ------------------------------------------------------------------------
+     CARRUSEL: la fila se desliza sola (despacio) y también se arrastra con el
+     ratón. Al pasar el ratón por encima se para para poder mirar; al salir sigue.
+     Para que el bucle sea infinito se clona el juego de tarjetas visible.
+     · VELOCIDAD_CARRUSEL  = píxeles por fotograma (más alto = más rápido).
+     ------------------------------------------------------------------------ */
+  const carrusel = (function () {
+    const VELOCIDAD_CARRUSEL = 0.4;
+    // Las fotos MÁS anchas que esta proporción (ancho/alto) se recortan por los
+    // lados (sin deformar) para que se vean más estrechas. Súbelo para permitir
+    // fotos más panorámicas; bájalo para recortarlas más.
+    const RATIO_MAX = 1.5;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let setW = 0, raf = 0, token = 0;
+    let hovering = false, dragging = false, mov = 0, pausaHasta = 0;
+
+    const visibles = () => cards.filter(c => c.style.display !== "none");
+    const limpiarClones = () => grid.querySelectorAll(".proy-card--clone").forEach(c => c.remove());
+
+    // Recorta las demasiado horizontales: fija la proporción de la tarjeta al
+    // tope y deja que object-fit:cover recorte los lados sin deformar.
+    function ajustarFormas() {
+      cards.forEach(c => {
+        const im = c.querySelector("img");
+        const wrap = c.querySelector(".img-wrapper");
+        if (!im || !wrap || !im.naturalWidth) return;
+        const ar = im.naturalWidth / im.naturalHeight;
+        wrap.style.aspectRatio = String(Math.min(ar, RATIO_MAX));
+      });
+    }
+
+    function medir() {
+      const clon = grid.querySelector(".proy-card--clone");
+      const vis = visibles();
+      setW = (clon && vis.length) ? (clon.offsetLeft - vis[0].offsetLeft) : 0;
+    }
+
+    // Duplica el juego de tarjetas visible tantas veces como haga falta para
+    // llenar la pantalla y que el bucle sea infinito SIEMPRE (aunque haya pocas).
+    function clonar() {
+      const vis = visibles();
+      if (!vis.length) { setW = 0; return; }
+      const anchoJuego = vis.reduce((s, c) => s + c.getBoundingClientRect().width, 0)
+        + (vis.length - 1) * parseFloat(getComputedStyle(grid).columnGap || 0);
+      if (anchoJuego <= 0) { setW = 0; return; }   // aún sin medidas: se reintenta fuera
+      // Nº de copias para cubrir el ancho visible + un juego extra (colchón del bucle)
+      const copias = Math.max(2, Math.ceil(grid.clientWidth / anchoJuego) + 1);
+      for (let k = 1; k < copias; k++) {
+        vis.forEach(c => {
+          const cl = c.cloneNode(true);
+          cl.classList.add("proy-card--clone");
+          cl.setAttribute("aria-hidden", "true");
+          cl.setAttribute("tabindex", "-1");
+          cl.removeAttribute("href");   // el clon no navega
+          grid.appendChild(cl);
+        });
+      }
+      medir();
+    }
+
+    function esperarImgs(cb) {
+      const els = Array.from(grid.querySelectorAll(".proy-card:not(.proy-card--clone) img"));
+      let quedan = els.length || 1;
+      const listo = () => { if (--quedan <= 0) cb(); };
+      if (!els.length) return cb();
+      els.forEach(im => {
+        if (im.complete && im.naturalWidth) listo();
+        else { im.addEventListener("load", listo, { once: true }); im.addEventListener("error", listo, { once: true }); }
+      });
+      setTimeout(cb, 1400);   // red de seguridad
+    }
+
+    // Monta clones + medición cuando el layout ya tiene ancho. Si aún no lo tiene
+    // (panel oculto, fuentes sin cargar…) reintenta unas cuantas veces.
+    function montar(t, intentos) {
+      if (t !== token) return;
+      limpiarClones();
+      ajustarFormas();
+      if (grid.clientWidth > 0) clonar();
+      if ((!setW || grid.clientWidth <= 0) && intentos < 20) {
+        requestAnimationFrame(() => montar(t, intentos + 1));
+      }
+    }
+
+    function rebuild() {
+      const t = ++token;
+      limpiarClones();
+      grid.scrollLeft = 0;
+      setW = 0;
+      let hecho = false;
+      esperarImgs(() => {
+        if (t !== token || hecho) return;   // llegó un rebuild más nuevo
+        hecho = true;
+        ajustarFormas();       // el recorte se aplica siempre (también con reduce)
+        if (reduce) return;    // pero sin bucle ni movimiento automático
+        montar(t, 0);
+      });
+    }
+
+    // Mantiene el scroll dentro de [0, setW): como las tarjetas están duplicadas,
+    // saltar de setW a 0 (o al revés) es imperceptible. Sirve para el bucle en
+    // ambos sentidos sin que el salto "pelee" con el arrastre.
+    function envolver(sl) {
+      if (!setW) return Math.max(0, sl);
+      return ((sl % setW) + setW) % setW;
+    }
+
+    function tick() {
+      // No se mueve solo mientras arrastras, mientras el ratón está encima, ni
+      // durante el instante posterior a soltar/usar la rueda.
+      if (setW && !hovering && !dragging && performance.now() >= pausaHasta) {
+        grid.scrollLeft = envolver(grid.scrollLeft + VELOCIDAD_CARRUSEL);
+      }
+      raf = requestAnimationFrame(tick);
+    }
+
+    // Parar al pasar el ratón (para mirar), seguir al salir
+    grid.addEventListener("pointerenter", e => { if (e.pointerType !== "touch") hovering = true; });
+    grid.addEventListener("pointerleave", () => { hovering = false; });
+    // La rueda/trackpad también pausa un momento el movimiento automático
+    grid.addEventListener("wheel", () => { pausaHasta = performance.now() + 1200; }, { passive: true });
+
+    // ARRASTRE INCREMENTAL: el carrusel sigue tu ratón exacto (a tu velocidad),
+    // sin que el deslizamiento automático se sume. Al soltar espera un momento
+    // antes de retomar el movimiento solo.
+    let lastX = 0, cap = false, pid = null;
+    grid.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      dragging = true; lastX = e.clientX; mov = 0; cap = false; pid = e.pointerId;
+    });
+    grid.addEventListener("pointermove", e => {
+      if (!dragging) return;
+      const dx = e.clientX - lastX;
+      lastX = e.clientX;
+      mov += Math.abs(dx);
+      if (!cap && mov > 6) { cap = true; grid.classList.add("is-drag"); try { grid.setPointerCapture(pid); } catch (_) {} }
+      if (cap) grid.scrollLeft = envolver(grid.scrollLeft - dx);   // tu mano manda
+    });
+    const finDrag = () => {
+      if (dragging) pausaHasta = performance.now() + 1200;   // deja un respiro tras soltar
+      dragging = false; cap = false; grid.classList.remove("is-drag");
+    };
+    grid.addEventListener("pointerup", finDrag);
+    grid.addEventListener("pointercancel", finDrag);
+    // Si hubo arrastre, cancelar el clic de navegación (fase de captura)
+    grid.addEventListener("click", e => { if (mov > 6) { e.preventDefault(); e.stopPropagation(); mov = 0; } }, true);
+
+    let rt;
+    window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(rebuild, 160); });
+    // Rehacer cuando cambian condiciones que afectan a la medida: fuentes cargadas,
+    // la ventana termina de cargar y cuando el panel vuelve a ser visible.
+    window.addEventListener("load", () => rebuild());
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => rebuild());
+    document.addEventListener("visibilitychange", () => { if (!document.hidden && !setW) rebuild(); });
+
+    raf = requestAnimationFrame(tick);
+    return { rebuild };
+  })();
+
+  carrusel.rebuild();
 });
 
 
@@ -1123,6 +1291,75 @@ const PROYECTOS = [
         ]
       }
     ]
+  },
+
+  {
+    id: 12, slug: "los-americanos", nombre: "Los Americanos", anio: "2025", disc: "Editorial, Dirección de arte",
+    cat: "marca", img: "media/proyectos/los-americanos/web-ticket-02.jpg", destacado: true,
+    intro: "Identidad para <em>Ojos de una Nación</em>, la exposición que trae a la fundación MOP el mítico fotolibro de Robert Frank. Una nación entera contada a través de una mirada extranjera.",
+    bloques: [
+      // -- PROBLEMA --
+      { t: "texto", html: "<p>Robert Frank no fotografiaba lo que se ve, sino lo que se siente. Su primer fotolibro, <em>Los Americanos</em>, retrató en los años cincuenta una América de contrastes, soledades y sueños rotos, muy lejos de la postal perfecta. El reto era montar una exposición a la altura de esa mirada y construir toda su identidad, del cartel al catálogo, sin traicionar el tono crudo y poético de sus imágenes.</p>" },
+
+      // -- CONCEPTO --
+      { t: "texto", html: "<p>La muestra se titula <em>Ojos de una Nación</em> y se plantea para la MOP, una fundación dedicada a la fotografía. El nombre resume la idea de fondo, ver un país entero a través de los ojos de alguien que llegó de fuera. Todo el recorrido se ordena en cinco capítulos que funcionan casi como versos, cada uno con su propio título.</p>" },
+
+      { t: "texto", html: "<p>Carreteras que no llevan a casa. Ciudades que laten en blanco y negro. Bailando sobre las sombras. Los días que nos definen. Espacios de silencio.</p>" },
+
+      // -- INSPIRACIÓN + MOODBOARD --
+      { t: "texto", html: "<p>Antes de diseñar nada reuní un imaginario de portadas y editoriales donde la tipografía manda y la fotografía se trata sin miedo. De ahí salió el tono de todo el proyecto, sobrio, directo y muy tipográfico, uno que deja respirar a las imágenes de Frank en lugar de competir con ellas.</p>" },
+
+      { t: "full", img: "media/proyectos/los-americanos/web-moodboard.jpg" },
+
+      // -- SISTEMA VISUAL / PROCESO --
+      { t: "texto", html: "<p>El sistema se apoya en dos tipografías que conviven bien, una gruesa y rotunda para los titulares y otra más neutra y legible para los textos largos, siempre sobre una retícula sencilla que ordena imagen y palabra.</p>" },
+
+      { t: "texto", html: "<p>Los colores no son un blanco y negro puros, sino los mismos tonos apagados de las copias originales. A eso sumé un azul deslavado que aporta un punto de color sin salirse del concepto, acompañado de un gris muy claro y un negro cálido.</p>" },
+
+      // -- RESULTADO CON MOCKUPS --
+      { t: "texto", html: "<p>El cartel es la cara pública de la exposición, en vertical para las marquesinas y en horizontal para el metro. La misma fotografía, la familia asomada al tranvía, se convierte en el símbolo que sostiene toda la campaña.</p>" },
+
+      {
+        t: "mosaico", imgs: [
+          "media/proyectos/los-americanos/web-cartel-vertical.jpg",
+          "media/proyectos/los-americanos/web-cartel-horizontal.jpg"
+        ]
+      },
+
+      { t: "texto", html: "<p>El catálogo recoge la serie en formato cuadrado. Abre con el índice de los cinco capítulos y va presentando las fotografías más icónicas de Frank, cada una con su contexto, como la <em>Funda de coche</em> de Long Beach o el <em>Funeral</em> de Carolina del Sur.</p>" },
+
+      {
+        t: "mosaico", imgs: [
+          "media/proyectos/los-americanos/web-catalogo-01.jpg",
+          "media/proyectos/los-americanos/web-catalogo-02.jpg",
+          "media/proyectos/los-americanos/web-catalogo-03.jpg",
+          "media/proyectos/los-americanos/web-catalogo-04.jpg",
+          "media/proyectos/los-americanos/web-catalogo-05.jpg"
+        ]
+      },
+
+      { t: "texto", html: "<p>El tríptico funciona como puerta de entrada a la muestra, con los datos, una cita del propio Frank y el recorrido completo por los cinco capítulos. La entrada repite el gesto de la portada y lleva el sello de la fundación, para que el recuerdo de la visita mantenga la misma imagen.</p>" },
+
+      {
+        t: "mosaico", imgs: [
+          "media/proyectos/los-americanos/web-triptico-01.jpg",
+          "media/proyectos/los-americanos/web-triptico-02.jpg",
+          "media/proyectos/los-americanos/web-ticket-01.jpg",
+          "media/proyectos/los-americanos/web-ticket-02.jpg"
+        ]
+      },
+
+      { t: "texto", html: "<p>Dentro, la señalética guía por los cinco recorridos y las fotografías saltan a gran formato en las salas. Fuera, la banderola y la propia fachada de la MOP anuncian la exposición desde la calle.</p>" },
+
+      {
+        t: "mosaico", imgs: [
+          "media/proyectos/los-americanos/web-sala-01.jpg",
+          "media/proyectos/los-americanos/web-sala-02.jpg",
+          "media/proyectos/los-americanos/web-banderola.jpg",
+          "media/proyectos/los-americanos/web-fachada.jpg"
+        ]
+      }
+    ]
   }
 
 ];
@@ -1698,15 +1935,13 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// ARCHIVO (landing) — pared de trabajos DISPERSA (no rejilla), con un gran centro
-// libre para el texto (estilo referencia). Se ARRASTRA para explorar (no hay scroll)
-// con un leve parallax entre piezas. Al pasar el ratón por una pieza, el texto
-// central cambia a su nombre y la pieza se resalta (las demás se atenúan).
+// ARCHIVO (landing) — lienzo tipo "cosmos": una pared de trabajos dispersos que
+// se EXPLORA con zoom (rueda del ratón, hacia el cursor) y arrastre (con inercia,
+// se mueve por la pantalla). Las fotos van apareciendo poco a poco. Si te quedas
+// quieto unos segundos, la propia web empieza a hacer zoom sola. Sin textos.
 document.addEventListener("DOMContentLoaded", () => {
   const vp = document.querySelector(".archivo-viewport");
   const canvas = document.querySelector(".archivo-canvas");
-  const center = document.querySelector(".archivo-center");
-  const centerText = document.querySelector(".archivo-center-text");
   if (!vp || !canvas || !window.gsap) return;
 
   /* ---- QUÉ IMÁGENES SALEN EN EL ARCHIVO --------------------------------
@@ -1740,7 +1975,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
      Sube o baja CUANTAS si la quieres más llena o más despejada.
      -------------------------------------------------------------------- */
-  const CUANTAS = 36;
+  const CUANTAS = 54;
 
   const proyectos = (typeof PROYECTOS !== "undefined") ? PROYECTOS : [];
   const vistas = new Set();
@@ -1775,318 +2010,380 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!data.length) return;
 
-  const DEFAULT_HTML = centerText ? centerText.innerHTML : "";
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let drag = null, items = [], startX = 0, startY = 0, anchoTexto = 0;
 
-  // Hover: el texto CENTRAL cambia al nombre de la pieza y se resalta la pieza
-  // (las demás se atenúan). La línea de abajo "Arrastra para explorar" NO cambia
-  // (se queda fija), como pidió Lorena.
-  canvas.addEventListener("mouseover", e => {
-    const it = e.target.closest(".archivo-item");
-    if (!it) return;
-    const nombre = it.getAttribute("data-nombre");
-    if (centerText) centerText.textContent = nombre;
-    canvas.classList.add("has-hover");
-    it.classList.add("is-hover");
-  });
+  /* ====== ESPACIO 3D POR CAPAS =============================================
+     Las fotos se reparten en varias CAPAS a distinta profundidad (eje Z). Al
+     hacer zoom "vuelas" hacia dentro: cada capa crece, la cruzas, se queda atrás
+     y otra aparece al fondo, en BUCLE infinito. Es CSS 3D real (perspectiva en el
+     viewport + translateZ por capa) movido por un bucle de requestAnimationFrame
+     con suavizado.  NÚMEROS QUE PUEDES TOCAR: */
+  const NUM_CAPAS   = 4;       // cuántas capas de profundidad hay
+  const PERSPECTIVA = 1200;    // px de perspectiva (menos = efecto más exagerado)
+  const Z_FONDO     = -3200;   // lo más lejos donde nace/renace una capa
+  const Z_FRENTE    = 640;     // lo más cerca antes de reciclarse al fondo
+  const SPAN        = Z_FRENTE - Z_FONDO;   // separación total entre capas (algo menos lejos)
+  const FADE_IN     = 0.14;    // solo aparece con transparencia al nacer al fondo
+  const SALIDA      = 0.90;    // y solo se desvanece cuando YA está pasando (100% al acercarse)
+  const SUAVIDAD    = 0.10;    // suavizado del viaje (zoom)
+  const SENS_RUEDA  = 1.0;     // sensibilidad del zoom con la rueda
+  const INERCIA     = 0.90;    // frenado del arrastre al soltar (0–1)
+  const ESPERA      = 9000;    // ms quieto antes de que arranque el auto-zoom
+  const AUTO_VIAJE  = 3.5;     // velocidad del auto-zoom (unidades de Z/fotograma)
+  const PAN_TOPE_X  = 0.90;    // cuánto se puede desplazar en horizontal (fracción)
+  const PAN_TOPE_Y  = 1.10;    // y en vertical (recorrido amplio: espacio de exploración)
+  const CLIC_OP     = 0.20;    // opacidad mínima para que una foto se pueda pinchar
+                               // (baja = se pinchan también las más lejanas)
+
+  let capas = [], viajeBase = [], listoLayers = false, bucleOn = false;
+  let viaje = 0, tViaje = 0;               // profundidad de viaje (real / objetivo)
+  let panX = 0, panY = 0, tPanX = 0, tPanY = 0;
+  let vpanX = 0, vpanY = 0;                // inercia del desplazamiento
+  let dragging = false, movidos = 0, reposoDesde = 0, sobreFoto = false, saliendo = false;
+  let pox = 0, poy = 0, tPox = 0, tPoy = 0;   // parallax de ratón (perspective-origin)
+  const ahora = () => performance.now();
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const paso01 = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  // Envuelve una Z al rango [Z_FONDO, Z_FRENTE): eso hace el bucle infinito.
+  const envZ = (z) => Z_FONDO + (((z - Z_FONDO) % SPAN) + SPAN) % SPAN;
+
+  vp.style.perspective = PERSPECTIVA + "px";   // por si el CSS no la trae
+
+  function limitarPan() {
+    const vw = vp.clientWidth, vh = vp.clientHeight;
+    tPanX = clamp(tPanX, -vw * PAN_TOPE_X, vw * PAN_TOPE_X);
+    tPanY = clamp(tPanY, -vh * PAN_TOPE_Y, vh * PAN_TOPE_Y);
+  }
+
+  // Al pasar el ratón por una foto (aunque esté lejos) el movimiento automático
+  // se PARA, para que puedas pincharla sin que se te escape.
+  canvas.addEventListener("mouseover", e => { if (e.target.closest(".archivo-item")) sobreFoto = true; });
   canvas.addEventListener("mouseout", e => {
     const it = e.target.closest(".archivo-item");
-    if (!it) return;
-    if (centerText) centerText.innerHTML = DEFAULT_HTML;
-    canvas.classList.remove("has-hover");
-    it.classList.remove("is-hover");
+    if (it && !it.contains(e.relatedTarget)) { sobreFoto = false; reposoDesde = ahora(); }
   });
 
-  // Parallax: cada pieza se desplaza un poco distinto al arrastrar (según profundidad)
-  function applyParallax(x, y) {
-    const dx = x - startX, dy = y - startY;
-    items.forEach(it => {
-      const d = parseFloat(it.dataset.depth) - 1;
-      it.style.transform = "translate(" + (dx * d * 0.14).toFixed(1) + "px," + (dy * d * 0.14).toFixed(1) + "px)";
+  // RUEDA = viajar en profundidad (arriba = hacia dentro, abajo = hacia fuera)
+  vp.addEventListener("wheel", e => {
+    e.preventDefault();
+    tViaje += -e.deltaY * SENS_RUEDA;
+    reposoDesde = ahora();
+  }, { passive: false });
+
+  // ARRASTRE = desplazar el espacio (con parallax por profundidad e inercia). El
+  // puntero se captura SOLO cuando ya es arrastre (>6px), para que un clic simple
+  // siga abriendo el proyecto.
+  let lastX = 0, lastY = 0, pid = null, cap = false;
+  vp.addEventListener("pointerdown", e => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    dragging = true; movidos = 0; cap = false; lastX = e.clientX; lastY = e.clientY; vpanX = vpanY = 0; pid = e.pointerId;
+  });
+  vp.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    const dx = e.clientX - lastX, dy = e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    movidos += Math.abs(dx) + Math.abs(dy);
+    if (!cap && movidos > 6) { cap = true; matarCue(); canvas.classList.add("is-grabbing"); try { vp.setPointerCapture(pid); } catch (_) {} }
+    if (cap) {
+      tPanX += dx; tPanY += dy; limitarPan();
+      panX = tPanX; panY = tPanY;
+      canvas.style.transform = `translate3d(${panX.toFixed(2)}px,${panY.toFixed(2)}px,0)`;  // 1:1 inmediato
+      vpanX = dx; vpanY = dy; reposoDesde = ahora();
+    }
+  });
+  const finArrastre = () => { dragging = false; cap = false; canvas.classList.remove("is-grabbing"); reposoDesde = ahora(); };
+  vp.addEventListener("pointerup", e => {
+    const eraClic = dragging && movidos <= 6;   // soltó SIN arrastrar = clic
+    finArrastre();
+    if (eraClic && !saliendo) {
+      const foto = fotoEn(e.clientX, e.clientY);   // detección TOLERANTE (no hace falta acertar el píxel)
+      if (foto) seleccionar(foto);
+    }
+  });
+  vp.addEventListener("pointercancel", finArrastre);
+  // El enlace de la foto NO navega directo: lo hace la animación (seleccionar()).
+  canvas.addEventListener("click", e => { e.preventDefault(); }, true);
+
+  // Encuentra la foto en (x,y): la de DELANTE si el punto cae dentro de alguna, y
+  // si no aciertas dentro, la MÁS CERCANA en un radio — así se pinchan fácil hasta
+  // las lejanas (ya no hay que estar pegado a la imagen).
+  const TOL = 42;   // px de margen alrededor de cada foto en los que también cuenta el clic
+  function fotoEn(x, y) {
+    let best = null, bestScore = -Infinity;   // el punto cae DENTRO de alguna foto
+    let cerca = null, cercaD = TOL * TOL;      // si no, la foto cuyo BORDE está más cerca
+    for (let i = 0; i < capas.length; i++) {
+      const op = parseFloat(getComputedStyle(capas[i]).opacity) || 0;   // opacidad REAL
+      if (op <= CLIC_OP) continue;
+      const its = capas[i].children;
+      for (let j = 0; j < its.length; j++) {
+        const r = its[j].getBoundingClientRect();
+        if (!r.width) continue;
+        const ddx = Math.max(r.left - x, 0, x - r.right);   // distancia al rectángulo
+        const ddy = Math.max(r.top - y, 0, y - r.bottom);
+        if (ddx === 0 && ddy === 0) {
+          const score = r.width * op;          // dentro: gana la de delante (más grande y opaca)
+          if (score > bestScore) { bestScore = score; best = its[j]; }
+        } else {
+          const d = ddx * ddx + ddy * ddy;
+          if (d < cercaD) { cercaD = d; cerca = its[j]; }
+        }
+      }
+    }
+    return best || cerca;
+  }
+
+  // ANIMACIÓN al pinchar: TODAS las fotos se abren hacia los lados (cada una hacia
+  // su lado) y se desvanecen. Al vaciarse la pantalla (queda el papel) se navega,
+  // así el cambio de página cae sobre pantalla vacía —sin parón— y la ficha entra
+  // con sus propias apariciones. Rápido.
+  function seleccionar(item) {
+    if (saliendo) return;
+    const href = item.getAttribute("href");
+    if (!href) return;
+    saliendo = true;   // congela el bucle: las fotos ya solo hacen esta salida
+    matarCue();
+    document.body.classList.remove("show-vercue");
+    const irProyecto = (() => { let ido = false; return () => { if (ido) return; ido = true; window.location.href = href; }; })();
+
+    if (reduce || !window.gsap) return irProyecto();
+
+    const vw = vp.clientWidth;
+    const cx = vw / 2;
+    // Cada foto sale por SU lado (según dónde esté) y se va del todo, acelerando.
+    canvas.querySelectorAll(".archivo-item").forEach(a => {
+      const rr = a.getBoundingClientRect();
+      const c = rr.left + rr.width / 2;
+      const dir = c < cx ? -1 : 1;
+      const dist = vw * 0.75 + Math.abs(c - cx);   // lo suficiente para salir por el borde
+      gsap.set(a, { xPercent: -50, yPercent: -50 });   // mantiene el centrado del CSS
+      gsap.to(a, { x: dir * dist, autoAlpha: 0, duration: 0.42, ease: "power2.in" });
     });
+
+    // Cuando la pantalla ya está vacía, se navega (la ficha entra con sus reveals).
+    gsap.delayedCall(0.4, irProyecto);
+    setTimeout(irProyecto, 650);   // red de seguridad
+  }
+
+  // ---- Aviso "ARRASTRA" bajo el cursor (mismo efecto de seguimiento que la bola,
+  // lo mueve cursor.js). Aparece al mover el ratón y desaparece en cuanto arrastras
+  // la primera vez. Se recuerda con sessionStorage: NO vuelve a salir en esta visita,
+  // pero sí reaparece en una visita nueva (así siempre orienta al que llega).
+  const YA_VISTO = "loreArrastraVisto";
+  let cuePuesto = false, cueMuerto = false;
+  try { cueMuerto = sessionStorage.getItem(YA_VISTO) === "1"; } catch (_) {}
+  function ponerCue() {
+    if (cueMuerto || cuePuesto || !window.matchMedia("(pointer: fine)").matches) return;
+    cuePuesto = true;
+    document.body.classList.add("show-scrollcue");
+    window.removeEventListener("mousemove", ponerCue);
+  }
+  function matarCue() {
+    window.removeEventListener("mousemove", ponerCue);
+    if (cueMuerto) return;
+    cueMuerto = true;
+    document.body.classList.remove("show-scrollcue");
+    try { sessionStorage.setItem(YA_VISTO, "1"); } catch (_) {}
+  }
+  if (!cueMuerto) window.addEventListener("mousemove", ponerCue);
+
+  // PARALLAX DE RATÓN (sutil): al mover el ratón, el punto de fuga se desplaza un
+  // poco y las capas se mueven distinto según su profundidad. Da sensación de 3D
+  // y de que hay algo que explorar, sin tener que arrastrar. PARALLAX = cuánto.
+  const PARALLAX = 5;   // % (sube para exagerar el 3D, 0 para quitarlo)
+  window.addEventListener("mousemove", e => {
+    if (saliendo) return;
+    tPox = (e.clientX / vp.clientWidth - 0.5) * -2 * PARALLAX;
+    tPoy = (e.clientY / vp.clientHeight - 0.5) * -2 * PARALLAX;
+  }, { passive: true });
+
+  // Bucle: suaviza viaje y desplazamiento, aplica inercia y auto-zoom, y coloca
+  // cada capa en su Z con su opacidad (aparecer al fondo / desaparecer al pasar).
+  let poxEsc = 999, poyEsc = 999;
+  function frame() {
+    if (listoLayers && !saliendo) {
+      // Inercia al soltar: el objetivo sigue avanzando y frenando poco a poco.
+      if (!dragging && (Math.abs(vpanX) > 0.1 || Math.abs(vpanY) > 0.1)) {
+        tPanX += vpanX; tPanY += vpanY; vpanX *= INERCIA; vpanY *= INERCIA; limitarPan();
+      }
+      if (!dragging && !reduce && !sobreFoto && ahora() > reposoDesde + ESPERA) tViaje += AUTO_VIAJE;
+
+      viaje += (tViaje - viaje) * SUAVIDAD;   // el ZOOM sí se suaviza
+      panX = tPanX; panY = tPanY;             // el DESPLAZAMIENTO va directo (sin lag ni rebote)
+      canvas.style.transform = `translate3d(${panX.toFixed(2)}px,${panY.toFixed(2)}px,0)`;
+
+      // Parallax de ratón: mover el punto de fuga (suave, y solo si cambia algo).
+      pox += (tPox - pox) * 0.08; poy += (tPoy - poy) * 0.08;
+      if (Math.abs(pox - poxEsc) > 0.05 || Math.abs(poy - poyEsc) > 0.05) {
+        vp.style.perspectiveOrigin = `${(50 + pox).toFixed(1)}% ${(50 + poy).toFixed(1)}%`;
+        poxEsc = pox; poyEsc = poy;
+      }
+
+      for (let i = 0; i < capas.length; i++) {
+        const z = envZ(viajeBase[i] + viaje);
+        const t = (z - Z_FONDO) / SPAN;
+        // Aparece con transparencia SOLO al nacer al fondo; al acercarse a la
+        // pantalla se mantiene 100% opaca; solo se desvanece cuando ya la pasa.
+        const op = paso01(0, FADE_IN, t) * (1 - paso01(SALIDA, 1, t));
+        const c = capas[i];
+        c.style.transform = `translateZ(${z.toFixed(1)}px)`;
+        c.style.opacity = op.toFixed(3);
+        // Clic incluso en capas lejanas. Solo se toca pointer-events cuando CAMBIA
+        // (escribirlo cada fotograma provocaba recálculos y el arrastre se "petaba").
+        const pe = op > CLIC_OP ? "auto" : "none";
+        if (c.dataset.pe !== pe) { c.style.pointerEvents = pe; c.dataset.pe = pe; }
+      }
+    }
+    requestAnimationFrame(frame);
   }
 
   function build() {
     const vw = vp.clientWidth, vh = vp.clientHeight;
     if (vw < 10 || vh < 10) return;
-    canvas.innerHTML = ""; items = [];
-    // El texto va DENTRO de la pared, así que se vuelve a meter cada vez que
-    // se reconstruye (el innerHTML de arriba lo ha vaciado todo).
-    if (center) canvas.appendChild(center);
+    canvas.innerHTML = ""; capas = []; viajeBase = []; listoLayers = false;
 
-    /* ---- LOS NÚMEROS QUE PUEDES TOCAR --------------------------------------
-       AIRE — cuánto espacio se deja alrededor del texto antes de que empiecen
-         las imágenes, en proporción al ancho de la ventana. Bájalo y las
-         imágenes se pegan más al texto.
-       ANCHO_* — el tamaño de cada imagen. Se calcula con el ancho de la
-         pantalla, pero con un mínimo y un máximo en píxeles para que ni en un
-         móvil salgan diminutas ni en un monitor enorme salgan gigantes.
-       -------------------------------------------------------------------- */
-    const AIRE       = 0.028;
-    const ANCHO_PROP = [0.15, 0.21];    // proporción del ancho de la ventana (más grandes, sobre todo las pequeñas)
-    const ANCHO_TOPE = [175, 360];      // mínimo y máximo en píxeles
-    // Alto que se le reserva a cada pieza para repartirlas, en proporción a su
-    // ancho. El alto de verdad lo da la imagen al cargar; esto es una estimación.
-    const RESERVA_ALTO = 1.05;
-    // Y esto es lo MÁS alta que puede llegar a salir una foto (las verticales de
-    // 1500x2250 o parecidas). Solo hace falta para no taparle el texto.
-    const ALTO_MAXIMO  = 2.0;
-    // Lo llena que queda la pared (1 = a reventar). Baja el número y habrá más
-    // sitio vacío entre las fotos.
-    const LLENADO   = 0.76;
+    // Tamaño de las fotos y radio de dispersión dentro de cada capa. El campo es
+    // MÁS ANCHO que la pantalla (y algo más alto), para que arrastres hacia donde
+    // arrastres siempre haya fotos y con hueco entre ellas (como la referencia).
+    // El campo cubre de sobra el recorrido del arrastre (PAN_TOPE) en cada eje.
+    const anchoMin = Math.round(clamp(vw * 0.10, 110, 240));
+    const anchoMax = Math.round(clamp(vw * 0.16, 140, 300));
+    const RX = vw * 1.45, RY = vh * 1.70;
 
-    const anchoMin = Math.round(gsap.utils.clamp(ANCHO_TOPE[0], ANCHO_TOPE[1], vw * ANCHO_PROP[0]));
-    const anchoMax = Math.round(gsap.utils.clamp(ANCHO_TOPE[0], ANCHO_TOPE[1], vw * ANCHO_PROP[1]));
+    // Se reparten las fotos por capas EN RONDA, para que cada capa mezcle
+    // proyectos distintos (y no salgan todas las de uno en la misma profundidad).
+    const porCapa = Array.from({ length: NUM_CAPAS }, () => []);
+    data.forEach((p, i) => porCapa[i % NUM_CAPAS].push(p));
 
-    // SALEN TODAS LAS FOTOS DE LA WEB, UNA SOLA VEZ CADA UNA. Antes había un
-    // tope de 44 piezas y se quedaban fuera las últimas; y si algún día hubiera
-    // menos fotos que piezas, se habrían repetido. Ninguna de las dos cosas
-    // pasa ya: una pieza por foto, ni más ni menos.
-    const N = data.length;
-
-    // El lienzo (la pared que se arrastra) se calcula para que quepan esas N
-    // fotos con el aire que diga LLENADO. Nunca menor que FACTOR_MIN veces la
-    // ventana, para que siempre haya algo que explorar arrastrando.
-    const FACTOR_MIN = (vw < 760) ? 2.3 : 2.15;   // más grande = más espacio para arrastrar
-    const anchoMedio = (anchoMin + anchoMax) / 2;
-    const areaNecesaria = N * anchoMedio * anchoMedio * RESERVA_ALTO / LLENADO;
-    const FACTOR = Math.max(FACTOR_MIN, Math.sqrt(areaNecesaria / (vw * vh)));
-    const cw = Math.round(vw * FACTOR);
-    const ch = Math.round(vh * FACTOR);
-    canvas.style.width = cw + "px";
-    canvas.style.height = ch + "px";
-
-    // El claro del centro se calcula con lo que MIDE EL TEXTO de verdad, no con
-    // un porcentaje a ojo. Antes se usaba la caja que lo contiene (mucho más
-    // ancha que las letras) y por eso las imágenes quedaban lejísimos.
-    // Se mide la CAJA del texto (no las letras): así el hueco vale también
-    // para el nombre del proyecto que aparece al pasar el ratón, que puede ser
-    // más largo que la frase de partida.
-    const rTexto = center ? center.getBoundingClientRect() : null;
-    anchoTexto = (rTexto && rTexto.width) ? rTexto.width : vw * 0.3;
-    const altoTexto = (rTexto && rTexto.height) ? rTexto.height : vh * 0.14;
-    const aire = vw * AIRE;
-
-    // El hueco del centro es CUADRADO: se toma el lado mayor del bloque de
-    // texto y se le suma el aire. Antes era una elipse ancha y baja, y el
-    // hueco quedaba con forma de sobre en vez de cuadrado.
-    const cx = cw / 2, cy = ch / 2;
-    const hueco = Math.max(anchoTexto, altoTexto) / 2 + aire;
-    const placed = [];
-
-    /* ---- POR DONDE NO SE PONEN FOTOS ---------------------------------------
-       Donde caen los rótulos fijos —el menú de arriba y MADRID, SP / 2026 ©—
-       con la pared en su sitio de partida. Así al entrar se leen limpios.
-       Si arrastras, sí pasan imágenes por detrás: para eso llevan el halo
-       difuminado (está en el CSS, busca "HALO").
-       -------------------------------------------------------------------- */
-    const desX = (cw - vw) / 2, desY = (ch - vh) / 2;   // el lienzo arranca centrado
-    const MARGEN_ROTULO = 18;
-    const zonas = [];
-    // Se miden LAS LETRAS, no la barra entera: entre ARCHIVO/PROYECTOS/SOBRE MÍ
-    // y LORENA SÁNCHEZ hay un hueco enorme, y entre MADRID, SP y 2026 © otro.
-    // Ahí sí pueden ir fotos, y si no la portada se quedaba medio vacía.
-    document.querySelectorAll(".site-nav a, .site-nav .nav-toggle, .site-baseline--fixed span, .archivo-hint")
-      .forEach(el => {
-        const r = el.getBoundingClientRect();
-        if (!r.width || !r.height) return;
-        zonas.push({
-          x: desX + r.left - MARGEN_ROTULO,
-          y: desY + r.top  - MARGEN_ROTULO,
-          w: r.width  + MARGEN_ROTULO * 2,
-          h: r.height + MARGEN_ROTULO * 2
-        });
+    for (let ci = 0; ci < NUM_CAPAS; ci++) {
+      const capa = document.createElement("div");
+      capa.className = "archivo-capa";
+      const puestas = [];
+      porCapa[ci].forEach(p => {
+        const w = Math.round(gsap.utils.random(anchoMin, anchoMax));
+        // Mejor de varias posiciones: la más separada de las ya puestas EN ESA capa
+        let mejor = { ox: 0, oy: 0 }, mejorNota = -Infinity;
+        for (let k = 0; k < 140; k++) {
+          const ox = gsap.utils.random(-RX, RX);
+          const oy = gsap.utils.random(-RY, RY);
+          let nota = puestas.length ? Infinity : 9999;
+          for (const b of puestas) nota = Math.min(nota, Math.hypot(ox - b.ox, oy - b.oy));
+          if (nota > mejorNota) { mejorNota = nota; mejor = { ox, oy }; }
+        }
+        const a = document.createElement("a");
+        a.className = "archivo-item";
+        a.href = "proyecto.html?p=" + p.slug + "&cat=" + (p.cat || "seleccionados");
+        a.setAttribute("data-nombre", p.nombre);
+        a.style.width = w + "px";
+        a.style.left = Math.round(vw / 2 + mejor.ox) + "px";
+        a.style.top  = Math.round(vh / 2 + mejor.oy) + "px";
+        const img = document.createElement("img");
+        img.src = p.img; img.alt = p.nombre; img.setAttribute("draggable", "false");
+        img.addEventListener("error", () => a.remove());   // si falta la foto, fuera
+        a.appendChild(img);
+        capa.appendChild(a);
+        puestas.push(mejor);
       });
-    const pisaRotulo = (x, y, w, h) => zonas.some(z =>
-      !(x + w <= z.x || z.x + z.w <= x || y + h <= z.y || z.y + z.h <= y));
-
-    /* ---- CÓMO SE REPARTEN LAS FOTOS ----------------------------------------
-       Para cada foto se sortean muchas posiciones y se elige LA MEJOR, no la
-       primera que valga. "Mejor" = la que queda más lejos de las demás, y sin
-       otra foto del mismo proyecto al lado (dos fotos del mismo trabajo se
-       parecen mucho y juntas cantan como si fueran la misma).
-
-       Antes se cogía la primera posición libre, y eso dejaba unos sitios
-       apelotonados y otros vacíos. Así queda repartido parejo y, además,
-       siempre entran TODAS las fotos.
-       -------------------------------------------------------------------- */
-    const distanciaAlMasCercano = (a) => {
-      let min = Infinity;
-      for (const b of placed) {
-        const d = Math.hypot((a.x + a.w / 2) - (b.x + b.w / 2), (a.y + a.h / 2) - (b.y + b.h / 2));
-        if (d < min) min = d;
-      }
-      return min;
-    };
-    // Lo cerca que le queda la foto MÁS CERCANA DE SU MISMO PROYECTO
-    const distanciaAlMismo = (a, id) => {
-      let min = Infinity;
-      for (const b of placed) {
-        if (b.id !== id) continue;
-        const d = Math.hypot((a.x + a.w / 2) - (b.x + b.w / 2), (a.y + a.h / 2) - (b.y + b.h / 2));
-        if (d < min) min = d;
-      }
-      return min;
-    };
-
-    for (let n = 0; n < N; n++) {
-      const p = data[n];
-      const w = Math.round(gsap.utils.random(anchoMin, anchoMax));
-      // Alto aproximado que se le reserva a la pieza. El real lo da la imagen
-      // cuando carga, así que esto es una estimación: si se pasa de generosa,
-      // quedan bandas vacías; si se queda corta, se pisan un poco más (que es
-      // justo el aire de collage que buscamos).
-      const h = Math.round(w * RESERVA_ALTO);
-      let mejor = null, mejorNota = -Infinity;
-
-      // Las fotos se quedan ENTERAS dentro de la pared (sin sangrar por los
-      // bordes) y con un pequeño margen para que no toquen el borde: así se ve
-      // siempre la imagen completa al arrastrar hasta ella.
-      const bordeX = w * 0.15, bordeY = h * 0.15;
-
-      for (let k = 0; k < 280; k++) {
-        const x = gsap.utils.random(bordeX, cw - w - bordeX);
-        const y = gsap.utils.random(bordeY, ch - h - bordeY);
-        const mx = x + w / 2, my = y + h / 2;
-        // Hueco CUADRADO del centro. Se mide con la pieza ENTERA, no solo con
-        // su centro, para que el claro que se ve sea el que dice "hueco".
-        //
-        // En vertical se mide distinto según la pieza esté por DEBAJO o por
-        // ENCIMA del texto: la imagen crece hacia abajo desde donde la
-        // colocamos, así que por debajo manda su borde de arriba (que sí
-        // conocemos) y por encima manda el de abajo, que depende del alto
-        // real. Por eso ahí se es generoso — si no, una foto vertical acaba
-        // metiéndose detrás del título.
-        const dy = my - cy;
-        const margenY = (dy >= 0 ? h / 2 : w * ALTO_MAXIMO - h / 2);
-        if (Math.abs(mx - cx) < hueco + w / 2 && Math.abs(dy) < hueco + margenY) continue;
-        if (pisaRotulo(x, y, w, h)) continue;
-
-        const caja = { x, y, w, h };
-        // Nota = lo lejos que queda de la foto más cercana. Se corta en w*2.4
-        // para que no se vayan todas a los bordes buscando el récord.
-        let nota = Math.min(distanciaAlMasCercano(caja), w * 2.4);
-        // Y un castigo por tener cerca otra foto del mismo proyecto — cuanto
-        // más cerca, más castigo. Es gradual a propósito: hay proyectos con 13
-        // fotos y exigirles a todas una distancia fija sería imposible de
-        // cumplir, así que en vez de descartar, se prefiere la que menos pega.
-        const SEPARA = w * 1.8;
-        const dMismo = distanciaAlMismo(caja, p.id);
-        if (dMismo < SEPARA) nota -= (SEPARA - dMismo) * 2.5;
-        if (nota > mejorNota) { mejorNota = nota; mejor = caja; }
-      }
-      if (!mejor) continue;
-      const { x, y } = mejor;
-      const a = document.createElement("a");
-      a.className = "archivo-item";
-      a.href = "proyecto.html?p=" + p.slug + "&cat=" + (p.cat || "seleccionados");
-      a.setAttribute("data-nombre", p.nombre);
-      a.style.width = w + "px";
-      a.style.left = Math.round(x) + "px";
-      a.style.top = Math.round(y) + "px";
-      a.dataset.depth = gsap.utils.random(0.9, 1.12).toFixed(3);
-      const img = document.createElement("img");
-      img.src = p.img; img.alt = p.nombre; img.setAttribute("draggable", "false");
-      // Si la foto no carga (ruta mal escrita, archivo que falta) se quita la
-      // pieza entera: mejor un hueco que un icono de imagen rota en la portada.
-      img.addEventListener("error", () => {
-        a.remove();
-        const i = items.indexOf(a);
-        if (i >= 0) items.splice(i, 1);
-      });
-      a.appendChild(img);
-      canvas.appendChild(a);
-      placed.push({ x, y, w, h, id: p.id });
-      items.push(a);
+      canvas.appendChild(capa);
+      capas.push(capa);
+      viajeBase.push(ci / NUM_CAPAS * SPAN);   // repartidas por toda la profundidad
     }
 
-    /* Al repartir solo se sabe el ANCHO de cada foto; el alto de verdad no
-       llega hasta que la imagen carga, y una vertical puede acabar metiéndose
-       en la franja de los rótulos. Así que en cuanto están todas cargadas se
-       repasa y se aparta la que haya quedado encima, por el lado más cerca. */
-    function separarDeRotulos() {
-      if (!zonas.length) return;
-      items.forEach(a => {
-        const alto = a.offsetHeight;
-        if (!alto) return;
-        const y0 = parseFloat(a.style.top);
-        const x0 = parseFloat(a.style.left);
-        const ancho = parseFloat(a.style.width);
-        // Solo estorban los rótulos que le pillan de lado a lado
-        const estorban = zonas.filter(z => !(x0 + ancho <= z.x || z.x + z.w <= x0));
-        if (!estorban.length) return;
-        // ¿Cabe en esta altura sin tocar ninguno? (puede sangrar un poco por
-        // arriba y por abajo, igual que al repartirlas)
-        const libre = (y) => y >= -alto * 0.35 && y <= ch - alto * 0.65 &&
-          estorban.every(z => y + alto <= z.y || z.y + z.h <= y);
-        if (libre(y0)) return;
-        // Se prueban los bordes de cada rótulo y se coge el que menos la mueva
-        const candidatos = [];
-        estorban.forEach(z => candidatos.push(z.y - alto, z.y + z.h));
-        const buenos = candidatos.filter(libre);
-        if (!buenos.length) return;   // no hay hueco donde quepa: se queda
-        buenos.sort((p, q) => Math.abs(p - y0) - Math.abs(q - y0));
-        a.style.top = Math.round(buenos[0]) + "px";
-      });
-    }
+    // Arranca quieto y centrado. El bucle (que hace el zoom/parallax) se lanza 1 vez.
+    viaje = tViaje = 0;
+    panX = panY = tPanX = tPanY = 0;
+    reposoDesde = ahora();
+    listoLayers = true;
+    if (!bucleOn) { bucleOn = true; requestAnimationFrame(frame); }
 
-    // Se repasa cada vez que carga una foto (no al final), para que se coloque
-    // mientras aún están apareciendo y no se vea ningún salto.
-    items.forEach(a => {
-      const im = a.querySelector("img");
-      if (im.complete) separarDeRotulos();
-      else {
-        im.addEventListener("load", separarDeRotulos);
-        im.addEventListener("error", separarDeRotulos);
-      }
-    });
-    setTimeout(separarDeRotulos, 1800);   // red de seguridad por si alguna no carga
-
-    // El texto, en el centro exacto de la pared
-    if (center) {
-      center.style.left = Math.round(cw / 2) + "px";
-      center.style.top  = Math.round(ch / 2) + "px";
-    }
-
-    // Posición inicial: lienzo centrado
-    startX = Math.round((vw - cw) / 2);
-    startY = Math.round((vh - ch) / 2);
-    gsap.set(canvas, { x: startX, y: startY });
-
-    // Arrastrar mueve TODO el lienzo (bounds: sus bordes no entran en la ventana)
-    if (drag) drag.kill();
-    if (window.Draggable) {
-      drag = Draggable.create(canvas, {
-        type: "x,y",
-        dragClickables: true,
-        bounds: { minX: vw - cw, maxX: 0, minY: vh - ch, maxY: 0 },
-        onPress() { canvas.classList.add("is-grabbing"); },
-        onRelease() { canvas.classList.remove("is-grabbing"); },
-        onDrag() { applyParallax(this.x, this.y); }
-      })[0];
-    }
-
-    // Entrada desigual (pantalla vacía  se llena). La escala va en la imagen para
-    // no pisar el transform de parallax del enlace; se limpia al acabar.
-    if (!reduce) {
-      const imgs = items.map(it => it.querySelector("img"));
-      gsap.set(imgs, { opacity: 0, scale: 0.88, transformOrigin: "50% 50%" });
-      const tl = gsap.to(imgs, {
-        opacity: 1, scale: 1, duration: 0.6, ease: "power2.out",
-        stagger: { each: 0.06, from: "random" }, clearProps: "transform"
-      });
-      setTimeout(() => { if (tl.progress() < 1) { gsap.killTweensOf(imgs); gsap.set(imgs, { opacity: 1, clearProps: "transform" }); } }, 2500);
-    }
+    // Las fotos empiezan invisibles: aparecerán POCO A POCO al quitar la pantalla
+    // de carga (lo hace revelar()). Si ya se reveló antes (p. ej. al cambiar el
+    // tamaño y reconstruir), salen visibles directamente.
+    canvas.querySelectorAll(".archivo-item").forEach(a => { a.style.opacity = revelado ? "1" : "0"; });
+    construido = true;
+    revelar();
   }
+
+  /* ---- PANTALLA DE CARGA REAL + APARICIÓN POCO A POCO ----------------------
+     Se precargan DE VERDAD todas las fotos antes de enseñar nada. Mientras, la
+     pantalla de carga tapa la portada con el porcentaje real. Cuando ya están
+     todas (o salta la red de seguridad) se retira la pantalla y las fotos van
+     apareciendo poco a poco. Así la portada entra fluida y no "petada". */
+  const loader    = document.querySelector(".archivo-loader");
+  const loaderNum = loader && loader.querySelector(".loader-num");
+  let construido = false, precargado = false, revelado = false;
+
+  (function precargar() {
+    // Tiempo MÍNIMO que se ve la carga: ni un parpadeo (si va rapidísimo) ni lenta.
+    const MIN_CARGA = 850;
+    const t0 = performance.now();
+    const urls = [...new Set(data.map(d => d.img))];
+    const total = urls.length || 1;
+    let hechas = 0, realProg = urls.length ? 0 : 1;
+    urls.forEach(src => {
+      const im = new Image();
+      const ok = () => { hechas++; realProg = hechas / total; };
+      im.onload = ok; im.onerror = ok; im.src = src;
+    });
+
+    // El número SUBE hacia el menor de (carga real, tiempo mínimo): si la carga es
+    // instantánea igual sube 0→100 en MIN_CARGA (se ve bien); si es lenta, va con
+    // la carga real y no la adelanta.
+    const li = setInterval(() => {
+      const elapsed = performance.now() - t0;
+      const mostrado = Math.min(realProg, elapsed / MIN_CARGA);
+      if (loaderNum) loaderNum.textContent = Math.round(mostrado * 100) + "%";
+      if (realProg >= 1 && elapsed >= MIN_CARGA) {
+        clearInterval(li);
+        if (loaderNum) loaderNum.textContent = "100%";
+        precargaFin();
+      }
+    }, 30);
+    setTimeout(() => { clearInterval(li); precargaFin(); }, 6000);   // red de seguridad
+  })();
+
+  function precargaFin() { if (precargado) return; precargado = true; revelar(); }
+
+  // Solo revela cuando están AMBAS: fotos precargadas Y capas construidas.
+  function revelar() {
+    if (revelado || !precargado || !construido) return;
+    revelado = true;
+    reposoDesde = ahora();            // la cuenta del auto-zoom empieza al aparecer
+    if (loader) { loader.classList.add("oculto"); setTimeout(() => { if (loader.parentNode) loader.remove(); }, 700); }
+    const fotos = [...canvas.querySelectorAll(".archivo-item")];
+    if (reduce) { fotos.forEach(f => { f.style.transition = "none"; f.style.opacity = "1"; }); return; }
+    // Aparecen DE DELANTE A ATRÁS (para que se note la profundidad 3D): primero la
+    // capa más cercana y luego las de detrás; dentro de cada capa, un pequeño escalón.
+    const orden = capas
+      .map((c, i) => ({ c, z: envZ(viajeBase[i]) }))
+      .sort((a, b) => b.z - a.z);   // z mayor = más cerca = primero
+    let d = 0;
+    orden.forEach(({ c }) => {
+      [...c.querySelectorAll(".archivo-item")].forEach(f => {
+        f.style.transitionDelay = d.toFixed(2) + "s"; f.style.opacity = "1"; d += 0.04;
+      });
+      d += 0.18;   // respiro entre una capa y la siguiente
+    });
+    setTimeout(() => fotos.forEach(f => { f.style.transitionDelay = ""; }), 3200);
+  }
+
+  // Red de seguridad: a los 4,5 s las fotos se ven SÍ o SÍ (sin transición, por si
+  // la pestaña estuvo en segundo plano y el fundido no llegó a correr) y la
+  // pantalla de carga desaparece. Con la pestaña en primer plano el fundido ya
+  // habrá terminado mucho antes, así que esto no se nota.
+  setTimeout(() => {
+    precargado = true;
+    if (construido) revelar();
+    if (loader && loader.parentNode) { loader.classList.add("oculto"); setTimeout(() => { if (loader.parentNode) loader.remove(); }, 700); }
+    canvas.querySelectorAll(".archivo-item").forEach(a => { a.style.transition = "none"; a.style.opacity = "1"; });
+  }, 4500);
 
   // Esperar a que la ventana tenga tamaño real antes de repartir las piezas.
   // Se intenta por varios caminos a propósito: requestAnimationFrame NO corre
   // si la pestaña está en segundo plano, y entonces la pared no se montaba
   // hasta que volvías a ella. Con el temporizador y el evento de carga, se
-  // monta igual. El "if (!items.length)" evita repartirla dos veces.
+  // monta igual.
   const listo    = () => vp.clientWidth > 10 && vp.clientHeight > 10;
-  const intentar = () => { if (!items.length && listo()) build(); };
+  const intentar = () => { if (!listoLayers && listo()) build(); };
 
   let tries = 0;
   const tick = () => {
@@ -2098,17 +2395,6 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("load", intentar);
   setTimeout(intentar, 600);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) intentar(); });
-
-  // La tipografía tarda un poco en cargar y el texto del centro cambia de
-  // tamaño. Como el claro del centro se calcula con lo que mide, hay que
-  // repartir otra vez si ha cambiado de verdad.
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => {
-      if (!center || !items.length) return;
-      const r = center.getBoundingClientRect();
-      if (r.width && Math.abs(r.width - anchoTexto) > 8) build();
-    });
-  }
 
   // recolocar al cambiar el tamaño de la ventana
   let rt;
@@ -2489,4 +2775,81 @@ document.addEventListener("DOMContentLoaded", () => {
   strip.addEventListener("pointercancel", finDrag);
 
   window.addEventListener("resize", () => { if (abierta) centrar(); else if (bucleVertical) centrarEntrada(); });
+
+  /* ------------------------------------------------------------------------
+     DESLIZAMIENTO SOLO Y LENTO. La columna de obras baja despacio ella sola, y
+     dentro de una obra la tira horizontal avanza despacio. Se para al pasar el
+     ratón por encima o al arrastrar/usar la rueda, y sigue un momento después.
+     · VEL_COLUMNA / VEL_TIRA = píxeles por fotograma (más alto = más rápido).
+     ------------------------------------------------------------------------ */
+  if (!reduce) {
+    const VEL_COLUMNA = 0.3;
+    const VEL_TIRA = 0.45;
+    let sobreGrid = false, sobreStrip = false, ruedaHasta = 0;
+
+    // La columna se para SOLO cuando el ratón está sobre una obra (no al entrar en
+    // la franja vacía de la columna). Al pasar entre trozos de la misma obra no
+    // parpadea (se comprueba que el ratón salga de verdad de la obra).
+    grid.addEventListener("mouseover", e => { if (e.target.closest(".lienzo-item")) sobreGrid = true; });
+    grid.addEventListener("mouseout", e => {
+      const it = e.target.closest(".lienzo-item");
+      if (it && !it.contains(e.relatedTarget)) sobreGrid = false;
+    });
+    strip.addEventListener("pointerenter", e => { if (e.pointerType !== "touch") sobreStrip = true; });
+    strip.addEventListener("pointerleave", () => { sobreStrip = false; });
+    const marcarRueda = () => { ruedaHasta = performance.now() + 1600; };
+    grid.addEventListener("wheel", marcarRueda, { passive: true });
+    strip.addEventListener("wheel", marcarRueda, { passive: true });
+
+    function auto() {
+      const ahora = performance.now();
+      const libre = ahora > ruedaHasta;
+      if (abierta) {
+        if (unSet && libre && !sobreStrip && !drag) strip.scrollLeft += VEL_TIRA;
+      } else if (bucleVertical) {
+        if (periodo && libre && !sobreGrid && !gDrag) grid.scrollTop += VEL_COLUMNA;
+      }
+      requestAnimationFrame(auto);
+    }
+    requestAnimationFrame(auto);
+  }
+});
+
+
+// SOBRE MÍ e HISTORIA — auto-scroll al estar quieta. Si la persona deja la página
+// parada unos segundos, empieza a bajar sola y despacio. En cuanto vuelve a tocar
+// (rueda, dedo, teclado o clic) se detiene y se reinicia la cuenta. En Sobre mí el
+// texto está en bucle, así que baja sin fin; en Historia se para al llegar al pie.
+// · VEL_AUTO = píxeles por fotograma · ESPERA = ms quieta antes de arrancar.
+document.addEventListener("DOMContentLoaded", () => {
+  const esSobre = document.body.classList.contains("page-sobremi");
+  const esHist = document.body.classList.contains("page-historia");
+  if (!esSobre && !esHist) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const VEL_AUTO = 0.6;
+  const ESPERA = 3500;
+  let activaHasta = performance.now() + ESPERA;   // no arranca hasta pasar la espera
+  let acumulado = 0;
+
+  const actividad = () => { activaHasta = performance.now() + ESPERA; acumulado = 0; };
+  ["wheel", "touchstart", "touchmove", "keydown", "pointerdown"].forEach(ev =>
+    window.addEventListener(ev, actividad, { passive: true }));
+
+  const alFinal = () => {
+    const doc = document.documentElement;
+    return window.scrollY + window.innerHeight >= doc.scrollHeight - 2;
+  };
+
+  function tick() {
+    if (performance.now() >= activaHasta && !alFinal()) {
+      acumulado += VEL_AUTO;
+      const paso = Math.floor(acumulado);
+      // behavior "auto" fuerza el paso instantáneo (el CSS pone scroll suave, que
+      // aquí entrecortaría el goteo pixel a pixel).
+      if (paso >= 1) { window.scrollBy({ top: paso, left: 0, behavior: "auto" }); acumulado -= paso; }
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 });

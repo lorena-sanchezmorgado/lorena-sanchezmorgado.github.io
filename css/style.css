@@ -856,7 +856,14 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
 /* PROYECTOS (Lorena)
 ---------------------------------------------------------------------------------------------------------------- */
 .proyectos {
-  padding: calc(var(--nav-h) + 1.4rem) var(--gutter) 2rem;   /* hueco para el nav fijo */
+  /* Ocupa la primera pantalla completa: cabecera + filtros arriba y el carrusel
+     rellenando todo el alto que queda. El pie queda JUSTO debajo del borde, así
+     que aparece al hacer scroll. El hueco de abajo deja respirar a MADRID, SP. */
+  padding: calc(var(--nav-h) + 1.4rem) var(--gutter) 4.5rem;   /* hueco arriba (nav) y abajo (baseline) */
+  height: 100vh;
+  height: 100svh;              /* alto DEFINIDO: así el 100% de alto de las fotos resuelve */
+  display: flex;
+  flex-direction: column;
 }
 
 .proy-head {
@@ -922,30 +929,52 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
   margin-left: 0.15em;
 }
 
+/* CARRUSEL DE PROYECTOS — una sola fila horizontal. Las imágenes ocupan TODO el
+   alto disponible (por eso cada una tiene el ancho de su forma y juntas rellenan
+   la fila). Se desliza sola, despacio, y también se arrastra con el ratón.
+   La velocidad y el ritmo del deslizamiento se ajustan en js/script.js. */
 .proy-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  flex: 1 1 auto;            /* rellena el alto que queda bajo cabecera y filtros */
+  min-height: 0;            /* deja que encoja dentro del flex (si no, desborda) */
+  display: flex;
+  align-items: stretch;
   gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  cursor: grab;
+  -webkit-overflow-scrolling: touch;
 }
+.proy-grid.is-drag { cursor: grabbing; }
 
 .proy-card {
+  flex: 0 0 auto;
+  height: 100%;
   display: block;
 }
 
+/* Cada foto tan alta como la fila; el ancho lo pone su forma, pero el JS limita
+   la proporción de las MUY anchas (las recorta por los lados sin deformar). */
 .proy-grid .img-wrapper {
-  aspect-ratio: 1 / 1;      /* cuadrado; se ajusta en su fase con las fotos reales */
+  height: 100%;
+  width: auto;
+  aspect-ratio: 4 / 3;      /* provisional: el JS pone la proporción real de cada foto */
+  overflow: hidden;
+}
+.proy-grid .img-grid {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
-/* La rejilla baja de columnas de forma progresiva (4 → 3 → 2 → 1)
-   para que las imágenes nunca queden demasiado pequeñas ni salte de 4 a 2 */
-@media (max-width: 1180px) {
-  .proy-grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 820px) {
-  .proy-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 520px) {
-  .proy-grid { grid-template-columns: 1fr; }
+/* En pantallas bajas (móvil apaisado, etc.) la fila no puede achicarse tanto que
+   las fotos desaparezcan: se fija un alto mínimo cómodo. */
+@media (max-height: 620px) {
+  .proyectos { min-height: 0; }
+  .proy-grid { height: 62vh; flex: 0 0 auto; }
 }
 
 /* Cabecera y filtros en una sola columna al estrecharse */
@@ -1775,9 +1804,10 @@ footer.site-footer {
   background: transparent;
 }
 
-/* Sin halo detrás de las palabras (Lorena lo quiere limpio). Para que el texto
-   se lea, el reparto de fotos aparta las que caen sobre los rótulos, el texto
-   central y "Arrastra para explorar" (ver zonas + separarDeRotulos en el JS). */
+/* Sin halo detrás de las palabras (Lorena lo quiere limpio). Para que en el
+   primer momento se lean los rótulos, el reparto inicial de fotos aparta las que
+   caen sobre ellos (ver zonas + separarDeRotulos en el JS). Al hacer zoom o
+   arrastrar, el menú y MADRID/© se quedan fijos por encima de las imágenes. */
 .page-archivo .nav-link.is-active { text-decoration-thickness: 2px; }
 
 /* En la portada, el NOMBRE va subrayado: es la página donde estás y, a la vez,
@@ -1792,26 +1822,44 @@ footer.site-footer {
 
 /* La ventana donde se ve el lienzo ocupa TODA la pantalla: las piezas pasan por
    debajo del menú y de MADRID/© y así se nota que hay más pared fuera. */
+/* La ventana es el "ojo" de la cámara: lleva la PERSPECTIVA que da la sensación
+   3D. Menos perspectiva = efecto más exagerado. */
 .archivo-viewport {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  cursor: inherit;
+  cursor: grab;
+  touch-action: none;   /* el arrastre táctil lo maneja el JS (pan), no el navegador */
   z-index: 1;
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
 }
+.archivo-canvas.is-grabbing { cursor: grabbing; }
 
-/* Lienzo grande y arrastrable (tamaño y posición inicial los pone el JS) */
+/* El "mundo" 3D: solo se desplaza (pan) en X/Y; la profundidad la ponen las capas.
+   preserve-3d es lo que deja que las capas vivan a distinta Z de verdad. */
 .archivo-canvas {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
+  transform-style: preserve-3d;
   will-change: transform;
+}
+/* Cada CAPA es un plano a una profundidad (translateZ) que pone el JS. Ocupa toda
+   la ventana y sus fotos se dispersan alrededor del centro. */
+.archivo-capa {
+  position: absolute;
+  inset: 0;
+  transform-style: flat;
+  pointer-events: none;      /* el JS la activa solo cuando está bien visible */
+  will-change: transform, opacity;
 }
 .archivo-item {
   position: absolute;
   display: block;
   color: var(--tinta);
-  transition: opacity 0.35s ease;   /* para atenuar las demás al hacer hover */
+  transform: translate(-50%, -50%);   /* left/top marcan el CENTRO de la foto */
+  pointer-events: inherit;            /* hereda de la capa (clicable solo si visible) */
+  transition: opacity 0.6s ease;      /* aparición poco a poco al cargar */
 }
 .archivo-item img {
   width: 100%;
@@ -1824,64 +1872,39 @@ footer.site-footer {
   transform-origin: center;
   transition: transform 0.3s ease;
 }
-/* Al pasar el ratón por una pieza: se resalta (escala) y las demás se atenúan */
-.archivo-canvas.has-hover .archivo-item:not(.is-hover) { opacity: 0.35; }
-.archivo-item.is-hover { z-index: 100; }   /* al pasar el ratón, la pieza va DELANTE de las que solapa */
-.archivo-item.is-hover img { transform: scale(1.08); }
+/* Al pasar el ratón por una pieza, se levanta un poco (sutil). Mientras arrastras
+   se desactiva para que no parpadee al pasar por encima de las fotos. */
+.archivo-item:hover { z-index: 100; }
+.archivo-item:hover img { transform: scale(1.05); }
+.archivo-canvas.is-grabbing .archivo-item:hover img { transform: none; }
 
-/* Texto del centro — vive DENTRO de la pared, en su centro exacto (el JS lo
-   coloca). Es decir, forma parte de la composición: al arrastrar se queda
-   donde está, con sus imágenes alrededor, no te persigue por la pantalla.
-   Va SIEMPRE por delante de las imágenes. */
-.archivo-center {
-  position: absolute;
-  left: 0;                       /* el JS pone el centro real del lienzo */
-  top: 0;
-  transform: translate(-50%, -50%);
-  /* Caja ESTRECHA a propósito: así el texto (y el nombre del proyecto al pasar
-     el ratón) se parte en dos o tres líneas y ocupa un bloque cuadrado, en vez
-     de una línea larguísima. El hueco que se le deja en la pared también es
-     cuadrado — lo calcula el JS con lo que mide este bloque. */
-  width: min(19rem, 70vw);
+/* PANTALLA DE CARGA (portada). Tapa todo con el color de papel y una barra con el
+   porcentaje real de fotos cargadas. Al terminar, el JS le pone .oculto (fundido)
+   y luego la quita del todo. */
+.archivo-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;                 /* por encima de todo, también del menú */
+  background: var(--papel);
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
-  z-index: 20;
+  transition: opacity 0.6s ease;
 }
-.archivo-center-text {
-  text-align: center;
-  font-family: var(--font-family-bold);
-  text-transform: uppercase;
-  color: var(--tinta);
-  font-size: clamp(1.05rem, 1.9vw, 1.7rem);   /* contenido y minimalista */
-  line-height: 1.12;
-  letter-spacing: -0.01em;
-  max-width: 100%;
-  /* Reparte las líneas para que queden parecidas de largo en vez de dejar una
-     palabra suelta abajo (Four Seasons × / Veuve Clicquot). */
-  text-wrap: balance;
-  transition: opacity .18s ease;
-}
-.archivo-hint {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 4.7rem;
-  text-align: center;
-  font-family: var(--font-family-wide-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.72rem;
-  color: var(--tinta-suave);
-  margin: 0;
-  z-index: 20;               /* el hint, delante */
-  pointer-events: none;
-}
+.archivo-loader.oculto { opacity: 0; pointer-events: none; }
 
-@media (max-width: 900px) {
-  /* (el lienzo ya ocupa toda la pantalla, aquí solo se ajusta el texto) */
-  .archivo-center { width: min(18rem, 78vw); }
+/* Al pinchar una foto, TODAS las imágenes de la portada se abren hacia los lados
+   y se desvanecen (lo hace js/script.js con transform + opacidad); no hace falta
+   CSS extra. La ficha entra luego con sus propias apariciones ("reveals"). */
+
+/* Solo un número grande que sube. Sin nombre ni barra. */
+.loader-num {
+  font-family: var(--font-family-bold);
+  font-size: clamp(3.5rem, 16vw, 11rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--tinta);
+  font-variant-numeric: tabular-nums;   /* que no baile el ancho al subir el número */
 }
 
 

@@ -38,6 +38,7 @@ media/proyectos/*
 !media/proyectos/mi-pueblo/
 !media/proyectos/twin-peaks/
 !media/proyectos/dicho-y-hecho/
+!media/proyectos/los-americanos/
 
 # Dentro de esas carpetas slug, versiona SOLO las imágenes finales de la web
 # (web-01.jpg, web-portada.jpg...). El material en crudo que dejes suelto ahí
