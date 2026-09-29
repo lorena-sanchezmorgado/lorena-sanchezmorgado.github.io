@@ -2060,6 +2060,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   // Se barajan para que no salgan agrupadas por proyecto
   barajar(data);
+  const fotosPendientes = barajar(porProyecto.flat());
+  let disponibles = fotosPendientes.slice();
+  let recicladas = [];
 
   if (!data.length) return;
 
@@ -2076,8 +2079,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const Z_FONDO     = -3200;   // lo más lejos donde nace/renace una capa
   const Z_FRENTE    = 640;     // lo más cerca antes de reciclarse al fondo
   const SPAN        = Z_FRENTE - Z_FONDO;   // separación total entre capas (algo menos lejos)
-  const FADE_IN     = 0.14;    // solo aparece con transparencia al nacer al fondo
-  const SALIDA      = 0.90;    // y solo se desvanece cuando YA está pasando (100% al acercarse)
+  const FADE_IN     = 0.14;    // fundido solo al entrar desde el fondo
+  const FADE_OUT    = 0.84;    // fundido solo para las fotos que se acercan de frente
   const SUAVIDAD    = 0.10;    // suavizado del viaje (zoom)
   const SENS_RUEDA  = 1.0;     // sensibilidad del zoom con la rueda
   const INERCIA     = 0.90;    // frenado del arrastre al soltar (0–1)
@@ -2088,7 +2091,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const CLIC_OP     = 0.20;    // opacidad mínima para que una foto se pueda pinchar
                                // (baja = se pinchan también las más lejanas)
 
-  let capas = [], viajeBase = [], listoLayers = false, bucleOn = false;
+  let capas = [], viajeBase = [], maxCicloCapa = [], listoLayers = false, bucleOn = false;
   let viaje = 0, tViaje = 0;               // profundidad de viaje (real / objetivo)
   let panX = 0, panY = 0, tPanX = 0, tPanY = 0;
   let vpanX = 0, vpanY = 0;                // inercia del desplazamiento
@@ -2106,6 +2109,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const vw = vp.clientWidth, vh = vp.clientHeight;
     tPanX = clamp(tPanX, -vw * PAN_TOPE_X, vw * PAN_TOPE_X);
     tPanY = clamp(tPanY, -vh * PAN_TOPE_Y, vh * PAN_TOPE_Y);
+  }
+
+  function ponerFoto(item, foto) {
+    item._foto = foto;
+    delete item.dataset.ladoDeriva;
+    item.href = "proyecto.html?p=" + foto.slug + "&cat=" + (foto.cat || "seleccionados");
+    item.dataset.nombre = foto.nombre;
+    const img = document.createElement("img");
+    img.src = foto.img;
+    img.alt = foto.nombre;
+    img.setAttribute("draggable", "false");
+    img.addEventListener("error", () => { if (item.querySelector("img") === img) item.remove(); });
+    const anterior = item.querySelector("img");
+    if (anterior) anterior.replaceWith(img);
+    else item.appendChild(img);
+  }
+
+  function renovarCapa(capa) {
+    const items = Array.from(capa.children);
+    const anteriores = items.map(item => item._foto).filter(Boolean);
+    const nuevas = [];
+    while (nuevas.length < items.length) {
+      if (!disponibles.length && recicladas.length) {
+        disponibles.push(...barajar(recicladas.splice(0)));
+      }
+      if (disponibles.length) nuevas.push(disponibles.shift());
+      else nuevas.push(anteriores[nuevas.length]);
+    }
+    const usadas = new Set(nuevas);
+    recicladas.push(...anteriores.filter(foto => !usadas.has(foto)));
+    items.forEach((item, i) => ponerFoto(item, nuevas[i]));
   }
 
   // Al pasar el ratón por una foto (aunque esté lejos) el movimiento automático
@@ -2250,7 +2284,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }, { passive: true });
 
   // Bucle: suaviza viaje y desplazamiento, aplica inercia y auto-zoom, y coloca
-  // cada capa en su Z con su opacidad (aparecer al fondo / desaparecer al pasar).
+  // cada capa en su Z manteniendo las fotos siempre opacas.
   let poxEsc = 999, poyEsc = 999;
   function frame() {
     if (listoLayers && !saliendo) {
@@ -2271,19 +2305,56 @@ document.addEventListener("DOMContentLoaded", () => {
         poxEsc = pox; poyEsc = poy;
       }
 
+      const area = vp.getBoundingClientRect();
+      const estados = [];
       for (let i = 0; i < capas.length; i++) {
-        const z = envZ(viajeBase[i] + viaje);
+        const zSinEnvolver = viajeBase[i] + viaje;
+        const ciclo = Math.floor((zSinEnvolver - Z_FONDO) / SPAN);
+        if (ciclo > maxCicloCapa[i]) {
+          renovarCapa(capas[i]);
+          maxCicloCapa[i] = ciclo;
+        }
+        const z = envZ(zSinEnvolver);
         const t = (z - Z_FONDO) / SPAN;
-        // Aparece con transparencia SOLO al nacer al fondo; al acercarse a la
-        // pantalla se mantiene 100% opaca; solo se desvanece cuando ya la pasa.
-        const op = paso01(0, FADE_IN, t) * (1 - paso01(SALIDA, 1, t));
+        const op = paso01(0, FADE_IN, t);
         const c = capas[i];
         c.style.transform = `translateZ(${z.toFixed(1)}px)`;
         c.style.opacity = op.toFixed(3);
+        const deriva = paso01(0.58, 0.98, t);
+        for (const item of c.children) {
+          if (deriva > 0) {
+            const r = item.getBoundingClientRect();
+            const deltaCentro = (r.left + r.right) / 2 - (area.left + area.right) / 2;
+            if (Math.abs(deltaCentro) > 8 || !item.dataset.ladoDeriva) {
+              item.dataset.ladoDeriva = String(Math.abs(deltaCentro) > 8
+                ? Math.sign(deltaCentro)
+                : parseFloat(item.dataset.ladoInicial) || 1);
+            }
+          }
+          const direccion = parseFloat(item.dataset.ladoDeriva) || 0;
+          const lateral = (parseFloat(item.dataset.deriva) || 0) * direccion * deriva;
+          item.style.translate = `${lateral.toFixed(1)}px 0`;
+        }
+        estados.push({ capa: c, op, t, deriva });
+      }
+      for (const { capa, op, t, deriva } of estados) {
+        for (const item of capa.children) {
+          const r = item.getBoundingClientRect();
+          const fuera = r.right <= area.left || r.left >= area.right
+            || r.bottom <= area.top || r.top >= area.bottom;
+          const desplazamientoLateral = Math.abs((parseFloat(item.dataset.deriva) || 0) * deriva);
+          let opItem = desplazamientoLateral >= area.width * 0.08
+            ? 1
+            : 1 - paso01(FADE_OUT, 1, t);
+          if (t >= 0.96 && !fuera) opItem = Math.min(opItem, 1 - paso01(0.96, 1, t));
+          if (revelado) item.style.opacity = opItem.toFixed(3);
+          const visibility = fuera ? "hidden" : "";
+          if (item.style.visibility !== visibility) item.style.visibility = visibility;
+        }
         // Clic incluso en capas lejanas. Solo se toca pointer-events cuando CAMBIA
         // (escribirlo cada fotograma provocaba recálculos y el arrastre se "petaba").
         const pe = op > CLIC_OP ? "auto" : "none";
-        if (c.dataset.pe !== pe) { c.style.pointerEvents = pe; c.dataset.pe = pe; }
+        if (capa.dataset.pe !== pe) { capa.style.pointerEvents = pe; capa.dataset.pe = pe; }
       }
     }
     requestAnimationFrame(frame);
@@ -2292,7 +2363,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function build() {
     const vw = vp.clientWidth, vh = vp.clientHeight;
     if (vw < 10 || vh < 10) return;
-    canvas.innerHTML = ""; capas = []; viajeBase = []; listoLayers = false;
+    canvas.innerHTML = ""; capas = []; viajeBase = []; maxCicloCapa = []; listoLayers = false;
+    disponibles = barajar(fotosPendientes.slice()); recicladas = [];
 
     // Tamaño de las fotos y radio de dispersión dentro de cada capa. El campo es
     // MÁS ANCHO que la pantalla (y algo más alto), para que arrastres hacia donde
@@ -2324,21 +2396,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         const a = document.createElement("a");
         a.className = "archivo-item";
-        a.href = "proyecto.html?p=" + p.slug + "&cat=" + (p.cat || "seleccionados");
-        a.setAttribute("data-nombre", p.nombre);
         a.style.width = w + "px";
         a.style.left = Math.round(vw / 2 + mejor.ox) + "px";
         a.style.top  = Math.round(vh / 2 + mejor.oy) + "px";
-        const img = document.createElement("img");
-        img.src = p.img; img.alt = p.nombre; img.setAttribute("draggable", "false");
-        img.addEventListener("error", () => a.remove());   // si falta la foto, fuera
-        a.appendChild(img);
+        const centralidad = clamp(1 - Math.abs(mejor.ox) / (vw * 0.45), 0, 1);
+        const lado = mejor.ox < 0 ? -1 : 1;
+        a.dataset.ladoInicial = String(lado);
+        a.dataset.deriva = (vw * 0.6 * centralidad).toFixed(1);
+        ponerFoto(a, p);
         capa.appendChild(a);
         puestas.push(mejor);
       });
       canvas.appendChild(capa);
       capas.push(capa);
       viajeBase.push(ci / NUM_CAPAS * SPAN);   // repartidas por toda la profundidad
+      maxCicloCapa.push(Math.floor((viajeBase[ci] - Z_FONDO) / SPAN));
     }
 
     // Arranca quieto y centrado. El bucle (que hace el zoom/parallax) se lanza 1 vez.

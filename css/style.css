@@ -1877,7 +1877,7 @@ footer.site-footer {
 /* Al pasar el ratón por una pieza, se levanta un poco (sutil). Mientras arrastras
    se desactiva para que no parpadee al pasar por encima de las fotos. */
 .archivo-item:hover { z-index: 100; }
-.archivo-item:hover img { transform: scale(1.05); }
+.archivo-item:hover img { transform: scale(1.16); }
 .archivo-canvas.is-grabbing .archivo-item:hover img { transform: none; }
 
 /* PANTALLA DE CARGA (portada). Tapa todo con el color de papel y una barra con el
