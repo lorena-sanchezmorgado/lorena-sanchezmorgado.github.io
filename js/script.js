@@ -394,7 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Pinta las tarjetas. SIN numerar — al filtrar por "Seleccionados" los
   // números saldrían salteados (01, 02, 04, 06...) y quedaba raro.
   grid.innerHTML = PROYECTOS.map(p => `
-    <a class="proy-card" draggable="false" href="proyecto.html?p=${p.slug}&cat=${p.cat}"
+    <a class="proy-card" draggable="false" href="proyecto.html?p=${p.slug}&cat=${p.cat}&volver=project"
        data-cat="${p.cat}" data-p="${p.slug}" data-destacado="${p.destacado ? "1" : "0"}">
       <div class="img-wrapper">
         <img class="img-grid" src="${p.img}" alt="${p.nombre}" draggable="false" decoding="async">
@@ -417,7 +417,7 @@ document.addEventListener("DOMContentLoaded", () => {
         : card.dataset.cat === cat;
       card.style.display = show ? "" : "none";
       // El enlace lleva el apartado del que vienes, para la lista de la ficha
-      card.setAttribute("href", `proyecto.html?p=${card.dataset.p}&cat=${destino}`);
+      card.setAttribute("href", `proyecto.html?p=${card.dataset.p}&cat=${destino}&volver=project`);
     });
   }
 
@@ -425,7 +425,9 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => { applyFilter(btn.dataset.cat); carrusel.rebuild(); });
   });
 
-  applyFilter("todos");   // estado inicial: Seleccionados
+  const categoriaInicial = new URLSearchParams(window.location.search).get("cat");
+  applyFilter(categoriaInicial && categoriaInicial !== "seleccionados"
+    && Array.from(filters).some(f => f.dataset.cat === categoriaInicial) ? categoriaInicial : "todos");
 
   /* ------------------------------------------------------------------------
      CARRUSEL: la fila se desliza sola (despacio) y también se arrastra con el
@@ -1431,6 +1433,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!list) return;
 
   const params = new URLSearchParams(window.location.search);
+  const origen = params.get("volver") === "index" ? "index" : "project";
+  const categoriaOrigen = CAT_NOMBRES[params.get("cat")] ? params.get("cat") : "seleccionados";
   let cat = params.get("cat") || "seleccionados";
   if (!CAT_NOMBRES[cat]) cat = "seleccionados";
   const p = params.get("p") || "";
@@ -1455,7 +1459,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   list.innerHTML = items.map(x => `
     <li class="ficha-item${x.slug === current ? " is-current" : ""}" data-p="${x.slug}" data-img="${x.img}">
-      <a href="proyecto.html?p=${x.slug}&cat=${cat}">
+      <a href="proyecto.html?p=${x.slug}&cat=${cat}&volver=${origen}">
         <div><h5>${x.nombre}</h5><p>${x.disc}</p></div>
         <span class="ficha-year">(${x.anio})</span>
       </a>
@@ -1463,6 +1467,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const catEl = document.querySelector(".ficha-cat");
   if (catEl) catEl.textContent = "(" + CAT_NOMBRES[cat] + ")";
+  const volver = document.querySelector(".ficha-volver");
+  if (volver) volver.href = origen === "index"
+    ? "index.html"
+    : `project.html?cat=${encodeURIComponent(categoriaOrigen)}`;
 
   // Nombre + fecha del proyecto actual (visible solo en móvil, en la columna derecha)
   const currentProj = items.find(x => x.slug === current);
@@ -2061,6 +2069,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Se barajan para que no salgan agrupadas por proyecto
   barajar(data);
   const fotosPendientes = barajar(porProyecto.flat());
+  const fotosPorImagen = new Map([...data, ...fotosPendientes].map(foto => [foto.img, foto]));
+  const CLAVE_ESTADO_ARCHIVO = "loreArchivoEstado";
   let disponibles = fotosPendientes.slice();
   let recicladas = [];
 
@@ -2103,6 +2113,28 @@ document.addEventListener("DOMContentLoaded", () => {
   // Envuelve una Z al rango [Z_FONDO, Z_FRENTE): eso hace el bucle infinito.
   const envZ = (z) => Z_FONDO + (((z - Z_FONDO) % SPAN) + SPAN) % SPAN;
 
+  let estadoGuardado = null;
+  try {
+    const guardado = JSON.parse(sessionStorage.getItem(CLAVE_ESTADO_ARCHIVO) || "null");
+    const staging = document.createElement("div");
+    if (guardado && typeof guardado.canvasHTML === "string") staging.innerHTML = guardado.canvasHTML;
+    const capasGuardadas = Array.from(staging.children);
+    const coincideViewport = guardado
+      && Math.abs(guardado.width - vp.clientWidth) <= 2
+      && Math.abs(guardado.height - vp.clientHeight) <= 2;
+    const fuentesValidas = capasGuardadas.length === NUM_CAPAS
+      && capasGuardadas.every(c => Array.from(c.querySelectorAll(".archivo-item img"))
+        .every(img => fotosPorImagen.has(img.getAttribute("src"))));
+    if (guardado?.version === 1 && coincideViewport && fuentesValidas
+      && guardado.viajeBase?.length === NUM_CAPAS && guardado.maxCicloCapa?.length === NUM_CAPAS) {
+      estadoGuardado = guardado;
+    } else {
+      sessionStorage.removeItem(CLAVE_ESTADO_ARCHIVO);
+    }
+  } catch (_) {
+    try { sessionStorage.removeItem(CLAVE_ESTADO_ARCHIVO); } catch (_) {}
+  }
+
   vp.style.perspective = PERSPECTIVA + "px";   // por si el CSS no la trae
 
   function limitarPan() {
@@ -2113,8 +2145,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function ponerFoto(item, foto) {
     item._foto = foto;
+    item.setAttribute("draggable", "false");
     delete item.dataset.ladoDeriva;
-    item.href = "proyecto.html?p=" + foto.slug + "&cat=" + (foto.cat || "seleccionados");
+    item.href = "proyecto.html?p=" + foto.slug + "&cat=" + (foto.cat || "seleccionados") + "&volver=index";
     item.dataset.nombre = foto.nombre;
     const img = document.createElement("img");
     img.src = foto.img;
@@ -2140,6 +2173,53 @@ document.addEventListener("DOMContentLoaded", () => {
     const usadas = new Set(nuevas);
     recicladas.push(...anteriores.filter(foto => !usadas.has(foto)));
     items.forEach((item, i) => ponerFoto(item, nuevas[i]));
+  }
+
+  function restaurarEstado() {
+    const estado = estadoGuardado;
+    if (!estado) return false;
+    canvas.innerHTML = estado.canvasHTML;
+    capas = Array.from(canvas.children);
+    capas.forEach(capa => capa.querySelectorAll(".archivo-item").forEach(item => {
+      const img = item.querySelector("img");
+      item._foto = fotosPorImagen.get(img.getAttribute("src"));
+      img.addEventListener("error", () => { if (item.querySelector("img") === img) item.remove(); });
+    }));
+    viajeBase = estado.viajeBase;
+    maxCicloCapa = estado.maxCicloCapa;
+    disponibles = estado.disponibles.map(src => fotosPorImagen.get(src)).filter(Boolean);
+    recicladas = estado.recicladas.map(src => fotosPorImagen.get(src)).filter(Boolean);
+    viaje = estado.viaje; tViaje = estado.tViaje;
+    panX = estado.panX; panY = estado.panY; tPanX = estado.tPanX; tPanY = estado.tPanY;
+    vpanX = estado.vpanX; vpanY = estado.vpanY;
+    pox = estado.pox; poy = estado.poy; tPox = estado.tPox; tPoy = estado.tPoy;
+    poxEsc = estado.poxEsc; poyEsc = estado.poyEsc;
+    canvas.style.transform = estado.canvasTransform;
+    vp.style.perspectiveOrigin = estado.perspectiveOrigin;
+    dragging = false; sobreFoto = false; saliendo = false; reposoDesde = ahora();
+    listoLayers = true; construido = true; precargado = true; revelado = true;
+    if (loader && loader.parentNode) loader.remove();
+    estadoGuardado = null;
+    try { sessionStorage.removeItem(CLAVE_ESTADO_ARCHIVO); } catch (_) {}
+    if (!bucleOn) { bucleOn = true; requestAnimationFrame(frame); }
+    return true;
+  }
+
+  function guardarEstado() {
+    const estado = {
+      version: 1,
+      width: vp.clientWidth,
+      height: vp.clientHeight,
+      canvasHTML: canvas.innerHTML,
+      canvasTransform: canvas.style.transform,
+      perspectiveOrigin: vp.style.perspectiveOrigin,
+      viaje, tViaje, panX, panY, tPanX, tPanY, vpanX, vpanY,
+      pox, poy, tPox, tPoy, poxEsc, poyEsc,
+      viajeBase, maxCicloCapa,
+      disponibles: disponibles.map(foto => foto.img),
+      recicladas: recicladas.map(foto => foto.img)
+    };
+    try { sessionStorage.setItem(CLAVE_ESTADO_ARCHIVO, JSON.stringify(estado)); } catch (_) {}
   }
 
   // Al pasar el ratón por una foto (aunque esté lejos) el movimiento automático
@@ -2227,6 +2307,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (saliendo) return;
     const href = item.getAttribute("href");
     if (!href) return;
+    try {
+      if (new URL(href, window.location.href).searchParams.get("volver") === "index") guardarEstado();
+    } catch (_) {}
     saliendo = true;   // congela el bucle: las fotos ya solo hacen esta salida
     matarCue();
     document.body.classList.remove("show-vercue");
@@ -2363,6 +2446,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function build() {
     const vw = vp.clientWidth, vh = vp.clientHeight;
     if (vw < 10 || vh < 10) return;
+    if (restaurarEstado()) return;
     canvas.innerHTML = ""; capas = []; viajeBase = []; maxCicloCapa = []; listoLayers = false;
     disponibles = barajar(fotosPendientes.slice()); recicladas = [];
 
@@ -2370,8 +2454,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // MÁS ANCHO que la pantalla (y algo más alto), para que arrastres hacia donde
     // arrastres siempre haya fotos y con hueco entre ellas (como la referencia).
     // El campo cubre de sobra el recorrido del arrastre (PAN_TOPE) en cada eje.
-    const anchoMin = Math.round(clamp(vw * 0.10, 110, 240));
-    const anchoMax = Math.round(clamp(vw * 0.16, 140, 300));
+    const anchoMin = Math.round(clamp(vw * 0.14, 135, 280));
+    const anchoMax = Math.round(clamp(vw * 0.22, 180, 420));
     const RX = vw * 1.45, RY = vh * 1.70;
 
     // Se reparten las fotos por capas EN RONDA, para que cada capa mezcle
@@ -2437,7 +2521,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loaderNum = loader && loader.querySelector(".loader-num");
   let construido = false, precargado = false, revelado = false;
 
-  (function precargar() {
+  if (!estadoGuardado) (function precargar() {
     // Tiempo MÍNIMO que se ve la carga: ni un parpadeo (si va rapidísimo) ni lenta.
     const MIN_CARGA = 850;
     const t0 = performance.now();
@@ -2495,7 +2579,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // la pestaña estuvo en segundo plano y el fundido no llegó a correr) y la
   // pantalla de carga desaparece. Con la pestaña en primer plano el fundido ya
   // habrá terminado mucho antes, así que esto no se nota.
-  setTimeout(() => {
+  if (!estadoGuardado) setTimeout(() => {
     precargado = true;
     if (construido) revelar();
     if (loader && loader.parentNode) { loader.classList.add("oculto"); setTimeout(() => { if (loader.parentNode) loader.remove(); }, 700); }

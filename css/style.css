@@ -1861,6 +1861,8 @@ footer.site-footer {
   color: var(--tinta);
   transform: translate(-50%, -50%);   /* left/top marcan el CENTRO de la foto */
   pointer-events: inherit;            /* hereda de la capa (clicable solo si visible) */
+  user-select: none;
+  -webkit-user-drag: none;
   transition: opacity 0.6s ease;      /* aparición poco a poco al cargar */
 }
 .archivo-item img {
