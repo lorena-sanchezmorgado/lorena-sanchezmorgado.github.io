@@ -621,6 +621,84 @@ footer:not(.site-footer) div {
   letter-spacing: -0.01em;
 }
 
+.contacto-page {
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: calc(var(--nav-h) + 1.4rem) var(--gutter) 2rem;
+  container-type: inline-size;
+}
+
+.page-contacto {
+  background-color: var(--tinta) !important;
+  color: var(--papel) !important;
+}
+
+.page-contacto .site-nav,
+.page-contacto .site-nav a,
+.page-contacto .site-nav .nav-toggle,
+.page-contacto .site-baseline {
+  color: var(--papel);
+}
+
+.page-contacto ::selection {
+  background: var(--papel);
+  color: var(--tinta);
+}
+
+.contacto-list {
+  width: 100%;
+  font-family: var(--font-family-bold);
+  font-size: clamp(0.75rem, 5.365vw, 9rem) !important;
+  font-size: clamp(0.75rem, 5.365cqi, 9rem) !important;
+  line-height: 0.9;
+}
+
+.contacto-list a {
+  display: block;
+  width: 100%;
+  color: var(--papel);
+  font-family: var(--font-family-bold);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.page-contacto .contacto-list .copyable {
+  border: 0;
+  text-decoration: none !important;
+}
+
+.page-contacto .contacto-list .copyable:hover,
+.page-contacto .contacto-list .copyable:focus-visible {
+  background: transparent;
+  color: var(--papel);
+  box-shadow: none;
+  border-bottom-color: transparent;
+}
+
+.page-contacto .contacto-list .copyable:focus-visible {
+  outline: 2px solid var(--papel);
+  outline-offset: 6px;
+}
+
+.page-contacto .contacto-list .copyable::after {
+  z-index: 110000;
+  min-width: 7rem;
+  padding: 0.65rem 1rem;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.contacto-phone { margin-top: 0.16em; }
+.contacto-phone.reveal { transition-delay: 0.16s; }
+.contacto-phone.reveal { transition-delay: 0.16s; }
+.page-contacto .contacto-phone.hint-abajo::after {
+  left: auto;
+  right: 0;
+}
+
 /* La foto de la puerta azul, fija arriba a la izquierda */
 .sm-photos {
   position: absolute;
@@ -816,6 +894,8 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
 /* Móvil / tablet: se apila todo, sin elementos fijos. Primero el NOMBRE, debajo
    la foto CENTRADA y luego el texto; el CV pasa a una sola columna (CONTACTO primero). */
 @media (max-width: 900px) {
+  .contacto-page { padding-top: calc(var(--nav-h) + 1rem); }
+
   .sm-fixed {
     position: static;
     pointer-events: auto;

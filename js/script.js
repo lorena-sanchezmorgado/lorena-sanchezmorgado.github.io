@@ -651,6 +651,11 @@ document.addEventListener("DOMContentLoaded", () => {
 // de que aparezca.
 function ladoDeLaEtiqueta(el) {
   const hint = el.getAttribute("data-hint") || "Copiar";
+  if (el.matches(".page-contacto .contacto-phone")) {
+    el.classList.add("hint-abajo");
+    el.classList.remove("hint-izq", "hint-der");
+    return;
+  }
   // Ancho aproximado de la pastilla — se usa el texto más largo de los dos
   // ("¡Copiado!" es el que aparece después de hacer clic), más el hueco.
   const letras = Math.max(hint.length, 9);
