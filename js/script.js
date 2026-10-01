@@ -1882,7 +1882,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const sels = [
     ".sm-photo", ".sm-name",                    // sobre mí (collage fijo)
     ".historia-volver", ".historia-title",      // quién es Lore: solo los fijos (el resto va por "reveal" al hacer scroll)
-    ".proy-head", ".proy-title", ".proy-desc", ".proy-filter", ".proy-card" // proyectos
+    ".proy-head", ".proy-title", ".proy-desc", ".proy-filter", ".proy-card", // proyectos
+    ".contacto-list a"                       // contacto
     // La ficha NO entra aquí: su contenido se anima aparte (reveals).
     // El contenido de historia (foto grande, fecha, textos, orla) tampoco:
     // usa "reveal" para que aparezca A MEDIDA que se hace scroll.
@@ -2459,8 +2460,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // MÁS ANCHO que la pantalla (y algo más alto), para que arrastres hacia donde
     // arrastres siempre haya fotos y con hueco entre ellas (como la referencia).
     // El campo cubre de sobra el recorrido del arrastre (PAN_TOPE) en cada eje.
-    const anchoMin = Math.round(clamp(vw * 0.14, 135, 280));
-    const anchoMax = Math.round(clamp(vw * 0.22, 180, 420));
+    const anchoMin = Math.round(clamp(vw * 0.15, 140, 300));
+    const anchoMax = Math.round(clamp(vw * 0.23, 190, 440));
     const RX = vw * 1.45, RY = vh * 1.70;
 
     // Se reparten las fotos por capas EN RONDA, para que cada capa mezcle

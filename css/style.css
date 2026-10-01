@@ -682,18 +682,16 @@ footer:not(.site-footer) div {
 
 .page-contacto .contacto-list .copyable::after {
   z-index: 110000;
-  min-width: 7rem;
-  padding: 0.65rem 1rem;
+  min-width: 4.5rem;
+  padding: 0.3rem 0.5rem;
   border-radius: 4px;
-  font-size: 0.95rem;
+  font-size: 0.72rem;
   letter-spacing: 0.08em;
   line-height: 1.1;
   text-align: center;
 }
 
 .contacto-phone { margin-top: 0.16em; }
-.contacto-phone.reveal { transition-delay: 0.16s; }
-.contacto-phone.reveal { transition-delay: 0.16s; }
 .page-contacto .contacto-phone.hint-abajo::after {
   left: auto;
   right: 0;
