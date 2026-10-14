@@ -957,8 +957,6 @@ const PROYECTOS = [
         ]
       },
 
-      { t: "texto", html: "<p>Para la segunda parte del concurso diseñé un amenity en forma de lata de barquillos, buscando que el regalo fuese algo más que un simple objeto promocional. <br><br> La elección de los barquillos parte de su relación con la tradición madrileña y con las fiestas de San Isidro. A partir de ahí quise construir una pequeña historia alrededor de la lata y recuperar otra expresión muy característica de Madrid: “Más chulo que un ocho”. <br><br> El diseño está protagonizado por el tranvía número ocho, relacionado con el origen de esta expresión y con los chulapos y chulapas que lo utilizaban para acudir a las fiestas y verbenas madrileñas. La historia queda integrada en el propio packaging para que el huésped pueda descubrirla al abrir la lata. <br><br> Además, la lata está pensada para conservarse y reutilizarse después de consumir los barquillos, convirtiéndose también en un pequeño recuerdo del paso por Madrid.</p>" },
-
       { t: "full", img: "media/proyectos/thompson/web-07.jpg" },
 
       { t: "texto", html: "<p>Este proyecto fue una experiencia especialmente significativa para mí, ya que surgió de una colaboración entre mi universidad y Thompson Madrid. Desde el primer momento me sentí muy cercana al proyecto, especialmente después de conocer de primera mano qué buscaba el hotel y cómo planteaban el concurso. <br><br> Fue un reto muy emocionante, pero también me daba cierto miedo. En ese momento estaba empezando segundo de carrera y el concurso estaba abierto a todos los estudiantes, así que sentía que muchas de las personas que participaban podían tener más experiencia que yo. Trabajar para una marca hotelera tan grande y con presencia internacional hacía que el proyecto fuese todavía más importante para mí. <br><br> Por eso, recibir el premio fue especialmente gratificante. Me quedo con la experiencia de haberme enfrentado a un proyecto que me sacaba de mi zona de confort, de haber aprendido durante el proceso y, sobre todo, con la ilusión y el agradecimiento de haber podido formar parte de una oportunidad así.</p>" },
@@ -1305,7 +1303,7 @@ const PROYECTOS = [
 
   {
     id: 11, slug: "dicho-y-hecho", nombre: "Dicho y hecho", anio: "2025", disc: "Editorial, Dirección de arte",
-    cat: "editorial", img: "media/proyectos/dicho-y-hecho/portada en plastico.png", destacado: false,
+    cat: "editorial", img: "media/proyectos/dicho-y-hecho/web-final.png", destacado: false,
     intro: "Una revista que rescata los refranes de siempre y los reinterpreta. Un proyecto en equipo donde la cultura popular se cruza con el diseño editorial.",
     bloques: [
       // -- CONTEXTO / CONCEPTO --
