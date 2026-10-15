@@ -99,7 +99,7 @@ Es la duda más fácil de tener, así que aquí va clarito:
 
 | Campo | Qué decide |
 |---|---|
-| `cat: "packaging"` | **en qué apartado** está — UX/UI, Packaging, Editorial, Ilustración o Fotografía |
+| `cat: "packaging"` | **en qué apartado** está — Identidad de marca, Packaging, Ilustración o Fotografía |
 | `destacado: true` | **si sale en tu escaparate**, el botón *Seleccionados* |
 
 - `destacado: true` → sale en *Seleccionados* **y** en su categoría.

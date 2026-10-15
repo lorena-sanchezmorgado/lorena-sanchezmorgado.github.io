@@ -381,21 +381,21 @@ document.addEventListener("DOMContentLoaded", () => {
    Archivo solo.
 
    El botón "Seleccionados" enseña únicamente los que llevan  destacado: true.
-   Los botones de categoría (Marca, Campaña, Ilustración) enseñan todos los de
-   esa categoría, sean destacados o no.
+   Los botones de categoría enseñan todos los proyectos de esa categoría,
+   sean destacados o no.
    ========================================================================== */
 document.addEventListener("DOMContentLoaded", () => {
   const grid = document.querySelector(".proy-grid");
   const filters = document.querySelectorAll(".proy-filter .filter-item");
   if (!grid || !filters.length) return;
 
-  const catLabel = { uxui: "UX/UI", packaging: "Packaging", editorial: "Editorial", ilustracion: "Ilustración", fotografia: "Fotografía" };
+  const catLabel = { marca: "Identidad de marca", packaging: "Packaging", ilustracion: "Ilustración", fotografia: "Fotografía" };
 
   // Pinta las tarjetas. SIN numerar — al filtrar por "Seleccionados" los
   // números saldrían salteados (01, 02, 04, 06...) y quedaba raro.
   grid.innerHTML = PROYECTOS.map(p => `
     <a class="proy-card" draggable="false" href="proyecto.html?p=${p.slug}&cat=${p.cat}&volver=project"
-       data-cat="${p.cat}" data-p="${p.slug}" data-destacado="${p.destacado ? "1" : "0"}">
+       data-cat="${p.cat}" data-p="${p.slug}" data-forma="${p.forma || ""}" data-encuadre="${p.encuadre || ""}" data-destacado="${p.destacado ? "1" : "0"}">
       <div class="img-wrapper">
         <img class="img-grid" src="${p.img}" alt="${p.nombre}" draggable="false" decoding="async">
         <div class="img-overlay"><span>${p.nombre}<br>${catLabel[p.cat] || ""}</span></div>
@@ -459,23 +459,23 @@ document.addEventListener("DOMContentLoaded", () => {
     function ajustarFormas() {
       const Hmax = grid.clientHeight;
       if (!Hmax || Hmax <= 0) return;
-      // Con 1-2 fotos van GRANDES y ocupan todo el alto; con dos, clonar() activa
-      // el bucle solo si no caben. Con 3+ se usa la sierra habitual.
-      const pocas = visibles().length < 3;
+      // Todas las categorías usan el mismo escalado, aunque haya pocas tarjetas.
       cards.forEach(c => {
         const im = c.querySelector("img");
         const wrap = c.querySelector(".img-wrapper");
         if (!im || !wrap || !im.naturalWidth) return;
-        const ar = im.naturalWidth / im.naturalHeight;         // >1 apaisada · <1 vertical
-        let h, w;
-        if (pocas) {
-          h = Hmax;                                            // completan el alto (grandes)
-          w = Math.round(h * ar);                              // ancho natural (sin recorte)
-        } else {
-          const frac = Math.max(MIN_ALTO, Math.min(1, BASE_AR / ar));
-          h = Math.round(Hmax * frac);                         // alto: verticales hasta abajo
-          w = Math.min(Math.round(h * ar), Math.round(Hmax * 1.35));   // ancho real (tope panorámicas)
-        }
+        const arNatural = im.naturalWidth / im.naturalHeight;
+        const ar = c.dataset.forma === "vertical" ? 0.75
+          : c.dataset.forma === "horizontal" ? Math.max(1.5, arNatural)
+            : arNatural;                                       // >1 apaisada · <1 vertical
+        const arEncuadre = Number(c.dataset.encuadre) || arNatural;
+        const frac = Math.max(MIN_ALTO, Math.min(1, BASE_AR / ar));
+        const h = Math.round(Hmax * frac);                     // verticales hasta abajo
+        const w = c.dataset.encuadre
+          ? Math.round(h * arEncuadre)
+          : c.dataset.forma
+            ? Math.round(h * arNatural)
+            : Math.min(Math.round(h * arNatural), Math.round(Hmax * 1.35));
         wrap.style.height = h + "px";
         wrap.style.width = w + "px";
         wrap.style.aspectRatio = "";                           // mandan el alto/ancho explícitos
@@ -495,13 +495,12 @@ document.addEventListener("DOMContentLoaded", () => {
     function clonar() {
       const vis = visibles();
       if (!vis.length) { setW = 0; cabe = false; return; }
-      // Una sola foto no forma un ciclo útil. Con dos, solo se activa el bucle
-      // cuando el juego completo no cabe en el ancho visible.
+      // Una sola foto no forma un ciclo útil; con dos o más, el carrusel siempre
+      // repite el conjunto para conservar el movimiento continuo.
       if (vis.length < 2) { setW = 0; cabe = true; return; }
       const anchoJuego = vis.reduce((s, c) => s + c.getBoundingClientRect().width, 0)
         + (vis.length - 1) * parseFloat(getComputedStyle(grid).columnGap || 0);
       if (anchoJuego <= 0) { setW = 0; cabe = false; return; }   // aún sin medidas: se reintenta fuera
-      if (vis.length === 2 && anchoJuego <= grid.clientWidth) { setW = 0; cabe = true; return; }
       // Nº de copias para cubrir el ancho visible + un juego extra (colchón del bucle)
       const copias = Math.max(2, Math.ceil(grid.clientWidth / anchoJuego) + 1);
       const crearClon = c => {
@@ -751,7 +750,7 @@ function fallbackCopy(text, done) {
           nombre: "Nombre del proyecto",          // lo que se ve en la lista
           anio: "2025",                           // se muestra entre paréntesis
           disc: "Disciplina · Disciplina",        // debajo del nombre, en pequeño
-          cat: "packaging",                       // uxui | packaging | editorial | ilustracion | fotografia
+          cat: "packaging",                       // marca | packaging | ilustracion | fotografia
           img: "media/proyectos/mi-proyecto/web-01.jpg",   // miniatura del grid
           destacado: true,                        // ¿sale en "Seleccionados"? true | false
           badge: "Ganador",                       // OPCIONAL, pastilla junto a la intro
@@ -799,7 +798,8 @@ function fallbackCopy(text, done) {
 
         destacado: true   -> sale en Seleccionados Y en su categoría
         destacado: false  -> NO sale en Seleccionados, pero sí al pinchar su
-                             categoría (Marca, Campaña o Ilustración)
+                             categoría (Identidad de marca, Packaging,
+                             Ilustración o Fotografía)
 
       Es decir, la categoría la decide  cat:  y el escaparate lo decide
       destacado:. Son dos cosas distintas. Cambiar una palabra (true por
@@ -821,7 +821,7 @@ const PROYECTOS = [
   // ---------------------------------------------------------------- (01)
   {
     id: 1, slug: "compas", nombre: "Compás", anio: "2026", disc: "Branding, UX/UI, Campaña",
-    cat: "uxui", img: "media/proyectos/compas/web-portada.jpg", destacado: true,
+    cat: "marca", img: "media/proyectos/compas/web-portada.jpg", destacado: true,
     intro: "Mi Trabajo Fin de Grado, una app de bienestar y prevención que cambia las cifras por color para que cuidarse sea fácil y no dé miedo. <em>El bienestar no se mide, se ve.</em>",
     bloques: [
       { t: "texto", html: "<p>Compás nace de una idea sencilla, cuidarse no debería empezar cuando el cuerpo o la mente ya empiezan a fallar. Viene de cerca, de ver en mi entorno familiar cómo el envejecimiento cambia el día a día, y de una pregunta, ¿puede el diseño ayudar a que las personas se cuiden antes, con calma, mientras todavía es fácil? <br><br> El foco no está en la vejez avanzada, sino en el momento previo. Diseñé la experiencia para adultos de 50 a 65 años con poca o media soltura digital, alrededor de microhábitos de estimulación cognitiva, actividad física ligera y bienestar emocional. Es un proyecto de diseño, no de salud. Compás no diagnostica, no trata y no sustituye a ningún profesional. Solo acompaña desde lo cotidiano.</p>" },
@@ -969,6 +969,8 @@ const PROYECTOS = [
   // ---------------------------------------------------------------- (03)
   {
     id: 3, slug: "mapilo", nombre: "Kit Mapilo", anio: "2025", disc: "Packaging, Producto",
+    forma: "horizontal",
+    encuadre: 1.35,
     cat: "packaging", img: "media/proyectos/mapilo/web-05.jpg", destacado: false,
     intro: "Un kit de juegos de mesa pensado para hacer una pausa y cuidar la mente lejos de la pantalla.",
     bloques: [
@@ -1011,7 +1013,7 @@ const PROYECTOS = [
   // ---------------------------------------------------------------- (04)
   {
     id: 4, slug: "pichi", nombre: "Pichi", anio: "2025", disc: "Creación de Marca, Ilustración, Packaging",
-    cat: "packaging", img: "media/proyectos/pichi/web-11.jpg", destacado: true,
+    cat: "marca", img: "media/proyectos/pichi/web-11.jpg", destacado: true,
     intro: "Cerveza muy Madrileña.",
     bloques: [
       { t: "texto", html: "<p>Quería crear una cerveza que tuviera algo de Madrid, pero sin limitarme a utilizar los símbolos que ya conocemos de siempre. Hablándolo con mi familia surgió la idea de investigar canciones antiguas que se escuchaban durante las fiestas de San Isidro y fue ahí donde apareció Pichi. Empecé a investigar la canción, el personaje y todo lo que había detrás del nombre, y me gustó la idea de coger algo tan ligado a la tradición madrileña y darle una vuelta para convertirlo en una marca más actual.</p>" },
@@ -1138,6 +1140,7 @@ const PROYECTOS = [
 
   {
     id: 7, slug: "cata-la-lata", nombre: "Cata la lata", anio: "2026", disc: "Packaging, Producto",
+    forma: "vertical",
     cat: "packaging", img: "media/proyectos/cata-la-lata/web-02.jpg", destacado: true,
     intro: "Serie Atlántica es una propuesta de packaging para el concurso Cata la Lata del 2026.",
     bloques: [
@@ -1303,7 +1306,7 @@ const PROYECTOS = [
 
   {
     id: 11, slug: "dicho-y-hecho", nombre: "Dicho y hecho", anio: "2025", disc: "Editorial, Dirección de arte",
-    cat: "editorial", img: "media/proyectos/dicho-y-hecho/web-final.png", destacado: false,
+    cat: "marca", img: "media/proyectos/dicho-y-hecho/web-final.png", destacado: false,
     intro: "Una revista que rescata los refranes de siempre y los reinterpreta. Un proyecto en equipo donde la cultura popular se cruza con el diseño editorial.",
     bloques: [
       // -- CONTEXTO / CONCEPTO --
@@ -1352,7 +1355,7 @@ const PROYECTOS = [
 
   {
     id: 12, slug: "los-americanos", nombre: "Los Americanos", anio: "2025", disc: "Editorial, Dirección de arte",
-    cat: "editorial", img: "media/proyectos/los-americanos/web-ticket-02.jpg", destacado: true,
+    cat: "marca", img: "media/proyectos/los-americanos/web-ticket-02.jpg", destacado: true,
     intro: "Identidad para <em>Ojos de una Nación</em>, la exposición que trae a la fundación MOP el mítico fotolibro de Robert Frank. Una nación entera contada a través de una mirada extranjera.",
     bloques: [
       // -- PROBLEMA --
@@ -1423,9 +1426,8 @@ const PROYECTOS = [
 
 const CAT_NOMBRES = {
   seleccionados: "SELECCIONADOS",
-  uxui: "UX/UI",
+  marca: "Identidad de marca",
   packaging: "PACKAGING",
-  editorial: "EDITORIAL",
   ilustracion: "ILUSTRACIÓN",
   fotografia: "FOTOGRAFÍA"
 };
