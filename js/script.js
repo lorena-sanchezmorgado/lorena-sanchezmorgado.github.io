@@ -1355,6 +1355,7 @@ const PROYECTOS = [
 
   {
     id: 12, slug: "los-americanos", nombre: "Los Americanos", anio: "2025", disc: "Editorial, Dirección de arte",
+    forma: "vertical", encuadre: 1.15,
     cat: "marca", img: "media/proyectos/los-americanos/web-ticket-02.jpg", destacado: true,
     intro: "Identidad para <em>Ojos de una Nación</em>, la exposición que trae a la fundación MOP el mítico fotolibro de Robert Frank. Una nación entera contada a través de una mirada extranjera.",
     bloques: [
