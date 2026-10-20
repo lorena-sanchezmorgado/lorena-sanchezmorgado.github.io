@@ -33,10 +33,65 @@ try {
     if (Test-Path $path -PathType Leaf) {
       $ext = [System.IO.Path]::GetExtension($path).ToLower()
       $ctype = $types[$ext]; if (-not $ctype) { $ctype = "application/octet-stream" }
-      $bytes = [System.IO.File]::ReadAllBytes($path)
       $ctx.Response.ContentType = $ctype
-      $ctx.Response.ContentLength64 = $bytes.Length
-      $ctx.Response.OutputStream.Write($bytes, 0, $bytes.Length)
+      if ($ext -eq ".mp4") {
+        $length = (Get-Item $path).Length
+        $start = [long]0
+        $end = $length - 1
+        $range = $ctx.Request.Headers["Range"]
+        $validRange = $true
+
+        if ($range -match "^bytes=(\d*)-(\d*)$") {
+          if ($Matches[1] -eq "" -and $Matches[2] -eq "") {
+            $validRange = $false
+          } elseif ($Matches[1] -eq "") {
+            $suffix = [Math]::Min([long]$Matches[2], $length)
+            $start = $length - $suffix
+          } else {
+            $start = [long]$Matches[1]
+            if ($Matches[2] -ne "") { $end = [Math]::Min([long]$Matches[2], $end) }
+          }
+          if ($start -ge $length -or $start -gt $end) { $validRange = $false }
+        }
+
+        $ctx.Response.Headers["Accept-Ranges"] = "bytes"
+        if (-not $validRange) {
+          $ctx.Response.StatusCode = 416
+          $ctx.Response.Headers["Content-Range"] = "bytes */$length"
+        } else {
+          if ($range -match "^bytes=(\d*)-(\d*)$") {
+            $ctx.Response.StatusCode = 206
+            $ctx.Response.Headers["Content-Range"] = "bytes $start-$end/$length"
+          }
+          $ctx.Response.ContentLength64 = $end - $start + 1
+          if ($ctx.Request.HttpMethod -ne "HEAD") {
+            $stream = [System.IO.File]::OpenRead($path)
+            try {
+              [void]$stream.Seek($start, [System.IO.SeekOrigin]::Begin)
+              $buffer = New-Object byte[] 65536
+              $remaining = $end - $start + 1
+              while ($remaining -gt 0) {
+                $read = $stream.Read($buffer, 0, [int][Math]::Min($buffer.Length, $remaining))
+                if ($read -le 0) { break }
+                $ctx.Response.OutputStream.Write($buffer, 0, $read)
+                $remaining -= $read
+              }
+            } catch [System.Net.HttpListenerException] {
+              # Browsers cancel range requests when they have enough video data.
+            } catch [System.IO.IOException] {
+              # A cancelled or closed media connection should not stop the server.
+            } finally {
+              $stream.Dispose()
+            }
+          }
+        }
+      } else {
+        $bytes = [System.IO.File]::ReadAllBytes($path)
+        $ctx.Response.ContentLength64 = $bytes.Length
+        if ($ctx.Request.HttpMethod -ne "HEAD") {
+          $ctx.Response.OutputStream.Write($bytes, 0, $bytes.Length)
+        }
+      }
     } else {
       $ctx.Response.StatusCode = 404
       $msg = [System.Text.Encoding]::UTF8.GetBytes("404 - no encontrado: $rel")

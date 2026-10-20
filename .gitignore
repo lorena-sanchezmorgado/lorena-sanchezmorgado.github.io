@@ -46,3 +46,8 @@ media/proyectos/*
 # pero fuera del repo, para que no pese de más al subirlo.
 media/proyectos/*/*
 !media/proyectos/*/web-*
+
+# Motion Graphics optimizados que publica la web (posters, previews y vídeos completos)
+!media/multimedia/
+!media/multimedia/*.jpg
+!media/multimedia/*.mp4

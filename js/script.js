@@ -389,20 +389,56 @@ document.addEventListener("DOMContentLoaded", () => {
   const filters = document.querySelectorAll(".proy-filter .filter-item");
   if (!grid || !filters.length) return;
 
-  const catLabel = { marca: "Identidad de marca", packaging: "Packaging", ilustracion: "Ilustración", fotografia: "Fotografía" };
+  const catLabel = { marca: "Identidad de marca", packaging: "Packaging", ilustracion: "Ilustración", fotografia: "Fotografía", audiovisual: "Audiovisual" };
 
   // Pinta las tarjetas. SIN numerar — al filtrar por "Seleccionados" los
   // números saldrían salteados (01, 02, 04, 06...) y quedaba raro.
   grid.innerHTML = PROYECTOS.map(p => `
     <a class="proy-card" draggable="false" href="proyecto.html?p=${p.slug}&cat=${p.cat}&volver=project"
-       data-cat="${p.cat}" data-p="${p.slug}" data-forma="${p.forma || ""}" data-encuadre="${p.encuadre || ""}" data-destacado="${p.destacado ? "1" : "0"}">
+       data-cat="${p.cat}" data-p="${p.slug}" data-forma="${p.forma || ""}" data-encuadre="${p.encuadre || ""}" data-destacado="${p.destacado ? "1" : "0"}" data-preview="${p.preview || ""}">
       <div class="img-wrapper">
+        ${p.preview ? `<video class="proy-preview" muted loop playsinline preload="none" aria-hidden="true"><source src="${p.preview}" type="video/mp4"></video>` : ""}
         <img class="img-grid" src="${p.img}" alt="${p.nombre}" draggable="false" decoding="async">
         <div class="img-overlay"><span>${p.nombre}<br>${catLabel[p.cat] || ""}</span></div>
       </div>
     </a>`).join("");
 
   const cards = Array.from(grid.querySelectorAll(".proy-card"));
+
+  const reducePreviewMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const startPreview = card => {
+    if (reducePreviewMotion || !card.dataset.preview) return;
+    const video = card.querySelector(".proy-preview");
+    const playback = video.play();
+    if (playback) {
+      playback.then(() => card.classList.add("is-playing")).catch(error => {
+        if (error.name !== "NotAllowedError") console.error("No se pudo reproducir la vista previa.", error);
+      });
+    }
+  };
+  const stopPreview = card => {
+    const video = card.querySelector(".proy-preview");
+    if (!video) return;
+    video.pause();
+    video.currentTime = 0;
+    card.classList.remove("is-playing");
+  };
+  grid.addEventListener("pointerover", event => {
+    const card = event.target.closest(".proy-card[data-preview]");
+    if (card && !card.contains(event.relatedTarget) && event.pointerType !== "touch") startPreview(card);
+  });
+  grid.addEventListener("pointerout", event => {
+    const card = event.target.closest(".proy-card[data-preview]");
+    if (card && !card.contains(event.relatedTarget)) stopPreview(card);
+  });
+  grid.addEventListener("focusin", event => {
+    const card = event.target.closest(".proy-card[data-preview]");
+    if (card) startPreview(card);
+  });
+  grid.addEventListener("focusout", event => {
+    const card = event.target.closest(".proy-card[data-preview]");
+    if (card && !card.contains(event.relatedTarget)) stopPreview(card);
+  });
 
   // El contador del botón "Seleccionados" se calcula solo
   const cuenta = document.querySelector(".proy-filter .filter-count");
@@ -473,9 +509,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const h = Math.round(Hmax * frac);                     // verticales hasta abajo
         const w = c.dataset.encuadre
           ? Math.round(h * arEncuadre)
-          : c.dataset.forma
+          : c.dataset.cat === "audiovisual"
             ? Math.round(h * arNatural)
-            : Math.min(Math.round(h * arNatural), Math.round(Hmax * 1.35));
+            : c.dataset.forma
+              ? Math.round(h * arNatural)
+              : Math.min(Math.round(h * arNatural), Math.round(Hmax * 1.35));
         wrap.style.height = h + "px";
         wrap.style.width = w + "px";
         wrap.style.aspectRatio = "";                           // mandan el alto/ancho explícitos
@@ -1421,6 +1459,43 @@ const PROYECTOS = [
         ]
       }
     ]
+  },
+
+  {
+    id: 13, slug: "dune", nombre: "Dune", disc: "Audiovisual",
+    cat: "audiovisual", img: "media/multimedia/dune-poster.jpg", preview: "media/multimedia/dune-preview.mp4", destacado: false,
+    intro: "Tráiler cinematográfico.",
+    bloques: [
+      { t: "texto", html: "<p>Me apetecía muchísimo hacer un tráiler para Dune 2, pero el primer gran reto fue enfrentarme a una película tan larguísima y caótica para elegir los fragmentos clave. Tenía pánico de meter algún spoiler, así que pasé horas seleccionando con lupa qué escenas enseñar y cuáles guardarme.</p><p>Además, no quería el típico tráiler con música épica de siempre, por eso busqué una canción totalmente fuera de lo común y me costó lo suyo cuadrar cada golpe de audio con los cortes de vídeo para que el ritmo visual fluyera perfecto. Al final, conseguí una pieza cortita pero con un ritmo súper potente.</p>" },
+      { t: "video", src: "media/multimedia/dune.mp4", poster: "media/multimedia/dune-video-poster.jpg", controls: true }
+    ]
+  },
+  {
+    id: 14, slug: "britney-spears-toxic", nombre: "Britney Spears — Toxic", disc: "Audiovisual",
+    cat: "audiovisual", img: "media/multimedia/toxic-poster.jpg", preview: "media/multimedia/toxic-preview.mp4", destacado: false,
+    intro: "Lyric video pop.",
+    bloques: [
+      { t: "texto", html: "<p>Para este lyric video de Toxic me apetecía usar un estilo visual que encajara y recordara mucho la época. Elegí un trozo de la canción y usé una estética de finales de los 2000 que tanto me gusta, mezclando el estilo Frutiger Metro y Vectordelia.</p><p>Lo más complicado fue conseguir que la letra y los elementos visuales fueran exactamente al ritmo de la música.</p><p>Jugué con una paleta de color CMYK súper pop, texturas de puntos digitales, símbolos planos y un montón de ornamentos florales vectoriales. El resultado es un vídeo con un rollo muy juvenil, nostálgico y divertido que le va genial al temazo de Britney.</p>" },
+      { t: "video", src: "media/multimedia/toxic.mp4", poster: "media/multimedia/toxic-video-poster.jpg", controls: true }
+    ]
+  },
+  {
+    id: 15, slug: "pienso-en-tu-mirada", nombre: "Pienso en tu mirada", disc: "Audiovisual",
+    cat: "audiovisual", img: "media/multimedia/pienso-en-tu-mirada-poster.jpg", preview: "media/multimedia/pienso-en-tu-mirada-preview.mp4", destacado: false,
+    intro: "Técnicas mixtas.",
+    bloques: [
+      { t: "texto", html: "<p>En este proyecto quería experimentar con técnicas mixtas sobre un fragmento del videoclip de Rosalía.</p><p>Por un lado, hice rotoscopias para dejar todo el fondo en blanco y negro y aislar solo el color rojo. Por otro, me puse a pintar encima de los fotogramas en la tablet, animando frame a frame. Pero quería ir más allá con las texturas asique imprimí partes del vídeo en papel, las pinté a mano con ceras de colores y brillos para buscar texturas orgánicas directas del mundo real, y luego volví a escanearlo todo para meterlo en el montaje final.</p><p>Fue un proceso manual increíble y con un contraste de texturas brutal.</p>" },
+      { t: "video", src: "media/multimedia/pienso-en-tu-mirada.mp4", poster: "media/multimedia/pienso-en-tu-mirada-video-poster.jpg", controls: true }
+    ]
+  },
+  {
+    id: 16, slug: "creditos-coraline", nombre: "Créditos de Coraline", disc: "Audiovisual",
+    cat: "audiovisual", img: "media/multimedia/creditos-coraline-poster.jpg", preview: "media/multimedia/creditos-coraline-preview.mp4", destacado: false,
+    intro: "Créditos ilustrados.",
+    bloques: [
+      { t: "texto", html: "<p>Este ha sido, sin duda, uno de mis proyectos más ambiciosos hasta la fecha. Quería hacer algo diferente, así que me puse a ilustrar a mano en la tablet cada elemento por separado.</p><p> Lo que más tiempo y trabajo me costó fue ponerme a ilustrar absolutamente todo a mano en la tablet, elemento por elemento.. Después, para conseguir la sensación de profundidad, coloqué esas imágenes 2D en un entorno 3D dentro de Premier Pro. Cuadrar las capas y las distancias para lograr ese efecto Parallax fue un proceso de pura prueba y error hasta dar con el resultado exacto. Al final, coordinando la cámara con los efectos y la música, conseguí esa atmósfera tan mágica que buscaba.</p>" },
+      { t: "video", src: "media/multimedia/creditos-coraline.mp4", poster: "media/multimedia/creditos-coraline-video-poster.jpg", controls: true }
+    ]
   }
 
 ];
@@ -1430,7 +1505,8 @@ const CAT_NOMBRES = {
   marca: "Identidad de marca",
   packaging: "PACKAGING",
   ilustracion: "ILUSTRACIÓN",
-  fotografia: "FOTOGRAFÍA"
+  fotografia: "FOTOGRAFÍA",
+  audiovisual: "AUDIOVISUAL"
 };
 
 // FICHA — construye la lista del apartado del que vienes, con el actual en negrita
@@ -1467,7 +1543,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <li class="ficha-item${x.slug === current ? " is-current" : ""}" data-p="${x.slug}" data-img="${x.img}">
       <a href="proyecto.html?p=${x.slug}&cat=${cat}&volver=${origen}">
         <div><h5>${x.nombre}</h5><p>${x.disc}</p></div>
-        <span class="ficha-year">(${x.anio})</span>
+        ${x.anio ? `<span class="ficha-year">(${x.anio})</span>` : ""}
       </a>
     </li>`).join("");
 
@@ -1484,7 +1560,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nameEl = document.querySelector(".ficha-title-name");
     const yearEl = document.querySelector(".ficha-title-year");
     if (nameEl) nameEl.textContent = currentProj.nombre;
-    if (yearEl) yearEl.textContent = "(" + currentProj.anio + ")";
+    if (yearEl) yearEl.textContent = currentProj.anio ? "(" + currentProj.anio + ")" : "";
 
     // Contenido de la derecha (intro + bloques), renderizado desde los datos
     const body = document.querySelector(".ficha-body");
@@ -1525,7 +1601,10 @@ document.addEventListener("DOMContentLoaded", () => {
           // silencio y en bucle cuando entra en pantalla, como un GIF. No carga
           // hasta que hace falta (preload none + el observador de más abajo).
           const poster = b.poster ? ` poster="${b.poster}"` : "";
-          html += `<div class="fb-video reveal"><video src="${b.src}"${poster} muted loop playsinline preload="none"></video></div>`;
+          const controls = b.controls ? " controls" : "";
+          const playback = b.controls ? "" : " muted loop";
+          const preload = b.controls ? "metadata" : "none";
+          html += `<div class="fb-video reveal"><video src="${b.src}"${poster}${controls}${playback} playsinline preload="${preload}"></video></div>`;
         }
       });
       body.innerHTML = html;
@@ -1534,7 +1613,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Los vídeos se reproducen solos (en silencio) cuando están a la vista y
       // se pausan al salir, para no descargar ni decodificar todos a la vez.
-      const vids = body.querySelectorAll(".fb-video video");
+      const vids = body.querySelectorAll(".fb-video video:not([controls])");
       if (vids.length && "IntersectionObserver" in window) {
         const vObs = new IntersectionObserver((ents) => {
           ents.forEach(e => {

@@ -22,7 +22,7 @@ Para parar, cierra la ventana negra.
 
 ---
 
-## 1. Las cuatro páginas
+## 1. Páginas principales
 
 | Archivo | Qué es |
 |---|---|
@@ -30,9 +30,17 @@ Para parar, cierra la ventana negra.
 | `project.html` | PROYECTOS — la rejilla con los filtros |
 | `proyecto.html` | La ficha de un proyecto. **Una sola para todos** |
 | `sobremi.html` | SOBRE MÍ |
+| `pintura.html` | GALERÍA |
+| `historia.html` | Historia personal |
+| `contacto.html` | CONTACTO |
 
 **No se crean archivos nuevos para cada proyecto.** `proyecto.html` se rellena
 sola con los datos de `js/script.js`, según el `?p=` del enlace.
+
+Audiovisual aparece como una categoría de PROYECTOS. Sus piezas se
+configuran en `js/script.js` como los demás proyectos, con la portada, el
+preview y un bloque de vídeo completo. Los archivos optimizados están en
+`media/multimedia/`.
 
 ---
 

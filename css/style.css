@@ -363,6 +363,7 @@ body.nav-open .nav-menu {
 
 .img-overlay {
   position: absolute;
+  z-index: 2;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
@@ -1048,6 +1049,33 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
   object-position: center;
   -webkit-user-drag: none;
   user-select: none;
+}
+
+.proy-grid .proy-card[data-cat="audiovisual"] .img-grid,
+.proy-grid .proy-card[data-cat="audiovisual"] .proy-preview {
+  object-fit: contain;
+}
+
+.proy-grid .proy-preview {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.proy-card.is-playing .proy-preview {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proy-grid .proy-preview {
+    transition: none;
+  }
 }
 
 /* En pantallas bajas (móvil apaisado, etc.) la fila no puede achicarse tanto que
