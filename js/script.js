@@ -358,7 +358,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const setOpen = (open) => {
     document.body.classList.toggle("nav-open", open);
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
-    menu.setAttribute("aria-hidden", open ? "false" : "true");
+    if (open) {
+      menu.setAttribute("aria-hidden", "false");
+      if (closeBtn) closeBtn.focus();
+      return;
+    }
+    if (menu.contains(document.activeElement)) toggle.focus();
+    menu.setAttribute("aria-hidden", "true");
   };
 
   toggle.addEventListener("click", () => setOpen(true));
