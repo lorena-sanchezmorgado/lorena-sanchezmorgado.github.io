@@ -1490,7 +1490,7 @@ const PROYECTOS = [
     cat: "audiovisual", img: "media/multimedia/pienso-en-tu-mirada-poster.jpg", preview: "media/multimedia/pienso-en-tu-mirada-preview.mp4", destacado: false,
     intro: "Técnicas mixtas.",
     bloques: [
-      { t: "texto", html: "<p>En este proyecto quería experimentar con técnicas mixtas sobre un fragmento del videoclip de Rosalía.</p><p>Por un lado, hice rotoscopias para dejar todo el fondo en blanco y negro y aislar solo el color rojo. Por otro, me puse a pintar encima de los fotogramas en la tablet, animando frame a frame. Pero quería ir más allá con las texturas asique imprimí partes del vídeo en papel, las pinté a mano con ceras de colores y brillos para buscar texturas orgánicas directas del mundo real, y luego volví a escanearlo todo para meterlo en el montaje final.</p><p>Fue un proceso manual increíble y con un contraste de texturas brutal.</p>" },
+      { t: "texto", html: "<p>En este proyecto quería experimentar con técnicas mixtas sobre un fragmento del videoclip de Rosalía.</p><p>Por un lado, hice rotoscopias para dejar todo el fondo en blanco y negro y aislar solo el color rojo. Por otro, me puse a pintar encima de los fotogramas en la tablet, animando frame a frame. Pero quería ir más allá con las texturas así que imprimí partes del vídeo en papel, las pinté a mano con ceras de colores y brillos para buscar texturas orgánicas directas del mundo real, y luego volví a escanearlo todo para meterlo en el montaje final.</p><p>Fue un proceso manual increíble y con un contraste de texturas brutal.</p>" },
       { t: "video", src: "media/multimedia/pienso-en-tu-mirada.mp4", poster: "media/multimedia/pienso-en-tu-mirada-video-poster.jpg", controls: true }
     ]
   },
@@ -1499,7 +1499,7 @@ const PROYECTOS = [
     cat: "audiovisual", img: "media/multimedia/creditos-coraline-poster.jpg", preview: "media/multimedia/creditos-coraline-preview.mp4", destacado: false,
     intro: "Créditos ilustrados.",
     bloques: [
-      { t: "texto", html: "<p>Este ha sido, sin duda, uno de mis proyectos más ambiciosos hasta la fecha. Quería hacer algo diferente, así que me puse a ilustrar a mano en la tablet cada elemento por separado.</p><p> Lo que más tiempo y trabajo me costó fue ponerme a ilustrar absolutamente todo a mano en la tablet, elemento por elemento.. Después, para conseguir la sensación de profundidad, coloqué esas imágenes 2D en un entorno 3D dentro de Premier Pro. Cuadrar las capas y las distancias para lograr ese efecto Parallax fue un proceso de pura prueba y error hasta dar con el resultado exacto. Al final, coordinando la cámara con los efectos y la música, conseguí esa atmósfera tan mágica que buscaba.</p>" },
+      { t: "texto", html: "<p>Este ha sido, sin duda, uno de mis proyectos más ambiciosos hasta la fecha. Quería hacer algo diferente, así que me puse a ilustrar a mano en la tablet cada elemento por separado.</p><p> Lo que más tiempo y trabajo me costó fue ponerme a ilustrar absolutamente todo a mano en la tablet, elemento por elemento. Después, para conseguir la sensación de profundidad, coloqué esas imágenes 2D en un entorno 3D dentro de Premier Pro. Cuadrar las capas y las distancias para lograr ese efecto Parallax fue un proceso de pura prueba y error hasta dar con el resultado exacto. Al final, coordinando la cámara con los efectos y la música, conseguí esa atmósfera tan mágica que buscaba.</p>" },
       { t: "video", src: "media/multimedia/creditos-coraline.mp4", poster: "media/multimedia/creditos-coraline-video-poster.jpg", controls: true }
     ]
   }
