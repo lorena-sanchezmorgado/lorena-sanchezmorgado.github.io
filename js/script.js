@@ -607,12 +607,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Mantiene el scroll dentro de las copias laterales; el juego original queda
-    // centrado para poder arrastrar en ambos sentidos antes de envolver.
+    // Mantiene el juego original como punto de referencia y envuelve en un solo
+    // ciclo, usando las copias contiguas para que no aparezca un hueco al reiniciar.
     function envolver(sl) {
       if (!setW) return Math.max(0, sl);
-      const periodo = setW * 2;
-      return ((sl % periodo) + periodo) % periodo;
+      return ((sl % setW) + setW) % setW + setW;
     }
 
     // La rueda y el trackpad desplazan de forma nativa, fuera de envolver().
