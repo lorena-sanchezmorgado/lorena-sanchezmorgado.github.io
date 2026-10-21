@@ -1288,7 +1288,7 @@ const PROYECTOS = [
 
   {
     id: 10, slug: "twin-peaks", nombre: "Twin Peaks", anio: "2025", disc: "Editorial, Fotografía, Dirección de arte",
-    cat: "fotografia", img: "media/proyectos/twin-peaks/web-mockup-05.jpg", destacado: true,
+    cat: "fotografia", img: "media/proyectos/twin-peaks/web-mockup-05.jpg", destacado: false,
     intro: "Serie de bodegones que trascienden lo cotidiano,<em>Twin Peaks</em> y al universo inquietante de David Lynch, llevada a las páginas de la revista Aperture.",
     bloques: [
       // -- PROBLEMA --
@@ -1350,7 +1350,7 @@ const PROYECTOS = [
 
   {
     id: 11, slug: "dicho-y-hecho", nombre: "Dicho y hecho", anio: "2025", disc: "Editorial, Dirección de arte",
-    cat: "marca", img: "media/proyectos/dicho-y-hecho/web-final.png", destacado: false,
+    cat: "marca", img: "media/proyectos/dicho-y-hecho/web-final.png", destacado: true,
     intro: "Una revista que rescata los refranes de siempre y los reinterpreta. Un proyecto en equipo donde la cultura popular se cruza con el diseño editorial.",
     bloques: [
       // -- CONTEXTO / CONCEPTO --
@@ -1400,7 +1400,7 @@ const PROYECTOS = [
   {
     id: 12, slug: "los-americanos", nombre: "Los Americanos", anio: "2025", disc: "Editorial, Dirección de arte",
     forma: "vertical", encuadre: 1.15,
-    cat: "marca", img: "media/proyectos/los-americanos/web-ticket-02.jpg", destacado: true,
+    cat: "marca", img: "media/proyectos/los-americanos/web-ticket-02.jpg", destacado: false,
     intro: "Identidad para <em>Ojos de una Nación</em>, la exposición que trae a la fundación MOP el mítico fotolibro de Robert Frank. Una nación entera contada a través de una mirada extranjera.",
     bloques: [
       // -- PROBLEMA --
@@ -1496,7 +1496,7 @@ const PROYECTOS = [
   },
   {
     id: 16, slug: "creditos-coraline", nombre: "Créditos de Coraline", disc: "Audiovisual",
-    cat: "audiovisual", img: "media/multimedia/creditos-coraline-poster.jpg", preview: "media/multimedia/creditos-coraline-preview.mp4", destacado: false,
+    cat: "audiovisual", img: "media/multimedia/creditos-coraline-poster.jpg", preview: "media/multimedia/creditos-coraline-preview.mp4", destacado: true,
     intro: "Créditos ilustrados.",
     bloques: [
       { t: "texto", html: "<p>Este ha sido, sin duda, uno de mis proyectos más ambiciosos hasta la fecha. Quería hacer algo diferente, así que me puse a ilustrar a mano en la tablet cada elemento por separado.</p><p> Lo que más tiempo y trabajo me costó fue ponerme a ilustrar absolutamente todo a mano en la tablet, elemento por elemento. Después, para conseguir la sensación de profundidad, coloqué esas imágenes 2D en un entorno 3D dentro de Premier Pro. Cuadrar las capas y las distancias para lograr ese efecto Parallax fue un proceso de pura prueba y error hasta dar con el resultado exacto. Al final, coordinando la cámara con los efectos y la música, conseguí esa atmósfera tan mágica que buscaba.</p>" },
