@@ -937,7 +937,7 @@ body.show-scrollcue .cursor-scroll { opacity: 1; }
 .proyectos {
   /* Ocupa la primera pantalla completa: cabecera + filtros arriba y el carrusel
      rellenando todo el alto que queda. El pie queda JUSTO debajo del borde, así
-     que aparece al hacer scroll. El hueco de abajo deja respirar a MADRID, SP. */
+     que aparece al hacer scroll. El hueco de abajo deja respirar a MADRID, ES. */
   padding: calc(var(--nav-h) + 1.4rem) var(--gutter) 4.5rem;   /* hueco arriba (nav) y abajo (baseline) */
   height: 100vh;
   height: 100svh;              /* alto DEFINIDO: así el 100% de alto de las fotos resuelve */

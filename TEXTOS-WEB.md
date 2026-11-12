@@ -13,7 +13,7 @@ PROYECTOS    ARCHIVO    SOBRE MÍ
 
 **Botón de menú (móvil):** `MENÚ` / `CERRAR`
 
-**Pie de página:** `MADRID, SP` — `2026 ©`
+**Pie de página:** `MADRID, ES` — `2026 ©`
 
 **Toggle del archivo:** `VISTA LIBRE` / `VISTA CUADRÍCULA`
 *(traducción de EXPERIENCE VIEW / GRID VIEW)*
