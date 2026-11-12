@@ -172,7 +172,7 @@ Cuando la pantalla se hace pequeña (**≤1100px**) el navbar se colapsa:
 
 ---
 
-## 8. Footer (MADRID, ES / 2026 ©)
+## 8. Footer (MADRID, ES / © 2026)
 
 - **SOBRE MÍ (escritorio)**: footer **fijo** abajo del todo.
 - **SOBRE MÍ (móvil ≤900px)**: como las fotos se apilan arriba, el footer **deja de ser

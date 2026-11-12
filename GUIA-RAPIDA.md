@@ -225,7 +225,7 @@ Funciona solo, no hay que marcar nada en las fotos.
 | Título y descripción de PROYECTOS | `project.html`, bloque `proy-head` |
 | Frase del centro del ARCHIVO | `index.html`, `archivo-center-text` |
 | Bio y redes del footer morado | `project.html` y `proyecto.html`, bloque `foot-card` |
-| MADRID, ES / 2026 © | al final de cada página, `site-baseline` |
+| MADRID, ES / © 2026 | al final de cada página, `site-baseline` |
 
 ### El texto de SOBRE MÍ
 
@@ -289,7 +289,7 @@ todos los números que puedes tocar:
   con la mejor: la que cae más lejos de las demás y sin otra foto del mismo
   proyecto al lado (dos del mismo trabajo se parecen y juntas cantan).
 - **Dónde NO se ponen** → en la franja del menú de arriba y en la de
-  MADRID, ES / 2026 ©, para que al entrar se lean limpios. Si arrastras sí
+  MADRID, ES / © 2026, para que al entrar se lean limpios. Si arrastras sí
   pasan fotos por detrás, y por eso esos rótulos llevan un **halo difuminado**
   de color papel (está en el CSS, busca `HALO`) que los hace legibles encima de
   cualquier imagen. Si lo quieres más marcado, sube los píxeles de los
